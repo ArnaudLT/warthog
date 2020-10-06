@@ -1,0 +1,9 @@
+=> Improve log management (NamedDataset)
+=> Need a way to load a directory (for parquet files)
+=> Improve Select panel :
+    => Something to (un)select all the column at once
+=> Improve Where panel :
+    => Add multiple criteria per attribut
+    => Add more functions (contains, ...)
+=> Implement a Partition By (for the output file)
+=> Drag and drop pour l'import de dataset

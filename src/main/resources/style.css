@@ -1,0 +1,5 @@
+.tab-pane {
+    -fx-tab-max-height: 25px;
+    -fx-tab-min-height: 25px;
+}
+
