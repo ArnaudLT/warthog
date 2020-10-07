@@ -49,9 +49,7 @@ public class TransformPane {
                 }
             }
         });
-
         this.namedDatasetToTab = new ConcurrentHashMap<>();
-
         this.namedDatasetsTabPane.setPrefWidth(1080);
         return this.namedDatasetsTabPane;
     }
@@ -72,6 +70,17 @@ public class TransformPane {
             tab = this.namedDatasetToTab.get(namedDataset);
         }
         this.namedDatasetsTabPane.getSelectionModel().select(tab);
+    }
+
+
+    public void closeNamedDataset(NamedDataset namedDataset) {
+
+        NamedDatasetTab namedDatasetTab = this.namedDatasetToTab.get(namedDataset);
+        if (namedDatasetTab != null) {
+
+            this.namedDatasetsTabPane.getTabs().remove(namedDatasetTab);
+        }
+        this.namedDatasetToTab.remove(namedDataset);
     }
 
 

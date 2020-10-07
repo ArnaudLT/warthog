@@ -19,6 +19,13 @@ class NamedDatasetManagerTest {
 
 
     @Test
+    void nestedColumnTest() {
+
+
+    }
+
+
+    @Test
     void createNamedDataset() {
 
         File file = new File("src/test/resources/covid19-sample.csv");
@@ -29,6 +36,7 @@ class NamedDatasetManagerTest {
         Catalog catalog = namedDataset.getCatalog();
         assertEquals(7, catalog.getColumns().size());
     }
+
 
     @Test
     void registerNamedDataset() {

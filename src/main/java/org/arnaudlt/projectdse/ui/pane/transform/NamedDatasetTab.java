@@ -162,7 +162,7 @@ public class NamedDatasetTab extends Tab  {
         int i=2;
         for (WhereNamedColumn wnc : namedDataset.getTransformation().getWhereNamedColumns()) {
 
-            grid.add(new Label(wnc.getName() + " (" + wnc.getType() + ")"), 1, i);
+            grid.add(new Label(wnc.getName() + " - " + wnc.getType()), 1, i);
 
             ComboBox<String> operator = new ComboBox<>();
             operator.getItems().add("");

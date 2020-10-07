@@ -33,6 +33,7 @@ public class NamedDatasetManager {
 
     private final ConcurrentMap<Integer, NamedDataset> namedDatasets;
 
+    // TODO can we find a better way ? (tracking with an observable the content of the namedDatasets map)
     private final ObservableList<NamedDataset> observableNamedDatasets;
 
 

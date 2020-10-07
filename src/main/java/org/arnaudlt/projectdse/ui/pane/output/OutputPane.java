@@ -28,9 +28,7 @@ public class OutputPane {
         this.outputText = new TextArea();
         Tab outputTab = new Tab("Overview", outputText);
 
-        Tab logTab = new Tab("Log", CustomLogAppender.getLogArea());
-
-        TabPane tabPane = new TabPane(outputTab, logTab);
+        TabPane tabPane = new TabPane(outputTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         return tabPane;
     }

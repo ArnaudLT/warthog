@@ -21,6 +21,7 @@ import org.arnaudlt.projectdse.model.dataset.NamedDatasetManager;
 import org.arnaudlt.projectdse.ui.pane.transform.TransformPane;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -79,9 +80,10 @@ public class ExplorerPane {
         Button importFolderButton = new Button("Import _Parquet", new MDL2IconFont("\uED25"));
         importFolderButton.setOnAction(this.requestImportFolder);
 
-        Button createButton = new Button("_Delete", new MDL2IconFont("\uE74D"));
+        Button deleteButton = new Button("_Delete", new MDL2IconFont("\uE74D"));
+        deleteButton.setOnAction(this.requestDelete);
 
-        return new HBox(2, importButton, importFolderButton, createButton);
+        return new HBox(2, importButton, importFolderButton, deleteButton);
     }
 
 
@@ -138,6 +140,26 @@ public class ExplorerPane {
             importService.setExecutor(this.poolService.getExecutor());
             importService.start();
 
+        }
+    };
+
+
+    private final EventHandler<ActionEvent> requestDelete = actionEvent -> {
+
+        ObservableList<TreeItem<NamedDatasetItem>> selectedItems = this.treeExplorer.getSelectionModel().getSelectedItems();
+        // TODO better solution ? Need a non observable copy to avoid NPE during the for loop
+        List<TreeItem<NamedDatasetItem>> selectedItemsCopy = new ArrayList<>(selectedItems);
+        for (TreeItem<NamedDatasetItem> selectedItem : selectedItemsCopy) {
+
+            if (selectedItem == null) continue;
+            if (selectedItem.getParent() != null && selectedItem.getParent() != this.treeExplorer.getRoot()) {
+                selectedItem = selectedItem.getParent();
+            }
+            NamedDataset selectedNamedDataset = selectedItem.getValue().getNamedDataset();
+            log.info("Request to close named dataset {}", selectedNamedDataset.getName());
+            this.transformPane.closeNamedDataset(selectedNamedDataset);
+            this.treeExplorer.getRoot().getChildren().remove(selectedItem);
+            this.namedDatasetManager.deregisterNamedDataset(selectedNamedDataset);
         }
     };
 
