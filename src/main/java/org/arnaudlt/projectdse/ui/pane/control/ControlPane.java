@@ -95,7 +95,10 @@ public class ControlPane {
             NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
             if (selectedNamedDataset == null) return;
             NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
-            overviewService.setOnSucceeded(success -> this.outputPane.fillOutput(overviewService.getValue()));
+            overviewService.setOnSucceeded(success -> {
+                this.outputPane.fillOutput(overviewService.getValue());
+                this.outputPane.fillSecret(overviewService.getValue());}
+            );
             overviewService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "overview"));
             overviewService.setExecutor(poolService.getExecutor());
             overviewService.start();

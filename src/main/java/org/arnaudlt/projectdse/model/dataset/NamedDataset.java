@@ -358,6 +358,13 @@ public class NamedDataset {
     }
 
 
+    public List<Row> generateRowOverview() {
+
+        Dataset<Row> output = applyTransformation();
+        return output.takeAsList(100);
+    }
+
+
     public List<String> generateOverview() {
 
         Dataset<Row> output = applyTransformation();
@@ -365,9 +372,8 @@ public class NamedDataset {
         String separator = this.getDecoration().getSeparator();
 
         List<String> strings = output
-                .limit(100)
                 .map((MapFunction<Row, String>) row -> row.mkString(separator), Encoders.STRING())
-                .collectAsList();
+                .takeAsList(100);
 
         String header = Arrays.stream(output.schema().fields())
                 .map(StructField::name)
