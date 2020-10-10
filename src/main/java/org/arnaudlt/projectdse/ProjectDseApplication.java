@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ProjectDseApplication {
 
     public static void main(String[] args) {
+
         Application.launch(ProjectDseFXApplication.class, args);
     }
 }

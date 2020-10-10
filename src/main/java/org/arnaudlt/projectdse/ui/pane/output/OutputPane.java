@@ -54,6 +54,7 @@ public class OutputPane {
     public void fillOutput(List<Row> rows) {
 
         if (rows == null || rows.isEmpty()) {
+
             this.outputText.setText("No result !");
         } else {
 

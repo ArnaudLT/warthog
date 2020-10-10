@@ -14,9 +14,10 @@ public class SparkInstance {
 
         return SparkSession
                 .builder()
+                .appName("project-blt")
                 .master("local[4]")
                 .config("spark.ui.enabled", false)
-                .appName("project-blt")
+                .enableHiveSupport()
                 .getOrCreate();
     }
 }

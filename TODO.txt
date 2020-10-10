@@ -1,9 +1,15 @@
-=> Improve log management (NamedDataset)
-=> Need a way to load a directory (for parquet files)
-=> Improve Select panel :
-    => Something to (un)select all the column at once
+=> Improve log management (NamedDataset) / logs are lost in Service (thread) :-)
+=> Improve the dataset manipulation :
+    => Something to (un)select all the column at once...
 => Improve Where panel :
     => Add multiple criteria per attribut
-    => Add more functions (contains, ...)
 => Implement a Partition By (for the output file)
 => Drag and drop pour l'import de dataset
+=> Read nested columns
+=> Deploy :
+    => -Dhadoop.home.dir=C:\Users\Arnaud\software\winutils
+    => How to handle the binary : \bin\winutils.exe
+=> enableHiveSupport on SparkSession  :
+    => String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
+    => .config("spark.sql.warehouse.dir", warehouseLocation) /
+    => How to handle command : \bin\winutils.exe chmod 777 \tmp\hive

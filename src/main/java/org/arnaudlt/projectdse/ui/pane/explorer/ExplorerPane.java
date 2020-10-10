@@ -130,7 +130,6 @@ public class ExplorerPane {
     private final EventHandler<ActionEvent> requestImportFolder = actionEvent -> {
 
         DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setInitialDirectory(new File("C:\\Users\\Arnaud\\Downloads"));
         File file = chooser.showDialog(this.getStage());
         if (file != null) {
 

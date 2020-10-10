@@ -1,20 +1,21 @@
 package org.arnaudlt.projectdse.model.dataset;
 
-import org.apache.spark.api.java.function.MapFunction;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.projectdse.model.dataset.transformation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.apache.spark.sql.functions.col;
 
+
+@Slf4j
 public class NamedDataset {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NamedDataset.class);
 
     private final int id;
 
@@ -90,6 +91,31 @@ public class NamedDataset {
         return name + " (" + id + ")";
     }
 
+
+    protected Dataset<Row> applyTransformation() {
+
+        Dataset<Row> output = applyWhere(this.dataset);
+        output = applySelect(output);
+        output = applyGroupBy(output);
+        output = applySort(output);
+        output = removeInternalAlias(output);
+        output = dropUnselected(output); // drop unselected columns but present in the group by.
+
+        return output;
+    }
+
+
+    private Dataset<Row> applyWhere(Dataset<Row> in) {
+
+        Dataset<Row> out = in;
+        for (WhereNamedColumn wnc : this.transformation.getWhereNamedColumns()) {
+
+            out = applyOneWhereNamedClause(out, wnc);
+        }
+        return out;
+    }
+
+
     private Dataset<Row> applySelect(Dataset<Row> in) {
 
         return in.select(this.transformation.getSelectNamedColumns().stream()
@@ -130,59 +156,52 @@ public class NamedDataset {
     }
 
 
-    private Column applyOneAggregateOperator(Column column, SelectNamedColumn snc) {
+    private Dataset<Row> applySort(Dataset<Row> output) {
 
-        AggregateOperator aggregateOperator = AggregateOperator.valueFromOperatorName(snc.getAggregateOperator());
+        List<SelectNamedColumn> sortedColumns = this.getTransformation().getSelectNamedColumns().stream()
+                .filter(snc -> snc.isSelected() && iAValidSort(snc.getSortType(), snc.getSortRank()))
+                .sorted(Comparator.comparingInt(snc -> Integer.parseInt(snc.getSortRank().trim())))
+                .collect(Collectors.toList());
 
-        if (aggregateOperator == null) {
+        if (!sortedColumns.isEmpty()) {
 
-            LOGGER.info("No valid aggregate operator ({}) on column {}", snc.getAggregateOperator(), snc.getName());
-            return column;
+            Column[] sort = sortedColumns.stream()
+                    .map(this::applyOneSort)
+                    .toArray(Column[]::new);
+            output = output.sort(sort);
         }
 
-        Column columnResult = column;
-        switch (aggregateOperator) {
-
-            case COUNT:
-                columnResult = functions.count(column);
-                break;
-            case COUNT_DISTINCT:
-                columnResult = functions.countDistinct(column);
-                break;
-            case SUM:
-                columnResult = functions.sum(column);
-                break;
-            case SUM_DISTINCT:
-                columnResult = functions.sumDistinct(column);
-                break;
-            case MIN:
-                columnResult = functions.min(column);
-                break;
-            case MAX:
-                columnResult = functions.max(column);
-                break;
-            case MEAN:
-                columnResult = functions.mean(column);
-                break;
-            default:
-                LOGGER.error("Aggregate operator {} is not yet implemented", aggregateOperator);
-        }
-        snc.setAlias(columnResult.toString() + "#agg_" + snc.getId());
-        return columnResult.alias(snc.getAlias());
+        return output;
     }
 
 
-    private Dataset<Row> applyWhere(Dataset<Row> in) {
+    private Dataset<Row> removeInternalAlias(Dataset<Row> output) {
 
-        Dataset<Row> out = in;
-        for (WhereNamedColumn wnc : this.transformation.getWhereNamedColumns()) {
+        for (SelectNamedColumn snc : this.getTransformation().getSelectNamedColumns()) {
 
-            out = applyOneWhereNamedClause(out, wnc);
+            if (snc.getAlias() == null || snc.getAlias().isEmpty()) continue;
+
+            // TODO not correct and risky (if #agg_12 is a part of the column name !! :-) ). Should replace only the last
+            String withoutInternalAlias = snc.getAlias().replace("#agg_" + snc.getId(), "");
+            output = output.withColumnRenamed(snc.getAlias(), withoutInternalAlias);
         }
-        return out;
+        return output;
     }
 
 
+    private Dataset<Row> dropUnselected(Dataset<Row> output) {
+
+        String[] toRemove = this.transformation.getSelectNamedColumns().stream()
+                .filter(snc -> !snc.isSelected())
+                .map(NamedColumn::getName)
+                .toArray(String[]::new);
+
+        return output.drop(toRemove);
+    }
+
+
+
+    // WHERE APPLY
     private Dataset<Row> applyOneWhereNamedClause(Dataset<Row> in, WhereNamedColumn wnc) {
 
         String columnNameString = wnc.getName();
@@ -191,15 +210,14 @@ public class NamedDataset {
 
         Dataset<Row> out = in;
 
-        // START VALIDITY CHECK
-        if (!isAValidWhereClause(columnNameString, operatorString, operandString)) {
+        if (!isAValidWhereClause(wnc)) {
             return out;
         }
 
         BooleanOperator booleanOperator = BooleanOperator.valueFromOperatorName(operatorString);
         switch (booleanOperator) {
 
-            // TODO consider column typ and cast operand ?
+            // TODO consider column type and cast operand ?
             case EQ:
                 out = out.where(col(columnNameString).equalTo(operandString));
                 break;
@@ -231,72 +249,85 @@ public class NamedDataset {
                 out = out.where(col(columnNameString).like(operandString));
                 break;
             default:
-                LOGGER.error("Operator {} is not yet implemented", booleanOperator);
+                log.error("Operator {} is not implemented", booleanOperator);
         }
 
         return out;
     }
 
+    // WHERE CHECK
+    private boolean isAValidWhereClause(WhereNamedColumn wnc) {
 
-    private boolean isAValidWhereClause(String columnNameString, String operatorString, String operandString) {
+        String columnNameString = wnc.getName();
+        String operatorString = wnc.getOperator();
+        String operandString = wnc.getOperand();
 
         if (columnNameString == null || columnNameString.isBlank() || operatorString == null || operatorString.isBlank()) {
 
-            LOGGER.info("c1a");
             return false;
         }
 
         BooleanOperator booleanOperator = BooleanOperator.valueFromOperatorName(operatorString);
         if (booleanOperator == null) {
 
-            LOGGER.warn("Unknown operator {} used on column {}", operatorString, columnNameString);
             return false;
         }
 
         if (booleanOperator.getArity() == 2 && (operandString == null || operandString.isBlank())) {
 
-            LOGGER.warn("Missing operand in restriction {} {} ?", columnNameString, booleanOperator);
+            log.warn("Missing operand in restriction {} {} ?", columnNameString, booleanOperator);
             return false;
         }
 
+        log.info("Where clause : {} {} {}", columnNameString, operatorString, operandString);
         return true;
     }
 
 
-    // Remove the alias given to the agg columns
-    private Dataset<Row> removeInternalAlias(Dataset<Row> output) {
+    // AGG APPLY
+    private Column applyOneAggregateOperator(Column column, SelectNamedColumn snc) {
 
-        for (SelectNamedColumn snc : this.getTransformation().getSelectNamedColumns()) {
+        AggregateOperator aggregateOperator = AggregateOperator.valueFromOperatorName(snc.getAggregateOperator());
 
-            if (snc.getAlias() == null || snc.getAlias().isEmpty()) continue;
+        if (aggregateOperator == null) {
 
-            // TODO not correct and risky (image a world where #agg_12 is a part of the column name !! :-) )
-            String withoutInternalAlias = snc.getAlias().replace("#agg_" + snc.getId(), "");
-            output = output.withColumnRenamed(snc.getAlias(), withoutInternalAlias);
+            log.info("No valid aggregate operator ({}) on column {}", snc.getAggregateOperator(), snc.getName());
+            return column;
         }
-        return output;
+
+        Column columnResult = column;
+        switch (aggregateOperator) {
+
+            case COUNT:
+                columnResult = functions.count(column);
+                break;
+            case COUNT_DISTINCT:
+                columnResult = functions.countDistinct(column);
+                break;
+            case SUM:
+                columnResult = functions.sum(column);
+                break;
+            case SUM_DISTINCT:
+                columnResult = functions.sumDistinct(column);
+                break;
+            case MIN:
+                columnResult = functions.min(column);
+                break;
+            case MAX:
+                columnResult = functions.max(column);
+                break;
+            case MEAN:
+                columnResult = functions.mean(column);
+                break;
+            default:
+                log.error("Aggregate operator {} is not yet implemented", aggregateOperator);
+        }
+        snc.setAlias(columnResult.toString() + "#agg_" + snc.getId());
+        return columnResult.alias(snc.getAlias());
     }
 
 
-    private Dataset<Row> applySort(Dataset<Row> output) {
-
-        List<SelectNamedColumn> sortedColumns = this.getTransformation().getSelectNamedColumns().stream()
-                .filter(snc -> snc.isSelected() && iAValidSort(snc.getSortType(), snc.getSortRank()))
-                .sorted(Comparator.comparingInt(snc -> Integer.parseInt(snc.getSortRank().trim())))
-                .collect(Collectors.toList());
-
-        if (!sortedColumns.isEmpty()) {
-
-            Column[] sort = sortedColumns.stream()
-                    .map(this::applyOneSort)
-                    .toArray(Column[]::new);
-            output = output.sort(sort);
-        }
-
-        return output;
-    }
-
-
+    // SORT APPLY
     private Column applyOneSort(SelectNamedColumn snc) {
 
         Column sortColumn;
@@ -316,7 +347,7 @@ public class NamedDataset {
         return sortColumn;
     }
 
-
+    // SORT CHECK
     private boolean iAValidSort(String sortTypeString, String sortRankString) {
 
         if (SortType.valueFromSortTypeName(sortTypeString) == null) {
@@ -333,57 +364,15 @@ public class NamedDataset {
     }
 
 
-    protected Dataset<Row> applyTransformation() {
-
-        Dataset<Row> output = applyWhere(this.dataset);
-        output = applySelect(output);
-        output = applyGroupBy(output);
-        output = applySort(output);
-        output = removeInternalAlias(output);
-        output = dropUnselected(output); // drop unselected columns but present in the group by.
-
-        return output;
-    }
-
-
-    // Handle all the columns part of the group by, but not selected by the user.
-    private Dataset<Row> dropUnselected(Dataset<Row> output) {
-
-        String[] toRemove = this.transformation.getSelectNamedColumns().stream()
-                .filter(snc -> !snc.isSelected())
-                .map(NamedColumn::getName)
-                .toArray(String[]::new);
-
-        return output.drop(toRemove);
-    }
+    // ###################################################################
+    // ######################### OUTPUT ##################################
+    // ###################################################################
 
 
     public List<Row> generateRowOverview() {
 
         Dataset<Row> output = applyTransformation();
         return output.takeAsList(100);
-    }
-
-
-    public List<String> generateOverview() {
-
-        Dataset<Row> output = applyTransformation();
-
-        String separator = this.getDecoration().getSeparator();
-
-        List<String> strings = output
-                .map((MapFunction<Row, String>) row -> row.mkString(separator), Encoders.STRING())
-                .takeAsList(100);
-
-        String header = Arrays.stream(output.schema().fields())
-                .map(StructField::name)
-                .collect(Collectors.joining(separator));
-
-        ArrayList<String> overview = new ArrayList<>();
-        overview.add(header);
-        overview.addAll(strings);
-
-        return overview;
     }
 
 
