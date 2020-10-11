@@ -197,42 +197,50 @@ public class NamedDatasetTab extends Tab  {
         grid.add(new Label("Column"), 5, 1);
 
         // Available Dataset
-        ComboBox<NamedDataset> availableDataset = new ComboBox<>();
-        availableDataset.setItems(namedDatasetManager.getObservableNamedDatasets());
-        grid.add(availableDataset, 1, 2);
+        ComboBox<NamedDataset> datasetToJoin = new ComboBox<>();
+        datasetToJoin.setItems(namedDatasetManager.getObservableNamedDatasets());
+        namedDataset.getTransformation().getJoin().setDatasetToJoin(datasetToJoin.valueProperty());
+        grid.add(datasetToJoin, 1, 2);
 
         // Join Type
         ComboBox<String> joinType = new ComboBox<>(
                 FXCollections.observableArrayList("inner", "left", "right", "outer", "cross"));
+        namedDataset.getTransformation().getJoin().setJoinType(StringBinding.stringExpression(joinType.valueProperty()));
         grid.add(joinType, 2, 2);
 
         // Column from current dataset
-        ComboBox<String> columnsForBase = new ComboBox<>();
+        ComboBox<NamedColumn> leftColumn = new ComboBox<>();
         for (NamedColumn nc : namedDataset.getCatalog().getColumns()) {
 
-            columnsForBase.getItems().add(nc.getName() + " - " + nc.getType());
+            leftColumn.getItems().add(nc);
         }
-        grid.add(columnsForBase, 3, 2);
+        namedDataset.getTransformation().getJoin().setLeftColumn(leftColumn.valueProperty());
+        grid.add(leftColumn, 3, 2);
 
         // Operator
-        grid.add(new Label(" == "), 4, 2);
+        grid.add(new Label("="), 4, 2);
 
         // Column from selected available dataset
-        ComboBox<NamedColumn> columnsForNew = new ComboBox<>();
-        columnsForNew.itemsProperty().bind(Bindings.createObjectBinding(() -> {
+        ComboBox<NamedColumn> rightColumn = new ComboBox<>();
+        rightColumn.itemsProperty().bind(Bindings.createObjectBinding(() -> {
 
-                    NamedDataset selectedNamedDataset = availableDataset.getValue();
+                    NamedDataset selectedNamedDataset = datasetToJoin.getValue();
                     ObservableList<NamedColumn> toReturn;
                     if (selectedNamedDataset == null) {
                         toReturn = FXCollections.emptyObservableList();
                     } else {
-                        toReturn = FXCollections.observableArrayList(new ArrayList<>(availableDataset.getValue().getCatalog().getColumns()));
+                        toReturn = FXCollections.observableArrayList(new ArrayList<>(datasetToJoin.getValue().getCatalog().getColumns()));
                     }
                     return toReturn;
-            }, availableDataset.valueProperty()
+            }, datasetToJoin.valueProperty()
         ));
+        namedDataset.getTransformation().getJoin().setRightColumn(rightColumn.valueProperty());
+        grid.add(rightColumn, 5, 2);
 
-        grid.add(columnsForNew, 5, 2);
+        Button activeJoin = new Button("Go !");
+        activeJoin.setOnAction(event -> log.info("Activate Join ! {}", namedDataset));
+
+        grid.add(activeJoin, 1, 3);
 
         ScrollPane scrollPane = new ScrollPane(grid);
         return new Tab("Join", scrollPane);

@@ -6,6 +6,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructField;
+import org.arnaudlt.projectdse.model.dataset.transformation.Join;
 import org.arnaudlt.projectdse.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.projectdse.model.dataset.transformation.WhereNamedColumn;
 import org.arnaudlt.projectdse.model.exception.ProcessingException;
@@ -90,7 +91,9 @@ public class NamedDatasetManager {
                     .map(nc -> new WhereNamedColumn(nc.getId(), nc.getName(), nc.getType()))
                     .collect(Collectors.toList());
 
-            Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns);
+            Join join = new Join();
+
+            Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns, join);
 
             return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
                     name, dataset, catalog, transformation, new Decoration(sizeInMegaBytes, separator));
