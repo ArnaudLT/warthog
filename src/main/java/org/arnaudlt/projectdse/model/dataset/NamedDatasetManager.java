@@ -2,6 +2,7 @@ package org.arnaudlt.projectdse.model.dataset;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,9 +35,6 @@ public class NamedDatasetManager {
 
     private final UniqueIdGenerator uniqueIdGenerator;
 
-    private final ConcurrentMap<Integer, NamedDataset> namedDatasets;
-
-    // TODO can we find a better way ? (tracking with an observable the content of the namedDatasets map)
     private final ObservableList<NamedDataset> observableNamedDatasets;
 
 
@@ -43,8 +43,7 @@ public class NamedDatasetManager {
 
         this.spark = spark;
         this.uniqueIdGenerator = uniqueIdGenerator;
-        this.namedDatasets = new ConcurrentHashMap<>();
-        this.observableNamedDatasets = FXCollections.observableArrayList();
+        this.observableNamedDatasets = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
     }
 
 
@@ -110,13 +109,12 @@ public class NamedDatasetManager {
         if (namedDataset == null) {
 
             throw new ProcessingException("Cannot register a null named dataset");
-        } else if (this.namedDatasets.containsKey(namedDataset.getId())) {
+        } else if (this.observableNamedDatasets.contains(namedDataset)) {
 
             throw new ProcessingException(String.format("A named dataset has already been registered with the same name; unable to add %s",
                     namedDataset.getName()));
         } else {
 
-            this.namedDatasets.put(namedDataset.getId(), namedDataset);
             this.observableNamedDatasets.add(namedDataset);
             LOGGER.info("Named dataset {} registered", namedDataset.getName());
         }
@@ -128,9 +126,8 @@ public class NamedDatasetManager {
         if (namedDataset == null) {
 
             throw new ProcessingException("Cannot deregister a null named dataset");
-        } else if (this.namedDatasets.containsKey(namedDataset.getId())) {
+        } else if (this.observableNamedDatasets.contains(namedDataset)) {
 
-            this.namedDatasets.remove(namedDataset.getId());
             this.observableNamedDatasets.remove(namedDataset);
             LOGGER.info("Deregister the named dataset {}", namedDataset.getName());
         } else {
@@ -141,14 +138,7 @@ public class NamedDatasetManager {
     }
 
 
-    public ConcurrentMap<Integer, NamedDataset> getNamedDatasets() {
-
-        return namedDatasets;
-    }
-
-
     public ObservableList<NamedDataset> getObservableNamedDatasets() {
-
         return observableNamedDatasets;
     }
 

@@ -52,7 +52,7 @@ public class ExplorerPane {
         Node buttonsBar = buildButtonsBar();
         this.treeExplorer = buildTreeView();
 
-        VBox vBox = new VBox(2, buttonsBar, treeExplorer);
+        VBox vBox = new VBox(buttonsBar, treeExplorer);
 
         this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
 

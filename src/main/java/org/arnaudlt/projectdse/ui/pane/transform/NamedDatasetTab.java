@@ -42,7 +42,7 @@ public class NamedDatasetTab extends Tab  {
         Tab whereTab = buildWhereTab();
         Tab joinTab = buildJoinTab();
 
-        TabPane transformationTabPane = new TabPane(selectTab, whereTab, joinTab);
+        TabPane transformationTabPane = new TabPane(selectTab, whereTab/*, joinTab*/);
         transformationTabPane.setSide(Side.TOP);
         transformationTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -190,7 +190,7 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.add(new Label("Dataset"), 1, 1);
+        grid.add(new Label("Join With"), 1, 1);
         grid.add(new Label("Type"), 2, 1);
         grid.add(new Label("Column"), 3, 1);
         grid.add(new Label(""), 4, 1);
@@ -238,13 +238,13 @@ public class NamedDatasetTab extends Tab  {
         grid.add(rightColumn, 5, 2);
 
         Button activeJoin = new Button("Go !");
-        activeJoin.setOnAction(event -> log.info("Activate Join ! {}", namedDataset));
 
         grid.add(activeJoin, 1, 3);
 
         ScrollPane scrollPane = new ScrollPane(grid);
         return new Tab("Join", scrollPane);
     }
+
 
 
     public NamedDataset getNamedDataset() {

@@ -96,7 +96,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 
         Scene scene = new Scene(mainPane.build(), 1280, 720);
         String styleSheet = getClass().getResource("/style.css").toExternalForm();
-        stage.setTitle("Project-blt");
+        stage.setTitle("Dataset Explorer");
         stage.getIcons().add(new Image("file:src/main/resources/icon.jpg"));
         stage.setOnCloseRequest(closeApplication);
 

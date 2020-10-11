@@ -1,15 +1,27 @@
+### CODE
 => Improve log management (NamedDataset) / logs are lost in Service (thread) :-)
+
+=> Validate transformation before execution ! (and provide feedback to user)
+
+### FEATURES
 => Improve the dataset manipulation :
     => Something to (un)select all the column at once...
+
 => Improve Where panel :
     => Add multiple criteria per attribut
+
 => Implement a Partition By (for the output file)
+
 => Drag and drop pour l'import de dataset
+
 => Read nested columns
+
 => Deploy :
     => -Dhadoop.home.dir=C:\Users\Arnaud\software\winutils
     => How to handle the binary : \bin\winutils.exe
+
 => enableHiveSupport on SparkSession  :
     => String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
     => .config("spark.sql.warehouse.dir", warehouseLocation) /
     => How to handle command : \bin\winutils.exe chmod 777 \tmp\hive
+

@@ -16,7 +16,7 @@ public class NamedColumn {
     public NamedColumn(int id, String name, String type) {
 
         Objects.requireNonNull(name, "A column name cannot be null");
-        Objects.requireNonNull(name, "A column type cannot be null");
+        Objects.requireNonNull(type, "A column type cannot be null");
         this.name = name;
         this.type = type;
         this.id = id;

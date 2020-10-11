@@ -14,7 +14,7 @@ public class SparkInstance {
 
         return SparkSession
                 .builder()
-                .appName("project-blt")
+                .appName("dataset-explorer")
                 .master("local[4]")
                 .config("spark.ui.enabled", false)
                 .enableHiveSupport()

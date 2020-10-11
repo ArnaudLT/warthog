@@ -94,7 +94,8 @@ public class NamedDataset {
 
     protected Dataset<Row> applyTransformation() {
 
-        Dataset<Row> output = applyWhere(this.dataset);
+        Dataset<Row> output = applyJoin(this.dataset);
+        output = applyWhere(output);
         output = applySelect(output);
         output = applyGroupBy(output);
         output = applySort(output);
@@ -102,6 +103,25 @@ public class NamedDataset {
         output = dropUnselected(output); // drop unselected columns but present in the group by.
 
         return output;
+    }
+
+
+    private Dataset<Row> applyJoin(Dataset<Row> in) {
+
+        Join join = this.getTransformation().getJoin();
+
+        if (join.getDatasetToJoin() == null ||
+            join.getJoinType() == null || join.getJoinType().isEmpty() ||
+            join.getLeftColumn() == null ||
+            join.getRightColumn() == null) {
+
+            log.info("No valid join for dataset {}", this.name);
+            return in;
+        }
+
+        return in.join(join.getDatasetToJoin().getDataset(),
+                col(join.getLeftColumn().getName()).equalTo(col(join.getRightColumn().getName())),
+                join.getJoinType());
     }
 
 
