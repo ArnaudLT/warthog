@@ -6,8 +6,11 @@ import javafx.beans.property.adapter.JavaBeanStringPropertyBuilder;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
@@ -47,12 +50,53 @@ public class OutputPane {
 
         TabPane tabPane = new TabPane(outputTab, secret);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        return tabPane;
+        tabPane.setMaxWidth(Double.MAX_VALUE);
+
+
+        Button settingButton = new Button("", new MDL2IconFont("\uE7FC"));
+        // number of lines in the output. => Dataset<Row> or NamedDataset
+        Button clearButton = new Button("", new MDL2IconFont("\uE74D"));
+        clearButton.setOnAction(event -> clear());
+
+        VBox buttonBar = new VBox(settingButton, clearButton);
+
+        HBox hBox = new HBox(buttonBar, tabPane);
+        tabPane.prefWidthProperty().bind(hBox.widthProperty());
+
+        return hBox;
     }
 
 
-    public void fillOutput(List<Row> rows) {
+    public void clear() {
 
+        this.clearOutput();
+        this.clearSecret();
+    }
+
+
+    protected void clearOutput() {
+
+        this.outputText.setText("");
+    }
+
+
+    protected void clearSecret() {
+
+        this.tableView.getItems().clear();
+        this.tableView.getColumns().clear();
+    }
+
+
+    public void fill(List<Row> rows) {
+
+        fillOutput(rows);
+        fillSecret(rows);
+    }
+
+
+    protected void fillOutput(List<Row> rows) {
+
+        clearOutput();
         if (rows == null || rows.isEmpty()) {
 
             this.outputText.setText("No result !");
@@ -71,11 +115,11 @@ public class OutputPane {
     }
 
 
-    public void fillSecret(List<Row> rows) {
+    protected void fillSecret(List<Row> rows) {
 
+        clearSecret();
         if (rows == null || rows.isEmpty()) return;
-        this.tableView.getItems().clear();
-        this.tableView.getColumns().clear();
+
         for (StructField field : rows.get(0).schema().fields()) {
 
             TableColumn<Row, Object> col = new TableColumn<>(field.name());
