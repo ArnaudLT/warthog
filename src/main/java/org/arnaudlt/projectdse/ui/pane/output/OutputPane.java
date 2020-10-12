@@ -1,25 +1,16 @@
 package org.arnaudlt.projectdse.ui.pane.output;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.adapter.JavaBeanStringPropertyBuilder;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
-import org.arnaudlt.projectdse.model.dataset.NamedColumn;
-import org.arnaudlt.projectdse.model.dataset.NamedDataset;
-import org.arnaudlt.projectdse.model.dataset.transformation.SelectNamedColumn;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,10 +34,10 @@ public class OutputPane {
     public Node buildOutputPane() {
 
         this.outputText = new TextArea();
-        Tab outputTab = new Tab("Overview", outputText);
+        Tab outputTab = new Tab("Raw Overview", outputText);
 
         this.tableView = new TableView<>();
-        Tab secret = new Tab("Secret", tableView);
+        Tab secret = new Tab("Table Overview", tableView);
 
         TabPane tabPane = new TabPane(outputTab, secret);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);

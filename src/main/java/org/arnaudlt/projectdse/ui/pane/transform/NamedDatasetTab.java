@@ -42,7 +42,7 @@ public class NamedDatasetTab extends Tab  {
         Tab whereTab = buildWhereTab();
         Tab joinTab = buildJoinTab();
 
-        TabPane transformationTabPane = new TabPane(selectTab, whereTab/*, joinTab*/);
+        TabPane transformationTabPane = new TabPane(selectTab, whereTab, joinTab);
         transformationTabPane.setSide(Side.TOP);
         transformationTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -56,39 +56,45 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.add(new Label("Column name"), 1, 1);
-        grid.add(new Label("Select"), 2, 1);
-        grid.add(new Label("Group by"), 3, 1);
-        grid.add(new Label("Aggregate"), 4, 1);
-        grid.add(new Label("Sort rank"), 5, 1);
-        grid.add(new Label("Sort type"), 6, 1);
+        grid.addRow(1,
+                new Label("Column name"),
+                new Label("Select"),
+                new Label("Group by"),
+                new Label("Aggregate"),
+                new Label("Sort rank"),
+                new Label("Sort type")
+        );
+
 
         int i=2;
         for (SelectNamedColumn snc : namedDataset.getTransformation().getSelectNamedColumns()) {
 
-            grid.add(new Label(snc.getName() + " - " + snc.getType()), 1, i);
-
             // Select
             CheckBox selectCheckBox = buildSelectCheckBox(snc);
-            grid.add(selectCheckBox, 2, i);
 
             // Group by
             CheckBox groupByCheckBox = buildGroupByCheckBox(snc);
-            grid.add(groupByCheckBox, 3, i);
 
             // Aggregate operator
             ComboBox<String> aggregateOperatorCombo = buildAggregateOperatorComboBox(snc, selectCheckBox, groupByCheckBox);
-            grid.add(aggregateOperatorCombo, 4, i);
 
             // Sort rank + type
             TextField sortRank = buildSortRankTextField(snc, selectCheckBox);
-            grid.add(sortRank, 5, i);
 
             ComboBox<String> sortType = buildSortTypeComboBox(snc, selectCheckBox);
-            grid.add(sortType, 6, i);
+
+            grid.addRow(i,
+                    new Label(snc.getName() + " - " + snc.getType()),
+                    selectCheckBox,
+                    groupByCheckBox,
+                    aggregateOperatorCombo,
+                    sortRank,
+                    sortType
+            );
 
             i++;
         }
+
 
         ScrollPane scrollPane = new ScrollPane(grid);
         return new Tab("Select / Group / Sort", scrollPane);
@@ -155,14 +161,15 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.add(new Label("Column name"), 1, 1);
-        grid.add(new Label("Operator"), 2, 1);
-        grid.add(new Label("Operand"), 3, 1);
+        grid.addRow(1,
+                new Label("Column name"),
+                new Label("Operator"),
+                new Label("Operand")
+        );
+
 
         int i=2;
         for (WhereNamedColumn wnc : namedDataset.getTransformation().getWhereNamedColumns()) {
-
-            grid.add(new Label(wnc.getName() + " - " + wnc.getType()), 1, i);
 
             ComboBox<String> operator = new ComboBox<>();
             operator.getItems().add("");
@@ -171,11 +178,16 @@ public class NamedDatasetTab extends Tab  {
                 operator.getItems().add(op.getOperatorName());
             }
             wnc.setOperator(StringBinding.stringExpression(operator.valueProperty()));
-            grid.add(operator, 2, i);
 
             TextField operand = new TextField();
             wnc.setOperand(StringBinding.stringExpression(operand.textProperty()));
-            grid.add(operand, 3, i);
+
+            grid.addRow(i,
+                    new Label(wnc.getName() + " - " + wnc.getType()),
+                    operator,
+                    operand
+            );
+
             i++;
         }
 
@@ -190,23 +202,23 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.add(new Label("Join With"), 1, 1);
-        grid.add(new Label("Type"), 2, 1);
-        grid.add(new Label("Column"), 3, 1);
-        grid.add(new Label(""), 4, 1);
-        grid.add(new Label("Column"), 5, 1);
+        grid.addRow(1,
+                new Label("Join With"),
+                new Label("Type"),
+                new Label("Column"),
+                new Label(""),
+                new Label("Column")
+        );
 
         // Available Dataset
         ComboBox<NamedDataset> datasetToJoin = new ComboBox<>();
         datasetToJoin.setItems(namedDatasetManager.getObservableNamedDatasets());
         namedDataset.getTransformation().getJoin().setDatasetToJoin(datasetToJoin.valueProperty());
-        grid.add(datasetToJoin, 1, 2);
 
         // Join Type
         ComboBox<String> joinType = new ComboBox<>(
                 FXCollections.observableArrayList("inner", "left", "right", "outer", "cross"));
         namedDataset.getTransformation().getJoin().setJoinType(StringBinding.stringExpression(joinType.valueProperty()));
-        grid.add(joinType, 2, 2);
 
         // Column from current dataset
         ComboBox<NamedColumn> leftColumn = new ComboBox<>();
@@ -215,10 +227,6 @@ public class NamedDatasetTab extends Tab  {
             leftColumn.getItems().add(nc);
         }
         namedDataset.getTransformation().getJoin().setLeftColumn(leftColumn.valueProperty());
-        grid.add(leftColumn, 3, 2);
-
-        // Operator
-        grid.add(new Label("="), 4, 2);
 
         // Column from selected available dataset
         ComboBox<NamedColumn> rightColumn = new ComboBox<>();
@@ -235,11 +243,17 @@ public class NamedDatasetTab extends Tab  {
             }, datasetToJoin.valueProperty()
         ));
         namedDataset.getTransformation().getJoin().setRightColumn(rightColumn.valueProperty());
-        grid.add(rightColumn, 5, 2);
+
+        grid.addRow(2,
+                datasetToJoin,
+                joinType,
+                leftColumn,
+                new Label("="),
+                rightColumn
+        );
 
         Button activeJoin = new Button("Go !");
-
-        grid.add(activeJoin, 1, 3);
+        grid.addRow(3, activeJoin);
 
         ScrollPane scrollPane = new ScrollPane(grid);
         return new Tab("Join", scrollPane);

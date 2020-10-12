@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.apache.spark.sql.functions.col;
-
 
 @Slf4j
 public class NamedDataset {
@@ -120,7 +118,7 @@ public class NamedDataset {
         }
 
         return in.join(join.getDatasetToJoin().getDataset(),
-                col(join.getLeftColumn().getName()).equalTo(col(join.getRightColumn().getName())),
+                dataset.col(join.getLeftColumn().getName()).equalTo(join.getDatasetToJoin().dataset.col(join.getRightColumn().getName())),
                 join.getJoinType());
     }
 
@@ -141,7 +139,7 @@ public class NamedDataset {
         return in.select(this.transformation.getSelectNamedColumns().stream()
                 .filter(snc -> snc.isSelected() || snc.isGroupBy())
                 .map(SelectNamedColumn::getName)
-                .map(functions::col)
+                .map(dataset::col)
                 .toArray(Column[]::new));
     }
 
@@ -159,12 +157,12 @@ public class NamedDataset {
         RelationalGroupedDataset afterGroupBy = in.groupBy(this.transformation.getSelectNamedColumns().stream()
                 .filter(SelectNamedColumn::isGroupBy)
                 .map(SelectNamedColumn::getName)
-                .map(functions::col)
+                .map(dataset::col)
                 .toArray(Column[]::new));
 
         Column[] aggColumns = this.transformation.getSelectNamedColumns().stream()
                 .filter(snc -> snc.isSelected() && !snc.isGroupBy())
-                .map(snc -> applyOneAggregateOperator(col(snc.getName()), snc))
+                .map(snc -> applyOneAggregateOperator(dataset.col(snc.getName()), snc))
                 .toArray(Column[]::new);
 
         if (aggColumns.length == 0) {
@@ -239,34 +237,34 @@ public class NamedDataset {
 
             // TODO consider column type and cast operand ?
             case EQ:
-                out = out.where(col(columnNameString).equalTo(operandString));
+                out = out.where(dataset.col(columnNameString).equalTo(operandString));
                 break;
             case NEQ:
-                out = out.where(col(columnNameString).notEqual(operandString));
+                out = out.where(dataset.col(columnNameString).notEqual(operandString));
                 break;
             case LT:
-                out = out.where(col(columnNameString).lt(operandString));
+                out = out.where(dataset.col(columnNameString).lt(operandString));
                 break;
             case LEQ:
-                out = out.where(col(columnNameString).leq(operandString));
+                out = out.where(dataset.col(columnNameString).leq(operandString));
                 break;
             case GT:
-                out = out.where(col(columnNameString).gt(operandString));
+                out = out.where(dataset.col(columnNameString).gt(operandString));
                 break;
             case GEQ:
-                out = out.where(col(columnNameString).geq(operandString));
+                out = out.where(dataset.col(columnNameString).geq(operandString));
                 break;
             case IS_NULL:
-                out = out.where(col(columnNameString).isNull());
+                out = out.where(dataset.col(columnNameString).isNull());
                 break;
             case IS_NOT_NULL:
-                out = out.where(col(columnNameString).isNotNull());
+                out = out.where(dataset.col(columnNameString).isNotNull());
                 break;
             case CONTAINS:
-                out = out.where(col(columnNameString).contains(operandString));
+                out = out.where(dataset.col(columnNameString).contains(operandString));
                 break;
             case LIKE:
-                out = out.where(col(columnNameString).like(operandString));
+                out = out.where(dataset.col(columnNameString).like(operandString));
                 break;
             default:
                 log.error("Operator {} is not implemented", booleanOperator);
@@ -353,10 +351,10 @@ public class NamedDataset {
         Column sortColumn;
         if (snc.getAlias() != null && !snc.getAlias().isEmpty()) {
 
-            sortColumn = functions.col(snc.getAlias());
+            sortColumn = dataset.col(snc.getAlias());
         } else {
 
-            sortColumn = functions.col(snc.getName());
+            sortColumn = dataset.col(snc.getName());
         }
 
         SortType sortType = SortType.valueFromSortTypeName(snc.getSortType());
