@@ -1,8 +1,6 @@
 package org.arnaudlt.projectdse.model.util;
 
 import org.arnaudlt.projectdse.model.exception.ProcessingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,19 +11,17 @@ import java.util.List;
 
 public class FileUtil {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
-
 
     private FileUtil() {}
 
 
-    public static String getFileType(String filename) {
+    public static String getFileType(File file) {
 
-        if (filename == null || !filename.contains(".")) {
+        if (!file.getName().contains(".") || file.isDirectory()) {
 
-            return "";
+            return "parquet";
         }
-        return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+        return file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
     }
 
 

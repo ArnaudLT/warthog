@@ -41,6 +41,21 @@ class NamedDatasetManagerTest {
 
         Catalog catalog = namedDataset.getCatalog();
         assertEquals(7, catalog.getColumns().size());
+
+
+        namedDataset.getDataset()
+                //Date de publication;Code Officiel Département;Nom Officiel Département;Nom Officiel Région;Indicateur (couleur);Geo Point;Geo Shape
+                .withColumnRenamed("Date de publication", "date")
+                .withColumnRenamed("Code Officiel Département", "code_dep")
+                .withColumnRenamed("Nom Officiel Département", "nom_dep")
+                .withColumnRenamed("Nom Officiel Région", "nom_reg")
+                .withColumnRenamed("Geo Point", "geo_point")
+                .withColumnRenamed("Geo Shape", "geo_shape")
+                .withColumnRenamed("Indicateur (couleur)", "couleur")
+                .repartition(10)
+                .write()
+                .partitionBy("couleur")
+                .parquet("target/covid19-sample-parquet");
     }
 
 

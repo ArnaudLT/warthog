@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,8 +49,7 @@ public class NamedDatasetManager {
 
         try {
 
-            String fileType = FileUtil.getFileType(file.getName());
-            String name = FileUtil.determineName(file.getName());
+            String fileType = FileUtil.getFileType(file);
             String separator = ";";
             double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(file);
 
@@ -91,7 +92,7 @@ public class NamedDatasetManager {
             Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns, join);
 
             return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
-                    name, dataset, catalog, transformation, new Decoration(sizeInMegaBytes, separator));
+                    file.getName(), dataset, catalog, transformation, new Decoration(sizeInMegaBytes, separator));
 
         } catch (Exception e) {
 
