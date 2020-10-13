@@ -1,5 +1,6 @@
 package org.arnaudlt.projectdse.model.dataset;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.arnaudlt.projectdse.model.dataset.transformation.*;
@@ -176,20 +177,21 @@ public class NamedDataset {
 
     private Dataset<Row> applySort(Dataset<Row> output) {
 
-        List<SelectNamedColumn> sortedColumns = this.getTransformation().getSelectNamedColumns().stream()
+        Column[] sortColumns = this.getTransformation().getSelectNamedColumns().stream()
                 .filter(snc -> snc.isSelected() && iAValidSort(snc.getSortType(), snc.getSortRank()))
                 .sorted(Comparator.comparingInt(snc -> Integer.parseInt(snc.getSortRank().trim())))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                .stream()
+                .map(snc -> applyOneSort(output, snc))
+                .toArray(Column[]::new);
 
-        if (!sortedColumns.isEmpty()) {
+        Dataset<Row> output2 = output;
+        if (sortColumns.length > 0) {
 
-            Column[] sort = sortedColumns.stream()
-                    .map(this::applyOneSort)
-                    .toArray(Column[]::new);
-            output = output.sort(sort);
+           output2 = output.sort(sortColumns);
         }
 
-        return output;
+        return output2;
     }
 
 
@@ -346,15 +348,15 @@ public class NamedDataset {
 
 
     // SORT APPLY
-    private Column applyOneSort(SelectNamedColumn snc) {
+    private Column applyOneSort(Dataset<Row> output, SelectNamedColumn snc) {
 
         Column sortColumn;
         if (snc.getAlias() != null && !snc.getAlias().isEmpty()) {
 
-            sortColumn = dataset.col(snc.getAlias());
+            sortColumn = output.col(snc.getAlias());
         } else {
 
-            sortColumn = dataset.col(snc.getName());
+            sortColumn = output.col(snc.getName());
         }
 
         SortType sortType = SortType.valueFromSortTypeName(snc.getSortType());
@@ -364,6 +366,7 @@ public class NamedDataset {
         }
         return sortColumn;
     }
+
 
     // SORT CHECK
     private boolean iAValidSort(String sortTypeString, String sortRankString) {
