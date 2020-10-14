@@ -2,7 +2,6 @@ package org.arnaudlt.projectdse.model.dataset.transformation;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.binding.StringExpression;
-import org.apache.spark.sql.Column;
 import org.arnaudlt.projectdse.model.dataset.NamedColumn;
 
 public class SelectNamedColumn extends NamedColumn {
@@ -20,9 +19,9 @@ public class SelectNamedColumn extends NamedColumn {
 
 
 
-    public SelectNamedColumn(int id, String name, String type, Column column) {
+    public SelectNamedColumn(int id, String name, String type) {
 
-        super(id, name, type, column);
+        super(id, name, type);
     }
 
 

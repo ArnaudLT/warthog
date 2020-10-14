@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,11 +78,11 @@ public class NamedDatasetManager {
             Catalog catalog = buildCatalog(dataset);
 
             List<SelectNamedColumn> selectNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType(), nc.getColumn()))
+                    .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
                     .collect(Collectors.toList());
 
             List<WhereNamedColumn> whereNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new WhereNamedColumn(nc.getId(), nc.getName(), nc.getType(), nc.getColumn()))
+                    .map(nc -> new WhereNamedColumn(nc.getId(), nc.getName(), nc.getType()))
                     .collect(Collectors.toList());
 
             Join join = new Join();
@@ -144,7 +142,7 @@ public class NamedDatasetManager {
 
         List<StructField> fields = List.of(dataset.schema().fields());
         List<NamedColumn> columns = fields.stream()
-                .map(field -> new NamedColumn(this.uniqueIdGenerator.getUniqueId(), field.name(), field.dataType().typeName(), dataset.col(field.name())))
+                .map(field -> new NamedColumn(this.uniqueIdGenerator.getUniqueId(), field.name(), field.dataType().typeName()))
                 .collect(Collectors.toList());
         return new Catalog(columns);
     }
