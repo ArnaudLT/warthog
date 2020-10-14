@@ -1,5 +1,7 @@
 package org.arnaudlt.projectdse.model.dataset;
 
+import org.apache.spark.sql.Column;
+
 import java.util.Objects;
 
 public class NamedColumn {
@@ -12,14 +14,17 @@ public class NamedColumn {
 
     private String alias;
 
+    private Column column;
 
-    public NamedColumn(int id, String name, String type) {
+
+    public NamedColumn(int id, String name, String type, Column column) {
 
         Objects.requireNonNull(name, "A column name cannot be null");
         Objects.requireNonNull(type, "A column type cannot be null");
         this.name = name;
         this.type = type;
         this.id = id;
+        this.column = column;
     }
 
 
@@ -48,19 +53,28 @@ public class NamedColumn {
     }
 
 
+    public Column getColumn() {
+        return column;
+    }
+
+
+    public void setColumn(Column column) {
+        this.column = column;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NamedColumn that = (NamedColumn) o;
-        return name.equals(that.name) &&
-                type.equals(that.type);
+        return id == that.id;
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type);
+        return Objects.hash(id);
     }
 
 

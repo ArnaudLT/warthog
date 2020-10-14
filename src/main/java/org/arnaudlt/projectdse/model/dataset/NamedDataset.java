@@ -1,6 +1,5 @@
 package org.arnaudlt.projectdse.model.dataset;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.arnaudlt.projectdse.model.dataset.transformation.*;
@@ -158,12 +157,12 @@ public class NamedDataset {
         RelationalGroupedDataset afterGroupBy = in.groupBy(this.transformation.getSelectNamedColumns().stream()
                 .filter(SelectNamedColumn::isGroupBy)
                 .map(SelectNamedColumn::getName)
-                .map(dataset::col)
+                .map(in::col)
                 .toArray(Column[]::new));
 
         Column[] aggColumns = this.transformation.getSelectNamedColumns().stream()
                 .filter(snc -> snc.isSelected() && !snc.isGroupBy())
-                .map(snc -> applyOneAggregateOperator(dataset.col(snc.getName()), snc))
+                .map(snc -> applyOneAggregateOperator(in.col(snc.getName()), snc))
                 .toArray(Column[]::new);
 
         if (aggColumns.length == 0) {
@@ -182,7 +181,7 @@ public class NamedDataset {
                 .sorted(Comparator.comparingInt(snc -> Integer.parseInt(snc.getSortRank().trim())))
                 .collect(Collectors.toList())
                 .stream()
-                .map(snc -> applyOneSort(output, snc))
+                .map(snc -> applyOneSortType(getColumn(output, snc), snc))
                 .toArray(Column[]::new);
 
         Dataset<Row> output2 = output;
@@ -275,6 +274,7 @@ public class NamedDataset {
         return out;
     }
 
+
     // WHERE CHECK
     private boolean isAValidWhereClause(WhereNamedColumn wnc) {
 
@@ -348,23 +348,14 @@ public class NamedDataset {
 
 
     // SORT APPLY
-    private Column applyOneSort(Dataset<Row> output, SelectNamedColumn snc) {
-
-        Column sortColumn;
-        if (snc.getAlias() != null && !snc.getAlias().isEmpty()) {
-
-            sortColumn = output.col(snc.getAlias());
-        } else {
-
-            sortColumn = output.col(snc.getName());
-        }
+    private Column applyOneSortType(Column column, SelectNamedColumn snc) {
 
         SortType sortType = SortType.valueFromSortTypeName(snc.getSortType());
         if (sortType == SortType.DESCENDING) {
 
-            sortColumn = sortColumn.desc();
+            column = column.desc();
         }
-        return sortColumn;
+        return column;
     }
 
 
@@ -384,6 +375,19 @@ public class NamedDataset {
         return true;
     }
 
+
+    private Column getColumn(Dataset<Row> dataset, SelectNamedColumn snc) {
+
+        Column column;
+        if (snc.getAlias() != null && !snc.getAlias().isEmpty()) {
+
+            column = dataset.col(snc.getAlias());
+        } else {
+
+            column = dataset.col(snc.getName());
+        }
+        return column;
+    }
 
     // ###################################################################
     // ######################### OUTPUT ##################################

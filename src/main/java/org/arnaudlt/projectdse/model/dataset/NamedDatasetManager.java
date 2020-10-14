@@ -80,11 +80,11 @@ public class NamedDatasetManager {
             Catalog catalog = buildCatalog(dataset);
 
             List<SelectNamedColumn> selectNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
+                    .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType(), nc.getColumn()))
                     .collect(Collectors.toList());
 
             List<WhereNamedColumn> whereNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new WhereNamedColumn(nc.getId(), nc.getName(), nc.getType()))
+                    .map(nc -> new WhereNamedColumn(nc.getId(), nc.getName(), nc.getType(), nc.getColumn()))
                     .collect(Collectors.toList());
 
             Join join = new Join();
@@ -144,7 +144,7 @@ public class NamedDatasetManager {
 
         List<StructField> fields = List.of(dataset.schema().fields());
         List<NamedColumn> columns = fields.stream()
-                .map(field -> new NamedColumn(this.uniqueIdGenerator.getUniqueId(), field.name(), field.dataType().typeName()))
+                .map(field -> new NamedColumn(this.uniqueIdGenerator.getUniqueId(), field.name(), field.dataType().typeName(), dataset.col(field.name())))
                 .collect(Collectors.toList());
         return new Catalog(columns);
     }
