@@ -1,6 +1,8 @@
 package org.arnaudlt.projectdse.model.dataset;
 
 import org.apache.spark.sql.AnalysisException;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -22,13 +24,6 @@ class NamedDatasetManagerTest {
 
     @Autowired
     private SparkSession sparkSession;
-
-
-    @Test
-    void nestedColumnTest() {
-
-
-    }
 
 
     @Test
@@ -44,15 +39,15 @@ class NamedDatasetManagerTest {
     }
 
 
+    @Test
     void hiveSupport() throws AnalysisException {
 
         File file = new File("src/test/resources/covid19-sample.csv");
         NamedDataset namedDataset = this.namedDatasetManager.createNamedDataset(file);
         namedDataset.getDataset().createTempView("cov");
-        namedDataset.getDataset().sqlContext()
-                .sql("SELECT `Nom Officiel Région` FROM cov WHERE `Indicateur (couleur)` = 'vert'")
-                .limit(10)
-                .show(false);
+        Dataset<Row> sqlResult = namedDataset.getDataset().sqlContext()
+                .sql("SELECT `Nom Officiel Région` FROM cov WHERE `Indicateur (couleur)` = 'vert'");
+        assertEquals(60, sqlResult.count());
 
         String[] tableNames = sparkSession.sqlContext().tableNames();
         assertEquals(1, tableNames.length);
@@ -63,12 +58,14 @@ class NamedDatasetManagerTest {
     @Test
     void registerNamedDataset() {
 
+        File file = new File("src/test/resources/covid19-sample.csv");
+        NamedDataset namedDataset = this.namedDatasetManager.createNamedDataset(file);
 
+        this.namedDatasetManager.registerNamedDataset(namedDataset);
+        assertTrue(this.namedDatasetManager.getObservableNamedDatasets().contains(namedDataset));
+
+        this.namedDatasetManager.deregisterNamedDataset(namedDataset);
+        assertFalse(this.namedDatasetManager.getObservableNamedDatasets().contains(namedDataset));
     }
 
-    @Test
-    void deregisterNamedDataset() {
-
-
-    }
 }
