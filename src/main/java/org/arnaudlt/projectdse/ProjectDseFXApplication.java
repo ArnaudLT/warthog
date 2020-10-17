@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -93,8 +94,9 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         PropertyConfigurator.configure(loggingProperties);
 
         MainPane mainPane = new MainPane(stage, namedDatasetManager, poolService);
+        Parent root = mainPane.build();
 
-        Scene scene = new Scene(mainPane.build(), 1280, 720);
+        Scene scene = new Scene(root, 1280, 720);
         String styleSheet = getClass().getResource("/style.css").toExternalForm();
         stage.setTitle("Dataset Explorer");
         stage.getIcons().add(new Image("file:src/main/resources/icon.jpg"));
@@ -103,6 +105,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         JMetro metro = new JMetro(Style.DARK);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(scene);
+
         stage.setScene(scene);
         scene.getStylesheets().add(styleSheet);
         stage.show();

@@ -8,7 +8,7 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.projectdse.model.dataset.transformation.Join;
 import org.arnaudlt.projectdse.model.dataset.transformation.SelectNamedColumn;
-import org.arnaudlt.projectdse.model.dataset.transformation.WhereNamedColumn;
+import org.arnaudlt.projectdse.model.dataset.transformation.WhereClause;
 import org.arnaudlt.projectdse.model.exception.ProcessingException;
 import org.arnaudlt.projectdse.model.util.FileUtil;
 import org.arnaudlt.projectdse.model.util.UniqueIdGenerator;
@@ -81,8 +81,8 @@ public class NamedDatasetManager {
                     .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
                     .collect(Collectors.toList());
 
-            List<WhereNamedColumn> whereNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new WhereNamedColumn(nc.getId(), nc.getName(), nc.getType()))
+            List<WhereClause> whereNamedColumns = catalog.getColumns().stream()
+                    .map(nc -> new WhereClause())
                     .collect(Collectors.toList());
 
             Join join = new Join();

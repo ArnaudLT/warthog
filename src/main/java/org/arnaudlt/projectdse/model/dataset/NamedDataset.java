@@ -126,9 +126,9 @@ public class NamedDataset {
     private Dataset<Row> applyWhere(Dataset<Row> in) {
 
         Dataset<Row> out = in;
-        for (WhereNamedColumn wnc : this.transformation.getWhereNamedColumns()) {
+        for (WhereClause wc : this.transformation.getWhereClauses()) {
 
-            out = applyOneWhereNamedClause(out, wnc);
+            out = applyOneWhereNamedClause(out, wc);
         }
         return out;
     }
@@ -221,54 +221,51 @@ public class NamedDataset {
 
 
     // WHERE APPLY
-    private Dataset<Row> applyOneWhereNamedClause(Dataset<Row> in, WhereNamedColumn wnc) {
-
-        String columnNameString = wnc.getName();
-        String operatorString = wnc.getOperator();
-        String operandString = wnc.getOperand();
+    private Dataset<Row> applyOneWhereNamedClause(Dataset<Row> in, WhereClause wc) {
 
         Dataset<Row> out = in;
 
-        if (!isAValidWhereClause(wnc)) {
+        if (!isAValidWhereClause(wc)) {
             return out;
         }
 
-        BooleanOperator booleanOperator = BooleanOperator.valueFromOperatorName(operatorString);
-        switch (booleanOperator) {
+        final String columnName = wc.getColumn().getName();
+
+        switch (wc.getOperator()) {
 
             // TODO consider column type and cast operand ?
             case EQ:
-                out = out.where(dataset.col(columnNameString).equalTo(operandString));
+                out = out.where(dataset.col(columnName).equalTo(wc.getOperand()));
                 break;
             case NEQ:
-                out = out.where(dataset.col(columnNameString).notEqual(operandString));
+                out = out.where(dataset.col(columnName).notEqual(wc.getOperand()));
                 break;
             case LT:
-                out = out.where(dataset.col(columnNameString).lt(operandString));
+                out = out.where(dataset.col(columnName).lt(wc.getOperand()));
                 break;
             case LEQ:
-                out = out.where(dataset.col(columnNameString).leq(operandString));
+                out = out.where(dataset.col(columnName).leq(wc.getOperand()));
                 break;
             case GT:
-                out = out.where(dataset.col(columnNameString).gt(operandString));
+                out = out.where(dataset.col(columnName).gt(wc.getOperand()));
                 break;
             case GEQ:
-                out = out.where(dataset.col(columnNameString).geq(operandString));
+                out = out.where(dataset.col(columnName).geq(wc.getOperand()));
                 break;
             case IS_NULL:
-                out = out.where(dataset.col(columnNameString).isNull());
+                out = out.where(dataset.col(columnName).isNull());
                 break;
             case IS_NOT_NULL:
-                out = out.where(dataset.col(columnNameString).isNotNull());
+                out = out.where(dataset.col(columnName).isNotNull());
                 break;
             case CONTAINS:
-                out = out.where(dataset.col(columnNameString).contains(operandString));
+                out = out.where(dataset.col(columnName).contains(wc.getOperand()));
                 break;
             case LIKE:
-                out = out.where(dataset.col(columnNameString).like(operandString));
+                out = out.where(dataset.col(columnName).like(wc.getOperand()));
                 break;
             default:
-                log.error("Operator {} is not implemented", booleanOperator);
+                log.error("Operator {} is not implemented", wc.getOperator());
         }
 
         return out;
@@ -276,30 +273,19 @@ public class NamedDataset {
 
 
     // WHERE CHECK
-    private boolean isAValidWhereClause(WhereNamedColumn wnc) {
+    private boolean isAValidWhereClause(WhereClause wc) {
 
-        String columnNameString = wnc.getName();
-        String operatorString = wnc.getOperator();
-        String operandString = wnc.getOperand();
-
-        if (columnNameString == null || columnNameString.isBlank() || operatorString == null || operatorString.isBlank()) {
+        if (wc.getColumn() == null || wc.getOperator() == null || wc.getOperator() == BooleanOperator.NONE) {
 
             return false;
         }
 
-        BooleanOperator booleanOperator = BooleanOperator.valueFromOperatorName(operatorString);
-        if (booleanOperator == null) {
+        if (wc.getOperator().getArity() == 2 && wc.getOperand() == null) {
 
             return false;
         }
 
-        if (booleanOperator.getArity() == 2 && (operandString == null || operandString.isBlank())) {
-
-            log.warn("Missing operand in restriction {} {} ?", columnNameString, booleanOperator);
-            return false;
-        }
-
-        log.info("Where clause : {} {} {}", columnNameString, operatorString, operandString);
+        log.info("Where clause : {} {} {}", wc.getColumn(), wc.getOperator(), wc.getOperand());
         return true;
     }
 

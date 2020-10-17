@@ -15,7 +15,7 @@ import org.arnaudlt.projectdse.model.dataset.NamedDatasetManager;
 import org.arnaudlt.projectdse.model.dataset.transformation.AggregateOperator;
 import org.arnaudlt.projectdse.model.dataset.transformation.BooleanOperator;
 import org.arnaudlt.projectdse.model.dataset.transformation.SelectNamedColumn;
-import org.arnaudlt.projectdse.model.dataset.transformation.WhereNamedColumn;
+import org.arnaudlt.projectdse.model.dataset.transformation.WhereClause;
 
 import java.util.ArrayList;
 
@@ -56,7 +56,7 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.addRow(1,
+        grid.addRow(grid.getRowCount(),
                 new Label("Column name"),
                 new Label("Select"),
                 new Label("Group by"),
@@ -65,8 +65,6 @@ public class NamedDatasetTab extends Tab  {
                 new Label("Sort type")
         );
 
-
-        int i=2;
         for (SelectNamedColumn snc : namedDataset.getTransformation().getSelectNamedColumns()) {
 
             // Select
@@ -83,7 +81,7 @@ public class NamedDatasetTab extends Tab  {
 
             ComboBox<String> sortType = buildSortTypeComboBox(snc, selectCheckBox);
 
-            grid.addRow(i,
+            grid.addRow(grid.getRowCount(),
                     new Label(snc.getName() + " - " + snc.getType()),
                     selectCheckBox,
                     groupByCheckBox,
@@ -91,8 +89,6 @@ public class NamedDatasetTab extends Tab  {
                     sortRank,
                     sortType
             );
-
-            i++;
         }
 
 
@@ -161,34 +157,40 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.addRow(1,
-                new Label("Column name"),
+        grid.addRow(grid.getRowCount(),
+                new Label("Column"),
                 new Label("Operator"),
                 new Label("Operand")
         );
 
+        for (WhereClause wc : namedDataset.getTransformation().getWhereClauses()) {
 
-        int i=2;
-        for (WhereNamedColumn wnc : namedDataset.getTransformation().getWhereNamedColumns()) {
+            // TODO allow dynamic number of where clauses
+            ComboBox<NamedColumn> column = new ComboBox<>();
+            column.getItems().add(null);
+            column.getItems().addAll(namedDataset.getCatalog().getColumns());
+            wc.setColumn(column.valueProperty());
 
-            ComboBox<String> operator = new ComboBox<>();
-            operator.getItems().add("");
-            for (BooleanOperator op : BooleanOperator.values()) {
-
-                operator.getItems().add(op.getOperatorName());
-            }
-            wnc.setOperator(StringBinding.stringExpression(operator.valueProperty()));
+            ComboBox<BooleanOperator> operator = new ComboBox<>();
+            operator.getItems().addAll(BooleanOperator.values());
+            operator.visibleProperty().bind(column.valueProperty().isNotNull());
+            wc.setOperator(operator.valueProperty());
 
             TextField operand = new TextField();
-            wnc.setOperand(StringBinding.stringExpression(operand.textProperty()));
+            operand.visibleProperty().bind(Bindings.createObjectBinding(() -> {
+                    if (operator.getValue() != null) {
+                        return operator.getValue().getArity() > 1 && operator.isVisible();
+                    }
+                    return false;
+                }, operator.valueProperty(), operator.visibleProperty()));
+            wc.setOperand(StringBinding.stringExpression(operand.textProperty()));
 
-            grid.addRow(i,
-                    new Label(wnc.getName() + " - " + wnc.getType()),
+
+            grid.addRow(grid.getRowCount(),
+                    column,
                     operator,
-                    operand
-            );
+                    operand);
 
-            i++;
         }
 
         ScrollPane scrollPane = new ScrollPane(grid);
@@ -202,7 +204,7 @@ public class NamedDatasetTab extends Tab  {
         grid.setHgap(10d);
         grid.setVgap(5d);
 
-        grid.addRow(1,
+        grid.addRow(grid.getRowCount(),
                 new Label("Join With"),
                 new Label("Type"),
                 new Label("Column"),
@@ -244,7 +246,7 @@ public class NamedDatasetTab extends Tab  {
         ));
         namedDataset.getTransformation().getJoin().setRightColumn(rightColumn.valueProperty());
 
-        grid.addRow(2,
+        grid.addRow(grid.getRowCount(),
                 datasetToJoin,
                 joinType,
                 leftColumn,
@@ -252,13 +254,9 @@ public class NamedDatasetTab extends Tab  {
                 rightColumn
         );
 
-        Button activeJoin = new Button("Go !");
-        grid.addRow(3, activeJoin);
-
         ScrollPane scrollPane = new ScrollPane(grid);
         return new Tab("Join", scrollPane);
     }
-
 
 
     public NamedDataset getNamedDataset() {

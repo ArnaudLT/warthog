@@ -2,6 +2,7 @@ package org.arnaudlt.projectdse.model.dataset.transformation;
 
 public enum BooleanOperator {
 
+    NONE("", 0),
     EQ("=", 2),
     NEQ("!=", 2),
     LT("<", 2),
