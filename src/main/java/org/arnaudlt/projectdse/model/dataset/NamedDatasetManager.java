@@ -81,9 +81,7 @@ public class NamedDatasetManager {
                     .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
                     .collect(Collectors.toList());
 
-            List<WhereClause> whereNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new WhereClause())
-                    .collect(Collectors.toList());
+            List<WhereClause> whereNamedColumns = new ArrayList<>();
 
             Join join = new Join();
 

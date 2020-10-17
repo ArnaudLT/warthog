@@ -163,38 +163,54 @@ public class NamedDatasetTab extends Tab  {
                 new Label("Operand")
         );
 
-        for (WhereClause wc : namedDataset.getTransformation().getWhereClauses()) {
+        addWhereClause(grid);
 
-            // TODO allow dynamic number of where clauses
-            ComboBox<NamedColumn> column = new ComboBox<>();
-            column.getItems().add(null);
-            column.getItems().addAll(namedDataset.getCatalog().getColumns());
-            wc.setColumn(column.valueProperty());
+        Button addWhereClauseButton = new Button("Add Clause");
+        addWhereClauseButton.setOnAction(event -> {
 
-            ComboBox<BooleanOperator> operator = new ComboBox<>();
-            operator.getItems().addAll(BooleanOperator.values());
-            operator.visibleProperty().bind(column.valueProperty().isNotNull());
-            wc.setOperator(operator.valueProperty());
+            grid.getChildren().remove(addWhereClauseButton);
+            addWhereClause(grid);
+            grid.addRow(grid.getRowCount(), addWhereClauseButton);
+        });
+        grid.addRow(grid.getRowCount(), addWhereClauseButton);
 
-            TextField operand = new TextField();
-            operand.visibleProperty().bind(Bindings.createObjectBinding(() -> {
-                    if (operator.getValue() != null) {
-                        return operator.getValue().getArity() > 1 && operator.isVisible();
-                    }
-                    return false;
-                }, operator.valueProperty(), operator.visibleProperty()));
-            wc.setOperand(StringBinding.stringExpression(operand.textProperty()));
-
-
-            grid.addRow(grid.getRowCount(),
-                    column,
-                    operator,
-                    operand);
-
-        }
 
         ScrollPane scrollPane = new ScrollPane(grid);
         return new Tab("Where", scrollPane);
+    }
+
+
+    private void addWhereClause(GridPane grid) {
+
+        WhereClause wc = new WhereClause();
+        namedDataset.getTransformation().getWhereClauses().add(wc);
+
+        // Column
+        ComboBox<NamedColumn> column = new ComboBox<>();
+        column.getItems().add(null);
+        column.getItems().addAll(namedDataset.getCatalog().getColumns());
+        wc.setColumn(column.valueProperty());
+
+        // Operator
+        ComboBox<BooleanOperator> operator = new ComboBox<>();
+        operator.getItems().addAll(BooleanOperator.values());
+        operator.visibleProperty().bind(column.valueProperty().isNotNull());
+        wc.setOperator(operator.valueProperty());
+
+        // Operand (if needed <=> arity > 1 and operator visible)
+        TextField operand = new TextField();
+        operand.visibleProperty().bind(Bindings.createObjectBinding(() -> {
+                if (operator.getValue() != null) {
+                    return operator.getValue().getArity() > 1 && operator.isVisible();
+                }
+                return false;
+            }, operator.valueProperty(), operator.visibleProperty()));
+        wc.setOperand(StringBinding.stringExpression(operand.textProperty()));
+
+        grid.addRow(grid.getRowCount(),
+                column,
+                operator,
+                operand);
     }
 
 
