@@ -1,7 +1,10 @@
 package org.arnaudlt.projectdse.model.dataset;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.arnaudlt.projectdse.model.dataset.transformation.*;
 
 import java.util.Arrays;
@@ -200,8 +203,7 @@ public class NamedDataset {
 
             if (snc.getAlias() == null || snc.getAlias().isEmpty()) continue;
 
-            // TODO not correct and risky (if #agg_12 is a part of the column name !! :-) ). Should replace only the last
-            String withoutInternalAlias = snc.getAlias().replace("#agg_" + snc.getId(), "");
+            String withoutInternalAlias = snc.getAlias().replaceAll("#agg_" + snc.getId() + "$", "");
             output = output.withColumnRenamed(snc.getAlias(), withoutInternalAlias);
         }
         return output;
@@ -233,7 +235,6 @@ public class NamedDataset {
 
         switch (wc.getOperator()) {
 
-            // TODO consider column type and cast operand ?
             case EQ:
                 out = out.where(dataset.col(columnName).equalTo(wc.getOperand()));
                 break;
@@ -383,14 +384,15 @@ public class NamedDataset {
     public List<Row> generateRowOverview() {
 
         Dataset<Row> output = applyTransformation();
-        return output.takeAsList(100);
+        output = stringify(output);
+        return output.takeAsList(101);
     }
 
 
     public void export(String filePath) {
 
         Dataset<Row> output = applyTransformation();
-
+        output = stringify(output);
         output
                 .coalesce(1)
                 .write()
@@ -398,6 +400,26 @@ public class NamedDataset {
                 .option("header", true)
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
                 .csv(filePath);
+    }
+
+
+    //TODO this is a very low cost map/array stringify function :-)
+    private Dataset<Row> stringify(Dataset<Row> dataset) {
+
+        Dataset<Row> output = dataset;
+
+        StructField[] fields = dataset.schema().fields();
+        for (StructField field : fields) {
+
+            if ("map".equals(field.dataType().typeName())) {
+
+                output = output.withColumn(field.name(), functions.callUDF("mapToString", output.col(field.name())));
+            } else if ("array".equals(field.dataType().typeName())) {
+
+                output = output.withColumn(field.name(), functions.callUDF("arrayToString", output.col(field.name())));
+            }
+        }
+        return output;
     }
 
 }

@@ -146,7 +146,6 @@ public class ExplorerPane {
     private final EventHandler<ActionEvent> requestDelete = actionEvent -> {
 
         ObservableList<TreeItem<NamedDatasetItem>> selectedItems = this.treeExplorer.getSelectionModel().getSelectedItems();
-        // TODO better solution ? Need a non observable copy to avoid NPE during the for loop
         List<TreeItem<NamedDatasetItem>> selectedItemsCopy = new ArrayList<>(selectedItems);
         for (TreeItem<NamedDatasetItem> selectedItem : selectedItemsCopy) {
 

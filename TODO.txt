@@ -7,14 +7,15 @@
 => Improve the dataset manipulation :
     => Something to (un)select all the column at once...
 
-=> Improve Where panel :
-    => Add multiple criteria per attribut
+=> Drag and drop pour l'import de dataset
 
 => Implement a Partition By (for the output file)
 
-=> Drag and drop pour l'import de dataset
+=> Finish the Join
 
-=> Read nested columns
+=> Need an easter egg !
+
+### DEPLOY
 
 => Deploy :
     => -Dhadoop.home.dir=C:\Users\Arnaud\software\winutils

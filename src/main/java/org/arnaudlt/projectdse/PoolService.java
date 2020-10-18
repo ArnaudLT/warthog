@@ -23,7 +23,7 @@ public class PoolService {
         this.executor = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         this.tickTack = new SimpleIntegerProperty(0);
 
-        // TODO I need a better solution ?
+        // Scheduled thread used to probe the 'executor' thread pool
         this.scheduler = Executors.newScheduledThreadPool(1);
         Runnable goTickTack = () -> this.tickTack.set(this.executor.getActiveCount());
         this.scheduler.scheduleAtFixedRate(goTickTack, 500, 500, TimeUnit.MILLISECONDS);
