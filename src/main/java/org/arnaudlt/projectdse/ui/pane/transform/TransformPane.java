@@ -50,7 +50,6 @@ public class TransformPane {
             }
         });
         this.namedDatasetToTab = new ConcurrentHashMap<>();
-        this.namedDatasetsTabPane.setPrefWidth(1080);
         return this.namedDatasetsTabPane;
     }
 

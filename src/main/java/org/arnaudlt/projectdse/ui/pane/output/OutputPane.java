@@ -41,13 +41,12 @@ public class OutputPane {
                 copySelectionToClipboard(tableView);
             }
         });
-
-        Button settingButton = new Button("", new MDL2IconFont("\uE7FC"));
+        
         // number of lines in the output. => Dataset<Row> or NamedDataset
         Button clearButton = new Button("", new MDL2IconFont("\uE74D"));
         clearButton.setOnAction(event -> clear());
 
-        VBox buttonBar = new VBox(settingButton, clearButton);
+        VBox buttonBar = new VBox(clearButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
         this.tableView.prefWidthProperty().bind(hBox.widthProperty());

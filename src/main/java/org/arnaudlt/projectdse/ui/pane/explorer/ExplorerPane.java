@@ -53,7 +53,6 @@ public class ExplorerPane {
         this.treeExplorer = buildTreeView();
 
         VBox vBox = new VBox(2, buttonsBar, treeExplorer);
-
         this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
 
         return vBox;
@@ -74,13 +73,13 @@ public class ExplorerPane {
 
     private Node buildButtonsBar() {
 
-        Button importButton = new Button("_Import File", new MDL2IconFont("\uE8E5"));
+        Button importButton = new Button("Import File", new MDL2IconFont("\uE8E5"));
         importButton.setOnAction(this.requestImportFile);
 
-        Button importFolderButton = new Button("Import _Parquet", new MDL2IconFont("\uED25"));
+        Button importFolderButton = new Button("Import Parquet", new MDL2IconFont("\uED25"));
         importFolderButton.setOnAction(this.requestImportFolder);
 
-        Button deleteButton = new Button("_Delete", new MDL2IconFont("\uE74D"));
+        Button deleteButton = new Button("Delete", new MDL2IconFont("\uE74D"));
         deleteButton.setOnAction(this.requestDelete);
 
         return new HBox(2, importButton, importFolderButton, deleteButton);

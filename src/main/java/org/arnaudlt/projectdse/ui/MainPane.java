@@ -47,10 +47,12 @@ public class MainPane {
         SplitPane middleSplitPane = new SplitPane();
         middleSplitPane.setOrientation(Orientation.HORIZONTAL);
         middleSplitPane.getItems().addAll(explorerNode, transformNode);
+        middleSplitPane.setDividerPositions(0.226);
 
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.getItems().addAll(controlNode, middleSplitPane, outputNode);
+        splitPane.setDividerPositions(0, 0.6, 0.4);
 
         return splitPane;
     }

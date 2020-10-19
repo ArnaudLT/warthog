@@ -51,13 +51,13 @@ public class ControlPane {
         ProgressBar progressBar = new ProgressBar();
         progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
 
-        Button settingsButton = new Button("_Settings", new MDL2IconFont("\uE713"));
+        Button settingsButton = new Button("Settings", new MDL2IconFont("\uE713"));
         settingsButton.setOnAction(getSettingsActionEventHandler());
 
-        Button overviewButton = new Button("_Overview", new MDL2IconFont("\uE7B3"));
+        Button overviewButton = new Button("Overview", new MDL2IconFont("\uE7B3"));
         overviewButton.setOnAction(getOverviewActionEventHandler());
 
-        Button exportButton = new Button("_Export", new MDL2IconFont("\uE74E"));
+        Button exportButton = new Button("Export", new MDL2IconFont("\uE74E"));
         exportButton.setOnAction(getExportActionEventHandler());
 
         HBox hbox = new HBox(2, progressBar, settingsButton, overviewButton, exportButton);
