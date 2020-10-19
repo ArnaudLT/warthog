@@ -2,3 +2,7 @@
     -fx-tab-max-height: 25px;
     -fx-tab-min-height: 25px;
 }
+
+.tree-cell {
+    -fx-indent: 0px;
+}

@@ -92,7 +92,7 @@ public class ExplorerPane {
         for (NamedColumn namedColumn : namedDataset.getCatalog().getColumns()) {
 
             NamedDatasetItem child = new NamedDatasetItem(namedDataset, namedColumn.getName() + " - " + namedColumn.getType());
-            item.getChildren().add(new TreeItem<>(child, new MDL2IconFont("\uEA81")));
+            item.getChildren().add(new TreeItem<>(child, new MDL2IconFont("\uEBFD")));
         }
         this.treeExplorer.getRoot().getChildren().add(item);
         this.treeExplorer.getSelectionModel().select(item);
