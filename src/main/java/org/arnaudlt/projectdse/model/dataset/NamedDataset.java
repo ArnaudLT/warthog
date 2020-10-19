@@ -383,7 +383,7 @@ public class NamedDataset {
 
         Dataset<Row> output = applyTransformation();
         output = stringify(output);
-        return output.takeAsList(101);
+        return output.takeAsList(100);
     }
 
 

@@ -2,11 +2,19 @@ package org.arnaudlt.projectdse.ui.pane.control;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.projectdse.PoolService;
 import org.arnaudlt.projectdse.model.dataset.NamedDataset;
@@ -53,30 +61,53 @@ public class ControlPane {
         Menu fileMenu = new Menu("File");
 
         MenuItem openFileItem = new MenuItem("Import file...");
+        openFileItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+I"));
         openFileItem.setOnAction(requestImportFile);
 
         MenuItem openParquetItem = new MenuItem("Import Parquet...");
+        openParquetItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+I"));
         openParquetItem.setOnAction(requestImportFolder);
 
         MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+D"));
         deleteItem.setOnAction(requestDelete);
-        fileMenu.getItems().addAll(openFileItem, openParquetItem, deleteItem);
+
+        MenuItem settingsItem = new MenuItem("Settings...");
+        settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+S"));
+        settingsItem.setOnAction(getSettingsActionEventHandler());
+
+        SeparatorMenuItem separator1 = new SeparatorMenuItem();
+        SeparatorMenuItem separator2 = new SeparatorMenuItem();
+
+        fileMenu.getItems().addAll(openFileItem, openParquetItem, separator1, settingsItem, separator2, deleteItem);
 
         Menu runMenu = new Menu("Run");
 
         MenuItem overviewItem = new MenuItem("Overview");
+        overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+O"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
-        MenuItem exportItem = new MenuItem("Export...");
+        MenuItem exportItem = new MenuItem("Export CSV...");
+        exportItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+E"));
         exportItem.setOnAction(getExportActionEventHandler());
 
         runMenu.getItems().addAll(overviewItem, exportItem);
 
-        return new MenuBar(fileMenu, runMenu);
+        MenuBar menuBar = new MenuBar(fileMenu, runMenu);
+
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
+
+        HBox hBox = new HBox(10, menuBar, progressBar);
+        hBox.setMaxHeight(30);
+        hBox.setMinHeight(30);
+        hBox.setAlignment(Pos.BASELINE_LEFT); // bas
+
+        return hBox;
     }
 
 
-    /*private EventHandler<ActionEvent> getSettingsActionEventHandler() {
+    private EventHandler<ActionEvent> getSettingsActionEventHandler() {
 
         return actionEvent -> {
 
@@ -92,7 +123,7 @@ public class ControlPane {
             dialog.setScene(dialogScene);
             dialog.show();
         };
-    }*/
+    }
 
 
     private EventHandler<ActionEvent> getOverviewActionEventHandler() {

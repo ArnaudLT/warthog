@@ -6,3 +6,23 @@
 .tree-cell {
     -fx-indent: 0px;
 }
+
+.progress-bar:indeterminate .dot_1 {
+    -fx-background-color: ACCENT_COLOR;
+}
+
+.progress-bar:indeterminate .dot_2 {
+    -fx-background-color: derive(ACCENT_COLOR, -15%);
+}
+
+.progress-bar:indeterminate .dot_3 {
+    -fx-background-color: derive(ACCENT_COLOR, -30%);
+}
+
+.progress-bar:indeterminate .dot_4 {
+    -fx-background-color: derive(ACCENT_COLOR, -45%);
+}
+
+.progress-bar:indeterminate .dot_5 {
+    -fx-background-color: derive(ACCENT_COLOR, -60%);
+}

@@ -11,13 +11,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.projectdse.PoolService;
 import org.arnaudlt.projectdse.model.dataset.NamedColumn;
 import org.arnaudlt.projectdse.model.dataset.NamedDataset;
-import org.arnaudlt.projectdse.model.dataset.NamedDatasetManager;
 import org.arnaudlt.projectdse.ui.pane.transform.TransformPane;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j

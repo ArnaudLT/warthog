@@ -38,7 +38,7 @@ public class OutputPane {
         final KeyCodeCombination keyCodeCopy = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
         this.tableView.setOnKeyPressed(event -> {
             if (keyCodeCopy.match(event)) {
-                copySelectionToClipboard(tableView);
+                copySelectionToClipboard();
             }
         });
         
@@ -46,7 +46,10 @@ public class OutputPane {
         Button clearButton = new Button("", new MDL2IconFont("\uE74D"));
         clearButton.setOnAction(event -> clear());
 
-        VBox buttonBar = new VBox(clearButton);
+        Button copyButton = new Button("", new MDL2IconFont("\uE8C8"));
+        copyButton.setOnAction(event -> copyAllToClipboard());
+
+        VBox buttonBar = new VBox(clearButton, copyButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
         this.tableView.prefWidthProperty().bind(hBox.widthProperty());
@@ -55,15 +58,22 @@ public class OutputPane {
     }
 
 
-    public void copySelectionToClipboard(final TableView<?> table) {
+    private void copyAllToClipboard() {
 
-        TreeSet<Integer> rows = table.getSelectionModel().getSelectedCells()
+        tableView.getSelectionModel().selectAll();
+        copySelectionToClipboard();
+    }
+
+
+    private void copySelectionToClipboard() {
+
+        TreeSet<Integer> rows = tableView.getSelectionModel().getSelectedCells()
                 .stream()
                 .map(TablePositionBase::getRow)
                 .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
 
         String content = rows.stream()
-                .map(row -> table.getColumns().stream()
+                .map(row -> tableView.getColumns().stream()
                         .map(column -> column.getCellData(row))
                         .map(cellData -> cellData == null ? "" : cellData.toString())
                         .collect(Collectors.joining(";")))
@@ -77,11 +87,11 @@ public class OutputPane {
 
     public void clear() {
 
-        this.clearSecret();
+        this.clearOverview();
     }
 
 
-    protected void clearSecret() {
+    protected void clearOverview() {
 
         this.tableView.getItems().clear();
         this.tableView.getColumns().clear();
@@ -90,14 +100,18 @@ public class OutputPane {
 
     public void fill(List<Row> rows) {
 
-        fillSecret(rows);
+        fillOverview(rows);
     }
 
 
-    protected void fillSecret(List<Row> rows) {
+    protected void fillOverview(List<Row> rows) {
 
-        clearSecret();
-        if (rows == null || rows.isEmpty()) return;
+        clearOverview();
+        if (rows == null || rows.isEmpty()) {
+
+            // TODO : if rows is null or empty we don't have the columns (model) !
+            return;
+        }
 
         for (StructField field : rows.get(0).schema().fields()) {
 
