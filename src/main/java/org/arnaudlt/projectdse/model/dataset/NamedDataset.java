@@ -1,10 +1,8 @@
 package org.arnaudlt.projectdse.model.dataset;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
 import org.arnaudlt.projectdse.model.dataset.transformation.*;
 
 import java.util.Arrays;

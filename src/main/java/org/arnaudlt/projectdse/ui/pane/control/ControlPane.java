@@ -2,74 +2,81 @@ package org.arnaudlt.projectdse.ui.pane.control;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
+import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.MDL2IconFont;
-import jfxtras.styles.jmetro.Style;
+import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.projectdse.PoolService;
 import org.arnaudlt.projectdse.model.dataset.NamedDataset;
+import org.arnaudlt.projectdse.model.dataset.NamedDatasetManager;
+import org.arnaudlt.projectdse.ui.pane.explorer.ExplorerPane;
+import org.arnaudlt.projectdse.ui.pane.explorer.NamedDatasetImportService;
 import org.arnaudlt.projectdse.ui.pane.output.OutputPane;
 import org.arnaudlt.projectdse.ui.pane.transform.TransformPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 
+@Slf4j
 public class ControlPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ControlPane.class);
 
     private final Stage stage;
 
-    private final PoolService poolService;
+    private NamedDatasetManager namedDatasetManager;
+
+    private PoolService poolService;
+
+    private ExplorerPane explorerPane;
 
     private TransformPane transformPane;
 
     private OutputPane outputPane;
 
 
-    public ControlPane(Stage stage, PoolService poolService) {
+    public ControlPane(Stage stage, NamedDatasetManager namedDatasetManager, PoolService poolService) {
 
         this.stage = stage;
+        this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
     }
 
 
     public Node buildControlPane() {
 
-        ProgressBar progressBar = new ProgressBar();
-        progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
+        Menu fileMenu = new Menu("File");
 
-        Button settingsButton = new Button("Settings", new MDL2IconFont("\uE713"));
-        settingsButton.setOnAction(getSettingsActionEventHandler());
+        MenuItem openFileItem = new MenuItem("Import file...");
+        openFileItem.setOnAction(requestImportFile);
 
-        Button overviewButton = new Button("Overview", new MDL2IconFont("\uE7B3"));
-        overviewButton.setOnAction(getOverviewActionEventHandler());
+        MenuItem openParquetItem = new MenuItem("Import Parquet...");
+        openParquetItem.setOnAction(requestImportFolder);
 
-        Button exportButton = new Button("Export", new MDL2IconFont("\uE74E"));
-        exportButton.setOnAction(getExportActionEventHandler());
+        MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setOnAction(requestDelete);
+        fileMenu.getItems().addAll(openFileItem, openParquetItem, deleteItem);
 
-        HBox hbox = new HBox(2, progressBar, settingsButton, overviewButton, exportButton);
-        hbox.setAlignment(Pos.BASELINE_CENTER);
+        Menu runMenu = new Menu("Run");
 
-        hbox.setMinHeight(27);
-        hbox.setMaxHeight(27);
-        return hbox;
+        MenuItem overviewItem = new MenuItem("Overview");
+        overviewItem.setOnAction(getOverviewActionEventHandler());
+
+        MenuItem exportItem = new MenuItem("Export...");
+        exportItem.setOnAction(getExportActionEventHandler());
+
+        runMenu.getItems().addAll(overviewItem, exportItem);
+
+        return new MenuBar(fileMenu, runMenu);
     }
 
 
-    private EventHandler<ActionEvent> getSettingsActionEventHandler() {
+    /*private EventHandler<ActionEvent> getSettingsActionEventHandler() {
 
         return actionEvent -> {
 
@@ -85,7 +92,7 @@ public class ControlPane {
             dialog.setScene(dialogScene);
             dialog.show();
         };
-    }
+    }*/
 
 
     private EventHandler<ActionEvent> getOverviewActionEventHandler() {
@@ -135,6 +142,67 @@ public class ControlPane {
     }
 
 
+    private final EventHandler<ActionEvent> requestImportFile = actionEvent -> {
+
+        FileChooser chooser = new FileChooser();
+        List<File> files = chooser.showOpenMultipleDialog(this.getStage());
+        if (files != null) {
+
+            for (File selectedFile : files) {
+
+                NamedDatasetImportService importService = new NamedDatasetImportService(namedDatasetManager, selectedFile);
+                importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
+                importService.setOnFailed(fail -> failToImport(selectedFile));
+                importService.setExecutor(this.poolService.getExecutor());
+                importService.start();
+            }
+        }
+    };
+
+
+    private final EventHandler<ActionEvent> requestImportFolder = actionEvent -> {
+
+        DirectoryChooser chooser = new DirectoryChooser();
+        File file = chooser.showDialog(this.getStage());
+        if (file != null) {
+
+            NamedDatasetImportService importService = new NamedDatasetImportService(namedDatasetManager, file);
+            importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
+            importService.setOnFailed(fail -> failToImport(file));
+            importService.setExecutor(this.poolService.getExecutor());
+            importService.start();
+
+        }
+    };
+
+
+    private void failToImport(File file) {
+
+        Alert datasetCreationAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
+        datasetCreationAlert.setHeaderText(String.format("Not able to add the dataset '%s'", file.getName()));
+        datasetCreationAlert.setContentText("Please check the file format and its integrity");
+        datasetCreationAlert.show();
+    }
+
+
+    private final EventHandler<ActionEvent> requestDelete = actionEvent -> {
+
+        Set<NamedDataset> selectedItems = this.explorerPane.getSelectedItems();
+        for (NamedDataset selectedNamedDataset : selectedItems) {
+
+            log.info("Request to close named dataset {}", selectedNamedDataset.getName());
+            this.transformPane.closeNamedDataset(selectedNamedDataset);
+            this.explorerPane.removeNamedDataset(selectedNamedDataset);
+            this.namedDatasetManager.deregisterNamedDataset(selectedNamedDataset);
+        }
+    };
+
+
+    public void setExplorerPane(ExplorerPane explorerPane) {
+        this.explorerPane = explorerPane;
+    }
+
+
     public void setTransformPane(TransformPane transformPane) {
         this.transformPane = transformPane;
     }
@@ -142,5 +210,10 @@ public class ControlPane {
 
     public void setOutputPane(OutputPane outputPane) {
         this.outputPane = outputPane;
+    }
+
+
+    public Stage getStage() {
+        return stage;
     }
 }
