@@ -21,7 +21,7 @@ public class SparkInstance {
                 .appName("dataset-explorer")
                 .master("local[4]")
                 .config("spark.ui.enabled", false)
-                .enableHiveSupport()
+                //.enableHiveSupport()
                 .getOrCreate();
 
         spark.sqlContext().udf()
@@ -35,11 +35,11 @@ public class SparkInstance {
 
 
     private static final UDF1<Seq<Object>, String> arrayToString = array ->
-            JavaConverters.seqAsJavaList(array).toString();
+            array != null ? JavaConverters.seqAsJavaList(array).toString() : "";
 
 
     private static final UDF1<scala.collection.Map<String,?>, String> mapToString = map ->
-            JavaConverters.mapAsJavaMap(map).toString().replace("WrappedArray", "");
+            map != null ?JavaConverters.mapAsJavaMap(map).toString().replace("WrappedArray", "") : "";
 
 
 }

@@ -99,7 +99,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         Scene scene = new Scene(root, 1280, 720);
         String styleSheet = getClass().getResource("/style.css").toExternalForm();
         stage.setTitle(" - Warthog - ");
-        stage.getIcons().add(new Image("file:src/main/resources/black-metal.png"));
+        stage.getIcons().add(new Image("/black-metal.png"));
         stage.setOnCloseRequest(closeApplication);
 
         JMetro metro = new JMetro(Style.DARK);
