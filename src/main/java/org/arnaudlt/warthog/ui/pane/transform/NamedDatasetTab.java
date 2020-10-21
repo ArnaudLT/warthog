@@ -194,6 +194,7 @@ public class NamedDatasetTab extends Tab  {
         // Operator
         ComboBox<BooleanOperator> operator = new ComboBox<>();
         operator.getItems().addAll(BooleanOperator.values());
+        operator.setValue(BooleanOperator.EQ);
         operator.visibleProperty().bind(column.valueProperty().isNotNull());
         wc.setOperator(operator.valueProperty());
 

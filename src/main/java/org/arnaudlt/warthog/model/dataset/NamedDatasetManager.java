@@ -88,7 +88,7 @@ public class NamedDatasetManager {
             Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns, join);
 
             return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
-                    file.getName(), dataset, catalog, transformation, new Decoration(sizeInMegaBytes, separator));
+                    file.getName(), dataset, catalog, transformation, new Decoration(file.toPath(), sizeInMegaBytes, separator));
 
         } catch (Exception e) {
 
