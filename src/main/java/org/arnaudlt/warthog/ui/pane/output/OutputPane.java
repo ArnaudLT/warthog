@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 
+import javax.tools.Tool;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -44,9 +45,11 @@ public class OutputPane {
         
         // number of lines in the output. => Dataset<Row> or NamedDataset
         Button clearButton = new Button("", new MDL2IconFont("\uE74D"));
+        clearButton.setTooltip(new Tooltip("Clear overview"));
         clearButton.setOnAction(event -> clear());
 
         Button copyButton = new Button("", new MDL2IconFont("\uE8C8"));
+        copyButton.setTooltip(new Tooltip("Copy all to clipboard"));
         copyButton.setOnAction(event -> copyAllToClipboard());
 
         VBox buttonBar = new VBox(clearButton, copyButton);

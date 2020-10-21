@@ -5,15 +5,11 @@
 => Improve the dataset manipulation :
     => Something to (un)select all the column at once...
 
-=> Drag and drop pour l'import de dataset
-
 => Implement a Partition By (for the output file)
 
 => Finish the Join
 
 => Add hive query support ?
-
-=> Shortcuts (not with "_" !)
 
 => Validate transformation before execution ! (and provide feedback to user)
     => Visual warning when using map/array column in where, group by, ...
