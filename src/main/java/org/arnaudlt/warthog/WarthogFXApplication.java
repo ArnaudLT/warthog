@@ -87,6 +87,9 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
     public void onApplicationEvent(StageReadyEvent stageReadyEvent) {
 
         Stage stage = stageReadyEvent.getStage();
+        stage.setTitle(" - Warthog - ");
+        stage.getIcons().add(new Image("/warthog_icon.png"));
+        stage.setOnCloseRequest(closeApplication);
 
         // For logger inside the app
         Properties loggingProperties = new Properties();
@@ -98,9 +101,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 
         Scene scene = new Scene(root, 1280, 720);
         String styleSheet = getClass().getResource("/style.css").toExternalForm();
-        stage.setTitle(" - Warthog - ");
-        stage.getIcons().add(new Image("/black-metal.png"));
-        stage.setOnCloseRequest(closeApplication);
+
 
         JMetro metro = new JMetro(Style.DARK);
         metro.setAutomaticallyColorPanes(true);
@@ -120,7 +121,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Are you sure ?");
             alert.setHeaderText("Tasks are still running !");
-            alert.setContentText("Are you sure that you want to quit an cancel tasks ?");
+            alert.setContentText("Are you sure that you want to quit and cancel tasks ?");
             Optional<ButtonType> response = alert.showAndWait();
             if (ButtonType.OK != response.get()) {
                 log.info("Request close cancelled");

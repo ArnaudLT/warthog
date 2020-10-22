@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.transform;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -9,7 +10,9 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.ui.util.FormatUtil;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,6 +52,19 @@ public class TransformPane {
                 }
             }
         });
+
+        this.stage.titleProperty().bind(Bindings.createStringBinding(() -> {
+
+            NamedDataset selectedNamedDataset = this.getSelectedNamedDataset();
+            if (selectedNamedDataset != null) {
+
+                return " - Warthog - " +
+                       selectedNamedDataset.getDecoration().getFilePath().toString() + " - " +
+                       FormatUtil.format(selectedNamedDataset.getDecoration().getSizeInMegaBytes()) + "MB";
+            }
+            return " - Warthog - ";
+        }, this.namedDatasetsTabPane.getSelectionModel().selectedItemProperty()));
+
         this.namedDatasetToTab = new ConcurrentHashMap<>();
         return this.namedDatasetsTabPane;
     }

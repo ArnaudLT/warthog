@@ -14,6 +14,8 @@
 => Validate transformation before execution ! (and provide feedback to user)
     => Visual warning when using map/array column in where, group by, ...
 
+=> Capability to change the size of the font and the color theme (DARK/LIGHT)
+
 => Need an easter egg !
 
 ### DEPLOY

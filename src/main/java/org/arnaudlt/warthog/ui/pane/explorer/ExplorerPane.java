@@ -50,22 +50,6 @@ public class ExplorerPane {
         VBox vBox = new VBox(treeExplorer);
         this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
 
-        vBox.setOnDragOver(dragEvent -> {
-
-            if (dragEvent.getDragboard().hasFiles()) {
-                dragEvent.acceptTransferModes(TransferMode.ANY);
-            }
-        });
-
-        vBox.setOnDragDropped(dragEvent -> {
-
-            List<File> files = dragEvent.getDragboard().getFiles();
-            for (File file : files) {
-
-                this.controlPane.importFile(file);
-            }
-        });
-
         return vBox;
     }
 
@@ -77,6 +61,22 @@ public class ExplorerPane {
         TreeView<NamedDatasetItem> tree = new TreeView<>(root);
         tree.setShowRoot(false);
         tree.addEventFilter(MouseEvent.MOUSE_PRESSED, requestOpenSelectedNamedDatasets);
+
+        tree.setOnDragOver(dragEvent -> {
+
+            if (dragEvent.getDragboard().hasFiles()) {
+                dragEvent.acceptTransferModes(TransferMode.ANY);
+            }
+        });
+
+        tree.setOnDragDropped(dragEvent -> {
+
+            List<File> files = dragEvent.getDragboard().getFiles();
+            for (File file : files) {
+
+                this.controlPane.importFile(file);
+            }
+        });
 
         return tree;
     }

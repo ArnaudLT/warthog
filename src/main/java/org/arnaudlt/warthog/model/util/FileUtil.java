@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.model.util;
 
+import org.apache.commons.io.FileUtils;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 
 import java.io.BufferedReader;
@@ -65,16 +66,13 @@ public class FileUtil {
     }
 
 
-    public static String determineName(String filename) {
-
-        return filename.substring(0,filename.lastIndexOf("."))
-                .replace(".", "-")
-                .replace(" ", "_");
-    }
-
-
     public static double getSizeInMegaBytes(File file) {
 
-        return file.length() / 1024d / 1024d;
+        if (file.isDirectory()) {
+
+            return FileUtils.sizeOfDirectory(file) / 1024d / 1024d;
+        } else {
+            return file.length() / 1024d / 1024d;
+        }
     }
 }
