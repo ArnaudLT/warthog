@@ -2,6 +2,7 @@ package org.arnaudlt.warthog.model.dataset;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -83,9 +84,7 @@ public class NamedDatasetManager {
 
             List<WhereClause> whereNamedColumns = new ArrayList<>();
 
-            Join join = new Join();
-
-            Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns, join);
+            Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns);
 
             return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
                     file.getName(), dataset, catalog, transformation, new Decoration(file.toPath(), sizeInMegaBytes, separator));
@@ -109,7 +108,14 @@ public class NamedDatasetManager {
         } else {
 
             this.observableNamedDatasets.add(namedDataset);
-            LOGGER.info("Named dataset {} registered", namedDataset.getName());
+            try {
+                namedDataset.getDataset().createTempView(namedDataset.getViewName());
+            } catch (AnalysisException e) {
+
+                throw new ProcessingException(String.format("Unable to create temporary view, the name %s is invalid or already exists", namedDataset.getName()),
+                        e);
+            }
+            LOGGER.info("Named dataset {} registered (view : `{}`)", namedDataset.getName(), namedDataset.getViewName());
         }
     }
 
@@ -122,6 +128,7 @@ public class NamedDatasetManager {
         } else if (this.observableNamedDatasets.contains(namedDataset)) {
 
             this.observableNamedDatasets.remove(namedDataset);
+            this.spark.catalog().dropTempView(namedDataset.getViewName());
             LOGGER.info("Deregister the named dataset {}", namedDataset.getName());
         } else {
 
@@ -143,6 +150,14 @@ public class NamedDatasetManager {
                 .map(field -> new NamedColumn(this.uniqueIdGenerator.getUniqueId(), field.name(), field.dataType().typeName()))
                 .collect(Collectors.toList());
         return new Catalog(columns);
+    }
+
+
+    public List<Row> generateRowOverview(String sqlQuery) {
+
+        Dataset<Row> sqlResult = this.spark.sqlContext().sql(sqlQuery);
+        sqlResult = NamedDataset.stringify(sqlResult);
+        return sqlResult.takeAsList(50);
     }
 
 

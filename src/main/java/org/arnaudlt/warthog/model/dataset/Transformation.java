@@ -13,14 +13,11 @@ public class Transformation {
 
     private final List<WhereClause> whereClauses;
 
-    private final Join join;
 
-
-    public Transformation(List<SelectNamedColumn> selectNamedColumns, List<WhereClause> whereClauses, Join join) {
+    public Transformation(List<SelectNamedColumn> selectNamedColumns, List<WhereClause> whereClauses) {
 
         this.selectNamedColumns = selectNamedColumns;
         this.whereClauses = whereClauses;
-        this.join = join;
     }
 
 
@@ -35,9 +32,4 @@ public class Transformation {
         return whereClauses;
     }
 
-
-    public Join getJoin() {
-
-        return join;
-    }
 }

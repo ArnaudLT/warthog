@@ -83,6 +83,7 @@ class NamedDatasetManagerTest {
     }
 
 
+    @Test
     void hiveSupport() throws AnalysisException {
 
         File file = new File("src/test/resources/covid19-sample.csv");

@@ -12,7 +12,6 @@ import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.util.FormatUtil;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -31,6 +30,7 @@ public class TransformPane {
 
 
     public TransformPane(Stage stage, NamedDatasetManager namedDatasetManager) {
+
         this.stage = stage;
         this.namedDatasetManager = namedDatasetManager;
     }
@@ -41,6 +41,11 @@ public class TransformPane {
         this.namedDatasetsTabPane = new TabPane();
         this.namedDatasetsTabPane.setSide(Side.BOTTOM);
         this.namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+
+        SqlTab sqlTab = new SqlTab(namedDatasetManager);
+        sqlTab.build();
+        this.namedDatasetsTabPane.getTabs().add(sqlTab); // Permanent tab, always added (not closeable)
+
         this.namedDatasetsTabPane.getTabs().addListener((ListChangeListener<Tab>) change -> {
             while (change.next()) {
 
@@ -62,7 +67,7 @@ public class TransformPane {
                        selectedNamedDataset.getDecoration().getFilePath().toString() + " - " +
                        FormatUtil.format(selectedNamedDataset.getDecoration().getSizeInMegaBytes()) + "MB";
             }
-            return " - Warthog - ";
+            return " - Warthog - SQL";
         }, this.namedDatasetsTabPane.getSelectionModel().selectedItemProperty()));
 
         this.namedDatasetToTab = new ConcurrentHashMap<>();
@@ -101,7 +106,7 @@ public class TransformPane {
 
     private NamedDatasetTab buildNamedDatasetTab(NamedDataset namedDataset) {
 
-        NamedDatasetTab namedDatasetTab = new NamedDatasetTab(namedDatasetManager, namedDataset);
+        NamedDatasetTab namedDatasetTab = new NamedDatasetTab(namedDataset);
         namedDatasetTab.build();
 
         return namedDatasetTab;
@@ -110,9 +115,11 @@ public class TransformPane {
 
     public NamedDataset getSelectedNamedDataset() {
 
-        NamedDatasetTab selectedItem = (NamedDatasetTab) this.namedDatasetsTabPane.getSelectionModel().getSelectedItem();
-        if (selectedItem != null) {
-            return selectedItem.getNamedDataset();
+        Tab selectedTab = this.namedDatasetsTabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab instanceof NamedDatasetTab) {
+
+            NamedDatasetTab selectedNamedDatasetTab = (NamedDatasetTab) selectedTab;
+            return selectedNamedDatasetTab.getNamedDataset();
         } else {
             return null;
         }

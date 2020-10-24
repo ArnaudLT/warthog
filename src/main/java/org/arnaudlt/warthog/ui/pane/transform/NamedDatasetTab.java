@@ -3,34 +3,27 @@ package org.arnaudlt.warthog.ui.pane.transform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedColumn;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
-import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.dataset.transformation.AggregateOperator;
 import org.arnaudlt.warthog.model.dataset.transformation.BooleanOperator;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 
-import java.util.ArrayList;
-
 @Slf4j
 public class NamedDatasetTab extends Tab  {
 
-    private final NamedDatasetManager namedDatasetManager;
 
     private final NamedDataset namedDataset;
 
 
-    public NamedDatasetTab(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset) {
+    public NamedDatasetTab(NamedDataset namedDataset) {
 
         super(namedDataset.getName());
-        this.namedDatasetManager = namedDatasetManager;
         this.namedDataset = namedDataset;
         this.setId(String.valueOf(namedDataset.getId()));
     }
@@ -40,9 +33,8 @@ public class NamedDatasetTab extends Tab  {
 
         Tab selectTab = buildSelectTab();
         Tab whereTab = buildWhereTab();
-        Tab joinTab = buildJoinTab();
 
-        TabPane transformationTabPane = new TabPane(selectTab, whereTab, joinTab);
+        TabPane transformationTabPane = new TabPane(selectTab, whereTab);
         transformationTabPane.setSide(Side.TOP);
         transformationTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -212,67 +204,6 @@ public class NamedDatasetTab extends Tab  {
                 column,
                 operator,
                 operand);
-    }
-
-
-    private Tab buildJoinTab() {
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10d);
-        grid.setVgap(5d);
-
-        grid.addRow(grid.getRowCount(),
-                new Label("Join With"),
-                new Label("Type"),
-                new Label("Column"),
-                new Label(""),
-                new Label("Column")
-        );
-
-        // Available Dataset
-        ComboBox<NamedDataset> datasetToJoin = new ComboBox<>();
-        datasetToJoin.setItems(namedDatasetManager.getObservableNamedDatasets());
-        namedDataset.getTransformation().getJoin().setDatasetToJoin(datasetToJoin.valueProperty());
-
-        // Join Type
-        ComboBox<String> joinType = new ComboBox<>(
-                FXCollections.observableArrayList("inner", "left", "right", "outer", "cross"));
-        namedDataset.getTransformation().getJoin().setJoinType(StringBinding.stringExpression(joinType.valueProperty()));
-
-        // Column from current dataset
-        ComboBox<NamedColumn> leftColumn = new ComboBox<>();
-        for (NamedColumn nc : namedDataset.getCatalog().getColumns()) {
-
-            leftColumn.getItems().add(nc);
-        }
-        namedDataset.getTransformation().getJoin().setLeftColumn(leftColumn.valueProperty());
-
-        // Column from selected available dataset
-        ComboBox<NamedColumn> rightColumn = new ComboBox<>();
-        rightColumn.itemsProperty().bind(Bindings.createObjectBinding(() -> {
-
-                    NamedDataset selectedNamedDataset = datasetToJoin.getValue();
-                    ObservableList<NamedColumn> toReturn;
-                    if (selectedNamedDataset == null) {
-                        toReturn = FXCollections.emptyObservableList();
-                    } else {
-                        toReturn = FXCollections.observableArrayList(new ArrayList<>(datasetToJoin.getValue().getCatalog().getColumns()));
-                    }
-                    return toReturn;
-            }, datasetToJoin.valueProperty()
-        ));
-        namedDataset.getTransformation().getJoin().setRightColumn(rightColumn.valueProperty());
-
-        grid.addRow(grid.getRowCount(),
-                datasetToJoin,
-                joinType,
-                leftColumn,
-                new Label("="),
-                rightColumn
-        );
-
-        ScrollPane scrollPane = new ScrollPane(grid);
-        return new Tab("Join", scrollPane);
     }
 
 

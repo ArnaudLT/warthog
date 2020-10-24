@@ -127,6 +127,7 @@ public class ExplorerPane {
             ObservableList<TreeItem<NamedDatasetItem>> selectedItems = this.treeExplorer.getSelectionModel().getSelectedItems();
             for (TreeItem<NamedDatasetItem> selectedItem : selectedItems) {
 
+                if (selectedItem == null) continue;
                 NamedDataset selectedNamedDataset = selectedItem.getValue().getNamedDataset();
                 log.info("Request to open named dataset {}", selectedNamedDataset.getName());
                 this.transformPane.openNamedDataset(selectedNamedDataset);

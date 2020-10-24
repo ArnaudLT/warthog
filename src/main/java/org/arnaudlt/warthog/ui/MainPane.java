@@ -26,16 +26,17 @@ public class MainPane {
 
     public MainPane(Stage stage, NamedDatasetManager namedDatasetManager, PoolService poolService) {
 
+        this.outputPane = new OutputPane(stage);
+        this.transformPane = new TransformPane(stage, namedDatasetManager);
+
         this.controlPane = new ControlPane(stage, namedDatasetManager, poolService);
         this.explorerPane = new ExplorerPane(stage);
-        this.transformPane = new TransformPane(stage, namedDatasetManager);
-        this.outputPane = new OutputPane(stage);
 
-        this.explorerPane.setTransformPane(this.transformPane);
-        this.explorerPane.setControlPane(controlPane);
-        this.controlPane.setExplorerPane(explorerPane);
+        this.controlPane.setExplorerPane(this.explorerPane);
         this.controlPane.setTransformPane(this.transformPane);
         this.controlPane.setOutputPane(this.outputPane);
+        this.explorerPane.setTransformPane(this.transformPane);
+        this.explorerPane.setControlPane(this.controlPane);
     }
 
 

@@ -93,8 +93,7 @@ public class NamedDataset {
 
     protected Dataset<Row> applyTransformation() {
 
-        Dataset<Row> output = applyJoin(this.dataset);
-        output = applyWhere(output);
+        Dataset<Row> output = applyWhere(this.dataset);
         output = applySelect(output);
         output = applyGroupBy(output);
         output = applySort(output);
@@ -102,25 +101,6 @@ public class NamedDataset {
         output = dropUnselected(output); // drop unselected columns but present in the group by.
 
         return output;
-    }
-
-
-    private Dataset<Row> applyJoin(Dataset<Row> in) {
-
-        Join join = this.getTransformation().getJoin();
-
-        if (join.getDatasetToJoin() == null ||
-            join.getJoinType() == null || join.getJoinType().isEmpty() ||
-            join.getLeftColumn() == null ||
-            join.getRightColumn() == null) {
-
-            log.info("No valid join for dataset {}", this.name);
-            return in;
-        }
-
-        return in.join(join.getDatasetToJoin().getDataset(),
-                dataset.col(join.getLeftColumn().getName()).equalTo(join.getDatasetToJoin().dataset.col(join.getRightColumn().getName())),
-                join.getJoinType());
     }
 
 
@@ -383,7 +363,7 @@ public class NamedDataset {
 
         Dataset<Row> output = applyTransformation();
         output = stringify(output);
-        return output.takeAsList(100);
+        return output.takeAsList(50);
     }
 
 
@@ -401,8 +381,8 @@ public class NamedDataset {
     }
 
 
-    //TODO this is a very low cost map/array stringify function :-)
-    private Dataset<Row> stringify(Dataset<Row> dataset) {
+    //TODO Should be move somewhere else. (useful from NamedDatasetManager)
+    protected static Dataset<Row> stringify(Dataset<Row> dataset) {
 
         Dataset<Row> output = dataset;
 
@@ -420,4 +400,13 @@ public class NamedDataset {
         return output;
     }
 
+
+    public String getViewName() {
+
+        return this.getName().trim()
+                .replace(".", "_")
+                .replace(" ", "_")
+                .replace("-", "_")
+                + "_" + this.id;
+    }
 }

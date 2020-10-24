@@ -58,6 +58,21 @@ public class ControlPane {
 
     public Node buildControlPane() {
 
+        MenuBar menuBar = buildMenuBar();
+
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
+
+        HBox hBox = new HBox(10, menuBar, progressBar);
+        hBox.setMaxHeight(30);
+        hBox.setMinHeight(30);
+        hBox.setAlignment(Pos.BASELINE_LEFT); // bas
+
+        return hBox;
+    }
+
+
+    private MenuBar buildMenuBar() {
         Menu fileMenu = new Menu("File");
 
         MenuItem openFileItem = new MenuItem("Import file...");
@@ -93,17 +108,7 @@ public class ControlPane {
 
         runMenu.getItems().addAll(overviewItem, exportItem);
 
-        MenuBar menuBar = new MenuBar(fileMenu, runMenu);
-
-        ProgressBar progressBar = new ProgressBar();
-        progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
-
-        HBox hBox = new HBox(10, menuBar, progressBar);
-        hBox.setMaxHeight(30);
-        hBox.setMinHeight(30);
-        hBox.setAlignment(Pos.BASELINE_LEFT); // bas
-
-        return hBox;
+        return new MenuBar(fileMenu, runMenu);
     }
 
 

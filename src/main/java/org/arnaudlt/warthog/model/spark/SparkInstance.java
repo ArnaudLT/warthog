@@ -21,7 +21,7 @@ public class SparkInstance {
                 .appName("dataset-explorer")
                 .master("local[4]")
                 .config("spark.ui.enabled", false)
-                //.enableHiveSupport()
+                .enableHiveSupport()
                 .getOrCreate();
 
         spark.sqlContext().udf()
