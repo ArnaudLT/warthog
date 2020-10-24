@@ -9,7 +9,6 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
-import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.util.FormatUtil;
 
 import java.util.List;
@@ -22,17 +21,14 @@ public class TransformPane {
 
     private final Stage stage;
 
-    private final NamedDatasetManager namedDatasetManager;
-
     private TabPane namedDatasetsTabPane;
 
     private ConcurrentMap<NamedDataset, NamedDatasetTab> namedDatasetToTab;
 
 
-    public TransformPane(Stage stage, NamedDatasetManager namedDatasetManager) {
+    public TransformPane(Stage stage) {
 
         this.stage = stage;
-        this.namedDatasetManager = namedDatasetManager;
     }
 
 
@@ -42,7 +38,7 @@ public class TransformPane {
         this.namedDatasetsTabPane.setSide(Side.BOTTOM);
         this.namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
-        SqlTab sqlTab = new SqlTab(namedDatasetManager);
+        SqlTab sqlTab = new SqlTab();
         sqlTab.build();
         this.namedDatasetsTabPane.getTabs().add(sqlTab); // Permanent tab, always added (not closeable)
 
@@ -50,7 +46,7 @@ public class TransformPane {
             while (change.next()) {
 
                 List<NamedDatasetTab> removedList = (List<NamedDatasetTab>) change.getRemoved();
-                for (NamedDatasetTab closedTab : removedList ){
+                for (NamedDatasetTab closedTab : removedList ) {
 
                     log.info("Named dataset tab {} closed", closedTab.getNamedDataset().getName());
                     this.namedDatasetToTab.remove(closedTab.getNamedDataset());
@@ -120,6 +116,19 @@ public class TransformPane {
 
             NamedDatasetTab selectedNamedDatasetTab = (NamedDatasetTab) selectedTab;
             return selectedNamedDatasetTab.getNamedDataset();
+        } else {
+            return null;
+        }
+    }
+
+
+    public String getSqlQuery() {
+
+        Tab selectedTab = this.namedDatasetsTabPane.getSelectionModel().getSelectedItem();
+        if (selectedTab instanceof SqlTab) {
+
+            SqlTab selectedSqlTab = (SqlTab) selectedTab;
+            return selectedSqlTab.getSqlQuery();
         } else {
             return null;
         }

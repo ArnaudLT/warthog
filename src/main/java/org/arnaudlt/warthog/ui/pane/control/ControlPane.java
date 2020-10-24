@@ -23,8 +23,6 @@ import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.explorer.NamedDatasetImportService;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -32,8 +30,6 @@ import java.util.Set;
 
 @Slf4j
 public class ControlPane {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ControlPane.class);
 
     private final Stage stage;
 
@@ -136,12 +132,21 @@ public class ControlPane {
         return event -> {
 
             NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
-            if (selectedNamedDataset == null) return;
-            NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
-            overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-            overviewService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "overview"));
-            overviewService.setExecutor(poolService.getExecutor());
-            overviewService.start();
+            if (selectedNamedDataset == null) {
+
+                final String sqlQuery = this.transformPane.getSqlQuery();
+                SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery);
+                overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
+                overviewService.setOnFailed(fail -> failToGenerate(sqlQuery, "overview"));
+                overviewService.start();
+            } else {
+
+                NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
+                overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
+                overviewService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "overview"));
+                overviewService.setExecutor(poolService.getExecutor());
+                overviewService.start();
+            }
         };
     }
 
@@ -150,20 +155,29 @@ public class ControlPane {
 
         return event -> {
 
-            NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
-            if (selectedNamedDataset == null) return;
-
             FileChooser fc = new FileChooser();
             File exportFile = fc.showSaveDialog(this.stage);
 
             if (exportFile == null) return;
             String filePath = exportFile.getAbsolutePath();
 
-            NamedDatasetExportService exportService = new NamedDatasetExportService(selectedNamedDataset, filePath);
-            exportService.setOnSucceeded(success -> LOGGER.info("Export success !"));
-            exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "export"));
-            exportService.setExecutor(poolService.getExecutor());
-            exportService.start();
+            NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
+            if (selectedNamedDataset == null) {
+
+                final String sqlQuery = this.transformPane.getSqlQuery();
+                SqlExportService exportService = new SqlExportService(namedDatasetManager, sqlQuery, filePath);
+                exportService.setOnSucceeded(success -> log.info("Export success !"));
+                exportService.setOnFailed(fail -> failToGenerate(sqlQuery, "export"));
+                exportService.setExecutor(poolService.getExecutor());
+                exportService.start();
+            } else {
+
+                NamedDatasetExportService exportService = new NamedDatasetExportService(selectedNamedDataset, filePath);
+                exportService.setOnSucceeded(success -> log.info("Export success !"));
+                exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "export"));
+                exportService.setExecutor(poolService.getExecutor());
+                exportService.start();
+            }
         };
     }
 
@@ -175,6 +189,15 @@ public class ControlPane {
                 context, namedDataset.getName()));
         namedDatasetExportAlert.setContentText("Please check the logs ... and cry");
         namedDatasetExportAlert.show();
+    }
+
+
+    private void failToGenerate(String query, String context) {
+
+        Alert sqlAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
+        sqlAlert.setHeaderText(String.format("Not able to generate an %s for query '%s'", context, query));
+        sqlAlert.setContentText("Please check the logs ... and cry");
+        sqlAlert.show();
     }
 
 

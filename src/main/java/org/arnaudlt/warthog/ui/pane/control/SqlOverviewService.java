@@ -1,4 +1,4 @@
-package org.arnaudlt.warthog.ui.pane.transform;
+package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -9,7 +9,7 @@ import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import java.util.List;
 
 @Slf4j
-public class NamedDatasetSqlService extends Service<List<Row>> {
+public class SqlOverviewService extends Service<List<Row>> {
 
 
     private final NamedDatasetManager namedDatasetManager;
@@ -17,7 +17,7 @@ public class NamedDatasetSqlService extends Service<List<Row>> {
     private final String sqlQuery;
 
 
-    public NamedDatasetSqlService(NamedDatasetManager namedDatasetManager, String sqlQuery) {
+    public SqlOverviewService(NamedDatasetManager namedDatasetManager, String sqlQuery) {
         this.namedDatasetManager = namedDatasetManager;
         this.sqlQuery = sqlQuery;
     }
@@ -30,9 +30,8 @@ public class NamedDatasetSqlService extends Service<List<Row>> {
             @Override
             protected List<Row> call() {
 
-                String cleanedSqlQuery = sqlQuery.trim();
-                log.info("Start generating an overview for the sql query : {}", cleanedSqlQuery);
-                return namedDatasetManager.generateRowOverview(cleanedSqlQuery);
+                log.info("Start generating an overview for the sql query : {}", sqlQuery.replace("\n", " "));
+                return namedDatasetManager.generateRowOverview(sqlQuery);
             }
         };
     }

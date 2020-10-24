@@ -2,13 +2,12 @@ package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class NamedDatasetExportService extends Service<Void> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NamedDatasetExportService.class);
 
     private final NamedDataset namedDataset;
 
@@ -28,7 +27,7 @@ public class NamedDatasetExportService extends Service<Void> {
             @Override
             protected Void call() {
 
-                LOGGER.info("Start generating an export for {}", namedDataset.getName());
+                log.info("Start generating an export for {}", namedDataset.getName());
                 namedDataset.export(filePath);
                 return null;
             }

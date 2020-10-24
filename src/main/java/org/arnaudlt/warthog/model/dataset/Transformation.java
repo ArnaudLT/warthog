@@ -1,6 +1,5 @@
 package org.arnaudlt.warthog.model.dataset;
 
-import org.arnaudlt.warthog.model.dataset.transformation.Join;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 

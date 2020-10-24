@@ -7,7 +7,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructField;
-import org.arnaudlt.warthog.model.dataset.transformation.Join;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
@@ -158,6 +157,20 @@ public class NamedDatasetManager {
         Dataset<Row> sqlResult = this.spark.sqlContext().sql(sqlQuery);
         sqlResult = NamedDataset.stringify(sqlResult);
         return sqlResult.takeAsList(50);
+    }
+
+
+    public void export(String sqlQuery, String filePath) {
+
+        Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
+        output = NamedDataset.stringify(output);
+        output
+                .coalesce(1)
+                .write()
+                .option("sep", ";")
+                .option("header", true)
+                .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
+                .csv(filePath);
     }
 
 

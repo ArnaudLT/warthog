@@ -3,18 +3,17 @@ package org.arnaudlt.warthog.ui.pane.transform;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 
 @Slf4j
 public class SqlTab extends Tab {
 
-    private final NamedDatasetManager namedDatasetManager;
+
+    private TextArea sqlArea;
 
 
-    public SqlTab(NamedDatasetManager namedDatasetManager) {
+    public SqlTab() {
 
         super("SQL");
-        this.namedDatasetManager = namedDatasetManager;
         this.setId("SQL");
     }
 
@@ -22,9 +21,15 @@ public class SqlTab extends Tab {
     public void build() {
 
         //https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
-        TextArea sqlArea = new TextArea("Not Yet functional !");
+        this.sqlArea = new TextArea("");
         this.setContent(sqlArea);
         this.setClosable(false);
     }
 
+
+    public String getSqlQuery() {
+
+        // TODO manage multiple queries in the sheet !
+        return this.sqlArea.getText().trim();
+    }
 }
