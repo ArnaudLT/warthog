@@ -1,7 +1,10 @@
 package org.arnaudlt.warthog.ui.pane.transform;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import org.arnaudlt.warthog.PoolService;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -64,6 +67,21 @@ public class SqlCodeArea {
         this.poolService = poolService;
         this.codeArea = new CodeArea();
         this.codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, i -> "%03d"));
+
+        // Auto indent
+        final Pattern whiteSpace = Pattern.compile( "^\\s+" );
+        codeArea.addEventHandler( KeyEvent.KEY_PRESSED, keyEvent ->
+        {
+            if ( keyEvent.getCode() == KeyCode.ENTER ) {
+                int caretPosition = codeArea.getCaretPosition();
+                int currentParagraph = codeArea.getCurrentParagraph();
+                Matcher m0 = whiteSpace.matcher(codeArea.getParagraph( currentParagraph-1 ).getSegments().get(0));
+                if ( m0.find() ) {
+                    Platform.runLater(() -> codeArea.insertText(caretPosition, m0.group()));
+                }
+            }
+        });
+
         this.codeArea.multiPlainChanges()
                 .successionEnds(Duration.ofMillis(500))
                 .supplyTask(this::computeHighlightingAsync)
