@@ -3,10 +3,6 @@
     -fx-tab-min-height: 25px;
 }
 
-.tree-cell {
-    -fx-indent: 0px;
-}
-
 
 .progress-bar:indeterminate .dot_1 {
     -fx-background-color: ACCENT_COLOR;

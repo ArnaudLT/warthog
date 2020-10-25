@@ -1,19 +1,22 @@
 package org.arnaudlt.warthog.ui.pane.transform;
 
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.PoolService;
 
 @Slf4j
 public class SqlTab extends Tab {
 
+    private final PoolService poolService;
 
-    private TextArea sqlArea;
+    private SqlCodeArea sqlArea;
 
 
-    public SqlTab() {
+
+    public SqlTab(PoolService poolService) {
 
         super("SQL");
+        this.poolService = poolService;
         this.setId("SQL");
     }
 
@@ -21,15 +24,14 @@ public class SqlTab extends Tab {
     public void build() {
 
         //https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
-        this.sqlArea = new TextArea("");
-        this.setContent(sqlArea);
+        this.sqlArea = new SqlCodeArea(poolService);
+        this.setContent(this.sqlArea.getWrappedSqlArea());
         this.setClosable(false);
     }
 
 
     public String getSqlQuery() {
 
-        // TODO manage multiple queries in the sheet !
-        return this.sqlArea.getText().trim();
+        return this.sqlArea.getActiveQuery();
     }
 }

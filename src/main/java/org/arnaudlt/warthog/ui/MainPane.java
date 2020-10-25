@@ -27,7 +27,7 @@ public class MainPane {
     public MainPane(Stage stage, NamedDatasetManager namedDatasetManager, PoolService poolService) {
 
         this.outputPane = new OutputPane(stage);
-        this.transformPane = new TransformPane(stage);
+        this.transformPane = new TransformPane(stage, poolService);
 
         this.controlPane = new ControlPane(stage, namedDatasetManager, poolService);
         this.explorerPane = new ExplorerPane(stage);

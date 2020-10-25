@@ -7,10 +7,6 @@
 
 => Implement a Partition By (for the output file)
 
-=> Finish the Join
-
-=> Add hive query support ?
-
 => Validate transformation before execution ! (and provide feedback to user)
     => Visual warning when using map/array column in where, group by, ...
 
@@ -22,7 +18,6 @@
 
 => Need an easter egg !
 
-=> Test lire un parquet partitionnés avec un filter VS pointer vers la partition direct (observer le comportement explain plan ...)
 
 ### DEPLOY
 

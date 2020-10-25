@@ -10,7 +10,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedColumn;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -88,7 +87,7 @@ public class ExplorerPane {
         for (NamedColumn namedColumn : namedDataset.getCatalog().getColumns()) {
 
             NamedDatasetItem child = new NamedDatasetItem(namedDataset, namedColumn.getName() + " - " + namedColumn.getType());
-            item.getChildren().add(new TreeItem<>(child, new MDL2IconFont("\uEBFD")));
+            item.getChildren().add(new TreeItem<>(child));
         }
         this.treeExplorer.getRoot().getChildren().add(item);
         this.treeExplorer.getSelectionModel().select(item);

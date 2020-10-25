@@ -8,6 +8,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.ui.util.FormatUtil;
 
@@ -21,14 +22,17 @@ public class TransformPane {
 
     private final Stage stage;
 
+    private final PoolService poolService;
+
     private TabPane namedDatasetsTabPane;
 
     private ConcurrentMap<NamedDataset, NamedDatasetTab> namedDatasetToTab;
 
 
-    public TransformPane(Stage stage) {
+    public TransformPane(Stage stage, PoolService poolService) {
 
         this.stage = stage;
+        this.poolService = poolService;
     }
 
 
@@ -38,7 +42,7 @@ public class TransformPane {
         this.namedDatasetsTabPane.setSide(Side.BOTTOM);
         this.namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
-        SqlTab sqlTab = new SqlTab();
+        SqlTab sqlTab = new SqlTab(poolService);
         sqlTab.build();
         this.namedDatasetsTabPane.getTabs().add(sqlTab); // Permanent tab, always added (not closeable)
 
