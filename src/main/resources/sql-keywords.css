@@ -1,3 +1,7 @@
+.sql-area {
+    -fx-font-size: 14px;
+}
+
 .keyword {
     -fx-fill: purple;
     -fx-font-weight: bold;

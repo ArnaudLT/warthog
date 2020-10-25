@@ -103,7 +103,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         String styleSheet = getClass().getResource("/style.css").toExternalForm();
         String sqlStyleSheet = getClass().getResource("/sql-keywords.css").toExternalForm();
 
-        JMetro metro = new JMetro(Style.DARK);
+        JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(false);
         metro.setScene(scene);
 

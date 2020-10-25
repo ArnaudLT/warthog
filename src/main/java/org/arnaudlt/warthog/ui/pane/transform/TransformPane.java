@@ -10,8 +10,8 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
-import org.arnaudlt.warthog.ui.util.FormatUtil;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -58,6 +58,7 @@ public class TransformPane {
             }
         });
 
+        DecimalFormat formatter = new DecimalFormat("#.##");
         this.stage.titleProperty().bind(Bindings.createStringBinding(() -> {
 
             NamedDataset selectedNamedDataset = this.getSelectedNamedDataset();
@@ -65,7 +66,7 @@ public class TransformPane {
 
                 return " - Warthog - " +
                        selectedNamedDataset.getDecoration().getFilePath().toString() + " - " +
-                       FormatUtil.format(selectedNamedDataset.getDecoration().getSizeInMegaBytes()) + "MB";
+                       formatter.format(selectedNamedDataset.getDecoration().getSizeInMegaBytes()) + "MB";
             }
             return " - Warthog - SQL";
         }, this.namedDatasetsTabPane.getSelectionModel().selectedItemProperty()));

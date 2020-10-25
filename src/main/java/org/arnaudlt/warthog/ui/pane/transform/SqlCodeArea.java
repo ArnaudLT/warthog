@@ -49,8 +49,8 @@ public class SqlCodeArea {
     private static final String BRACE_PATTERN = "\\{|\\}";
     private static final String BRACKET_PATTERN = "\\[|\\]";
     private static final String SEMICOLON_PATTERN = "\\;";
-    private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
-    private static final String COMMENT_PATTERN = "//[^\n]*" + "|" + "/\\*(.|\\R)*?\\*/";
+    private static final String STRING_PATTERN = "\\`([^\"\\\\]|\\\\.)*\\`" + "|" + "\'([^\"\\\\]|\\\\.)*\'";
+    private static final String COMMENT_PATTERN = "//[^\n]*" + "|\\-\\-(.*)|" + "/\\*(.|\\R)*?\\*/";
 
     private static final Pattern PATTERN = Pattern.compile(
             "(?<KEYWORD>" + KEYWORD_PATTERN + ")"
@@ -66,13 +66,14 @@ public class SqlCodeArea {
 
         this.poolService = poolService;
         this.codeArea = new CodeArea();
+        this.codeArea.getStyleClass().add("sql-area");
         this.codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, i -> "%03d"));
 
         // Auto indent
-        final Pattern whiteSpace = Pattern.compile( "^\\s+" );
-        codeArea.addEventHandler( KeyEvent.KEY_PRESSED, keyEvent ->
-        {
-            if ( keyEvent.getCode() == KeyCode.ENTER ) {
+        final Pattern whiteSpace = Pattern.compile("^\\s+");
+        codeArea.addEventHandler( KeyEvent.KEY_PRESSED, keyEvent -> {
+
+            if ( keyEvent.getCode() == KeyCode.ENTER && codeArea.getCurrentParagraph() > 0) {
                 int caretPosition = codeArea.getCaretPosition();
                 int currentParagraph = codeArea.getCurrentParagraph();
                 Matcher m0 = whiteSpace.matcher(codeArea.getParagraph( currentParagraph-1 ).getSegments().get(0));
