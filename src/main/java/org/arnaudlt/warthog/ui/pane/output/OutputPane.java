@@ -112,6 +112,7 @@ public class OutputPane {
         if (rows == null || rows.isEmpty()) {
 
             // TODO : if rows is null or empty we don't have the columns (model) !
+            log.info("No result to display");
             return;
         }
 
