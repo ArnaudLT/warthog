@@ -138,6 +138,7 @@ public class ControlPane {
                 SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> failToGenerate(sqlQuery, "overview"));
+                overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             } else {
 
