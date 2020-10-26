@@ -5,9 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -77,16 +75,38 @@ public class ExplorerPane {
             }
         });
 
+        final KeyCodeCombination keyCodeCopy = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
+        tree.setOnKeyPressed(event -> {
+            if (keyCodeCopy.match(event)) {
+                copySelectionToClipboard();
+            }
+        });
+
         return tree;
+    }
+
+
+    private void copySelectionToClipboard() {
+
+        String content;
+        TreeItem<NamedDatasetItem> selectedItem = this.treeExplorer.getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            content = "";
+        } else {
+            content = selectedItem.getValue().getSqlName();
+        }
+        final ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(content);
+        Clipboard.getSystemClipboard().setContent(clipboardContent);
     }
 
 
     public void addNamedDatasetItem(NamedDataset namedDataset) {
 
-        TreeItem<NamedDatasetItem> item = new TreeItem<>(new NamedDatasetItem(namedDataset, namedDataset.getName()));
+        TreeItem<NamedDatasetItem> item = new TreeItem<>(new NamedDatasetItem(namedDataset, namedDataset.getName(), namedDataset.getViewName()));
         for (NamedColumn namedColumn : namedDataset.getCatalog().getColumns()) {
 
-            NamedDatasetItem child = new NamedDatasetItem(namedDataset, namedColumn.getName() + " - " + namedColumn.getType());
+            NamedDatasetItem child = new NamedDatasetItem(namedDataset, namedColumn.getName() + " - " + namedColumn.getType(), namedColumn.getName());
             item.getChildren().add(new TreeItem<>(child));
         }
         this.treeExplorer.getRoot().getChildren().add(item);

@@ -8,10 +8,13 @@ public class NamedDatasetItem {
 
     private final String label;
 
+    private final String sqlName;
 
-    public NamedDatasetItem(NamedDataset namedDataset, String label) {
+
+    public NamedDatasetItem(NamedDataset namedDataset, String label, String sqlName) {
         this.namedDataset = namedDataset;
         this.label = label;
+        this.sqlName = sqlName;
     }
 
 
@@ -22,6 +25,18 @@ public class NamedDatasetItem {
 
     public String getLabel() {
         return label;
+    }
+
+
+    public String getSqlName() {
+
+        if (sqlName.contains(" ")) {
+
+            return "`" + sqlName + "`";
+        } else {
+
+            return sqlName;
+        }
     }
 
 

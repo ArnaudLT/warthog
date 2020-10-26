@@ -65,7 +65,13 @@ public class SqlCodeArea {
     public SqlCodeArea(PoolService poolService) {
 
         this.poolService = poolService;
-        this.codeArea = new CodeArea();
+        this.codeArea = new CodeArea(
+                "/*\n" +
+                "   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V)\n" +
+                "   Select the query you want to run and press 'CTRL+O'\n" +
+                "   https://cwiki.apache.org/confluence/display/Hive/LanguageManual\n" +
+                "*/\n"
+        );
         this.codeArea.getStyleClass().add("sql-area");
         this.codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, i -> "%03d"));
 
@@ -144,7 +150,12 @@ public class SqlCodeArea {
 
     public String getActiveQuery() {
 
-        return this.codeArea.getText();
+        String selectedText = this.codeArea.getSelectedText();
+        if (selectedText != null && !selectedText.isBlank()) {
+            return selectedText;
+        } else {
+            return codeArea.getText();
+        }
     }
 
 
