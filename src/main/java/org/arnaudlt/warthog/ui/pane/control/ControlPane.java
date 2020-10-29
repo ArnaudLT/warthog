@@ -72,15 +72,15 @@ public class ControlPane {
         Menu fileMenu = new Menu("File");
 
         MenuItem openFileItem = new MenuItem("Import file...");
-        openFileItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+I"));
+        openFileItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+O"));
         openFileItem.setOnAction(requestImportFile);
 
         MenuItem openParquetItem = new MenuItem("Import Parquet...");
-        openParquetItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+I"));
+        openParquetItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
         openParquetItem.setOnAction(requestImportFolder);
 
         MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+D"));
+        deleteItem.setAccelerator(KeyCodeCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
         MenuItem settingsItem = new MenuItem("Settings...");
@@ -95,7 +95,7 @@ public class ControlPane {
         Menu runMenu = new Menu("Run");
 
         MenuItem overviewItem = new MenuItem("Overview");
-        overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+O"));
+        overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ENTER"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
         MenuItem exportItem = new MenuItem("Export CSV...");
@@ -186,9 +186,8 @@ public class ControlPane {
     private void failToGenerate(NamedDataset namedDataset, String context) {
 
         Alert namedDatasetExportAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        namedDatasetExportAlert.setHeaderText(String.format("Not able to generate an %s for the dataset '%s'",
-                context, namedDataset.getName()));
-        namedDatasetExportAlert.setContentText("Please check the logs ... and cry");
+        namedDatasetExportAlert.setHeaderText(String.format("Not able to generate the %s for the dataset :", context));
+        namedDatasetExportAlert.setContentText(namedDataset.getName());
         namedDatasetExportAlert.show();
     }
 
@@ -196,8 +195,8 @@ public class ControlPane {
     private void failToGenerate(String query, String context) {
 
         Alert sqlAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        sqlAlert.setHeaderText(String.format("Not able to generate an %s for query '%s'", context, query));
-        sqlAlert.setContentText("Please check the logs ... and cry");
+        sqlAlert.setHeaderText(String.format("Not able to generate the %s for the query :", context));
+        sqlAlert.setContentText(query);
         sqlAlert.show();
     }
 
