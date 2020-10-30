@@ -12,7 +12,6 @@ public class SqlTab extends Tab {
     private SqlCodeArea sqlArea;
 
 
-
     public SqlTab(PoolService poolService) {
 
         super("SQL");

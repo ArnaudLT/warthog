@@ -34,6 +34,7 @@ public class OutputPane {
 
         this.tableView = new TableView<>();
         this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        this.tableView.getSelectionModel().setCellSelectionEnabled(true);
 
         final KeyCodeCombination keyCodeCopy = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
         this.tableView.setOnKeyPressed(event -> {
@@ -69,16 +70,22 @@ public class OutputPane {
 
     private void copySelectionToClipboard() {
 
-        TreeSet<Integer> rows = tableView.getSelectionModel().getSelectedCells()
+        TreeSet<Integer> selectedRows = tableView.getSelectionModel().getSelectedCells()
                 .stream()
                 .map(TablePositionBase::getRow)
                 .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
 
-        String content = rows.stream()
-                .map(row -> tableView.getColumns().stream()
-                        .map(column -> column.getCellData(row))
+        TreeSet<Integer> selectedColumns = tableView.getSelectionModel().getSelectedCells()
+                .stream()
+                .map(TablePosition::getColumn)
+                .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
+
+        String content = selectedRows.stream()
+                .map(rowIndex -> selectedColumns.stream()
+                        .map(column -> tableView.getColumns().get(column).getCellData(rowIndex))
                         .map(cellData -> cellData == null ? "" : cellData.toString())
-                        .collect(Collectors.joining(";")))
+                        .collect(Collectors.joining(";"))
+                )
                 .collect(Collectors.joining("\n"));
 
         final ClipboardContent clipboardContent = new ClipboardContent();
