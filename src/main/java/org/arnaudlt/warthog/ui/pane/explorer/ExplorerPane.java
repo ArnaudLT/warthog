@@ -75,7 +75,7 @@ public class ExplorerPane {
             }
         });
 
-        final KeyCodeCombination keyCodeCopy = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
+        final KeyCombination keyCodeCopy = KeyCodeCombination.valueOf("CTRL+C");
         tree.setOnKeyPressed(event -> {
             if (keyCodeCopy.match(event)) {
                 copySelectionToClipboard();

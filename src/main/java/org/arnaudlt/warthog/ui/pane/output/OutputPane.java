@@ -36,12 +36,17 @@ public class OutputPane {
         this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.tableView.getSelectionModel().setCellSelectionEnabled(true);
 
-        final KeyCodeCombination keyCodeCopy = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
+        final KeyCombination keyCodeCopy = KeyCodeCombination.valueOf("CTRL+C");
+        final KeyCombination keyCodeCopyWithHeader = KeyCodeCombination.valueOf("CTRL+SHIFT+C");
         this.tableView.setOnKeyPressed(event -> {
             if (keyCodeCopy.match(event)) {
-                copySelectionToClipboard();
+                copySelectionToClipboard(false);
+            }
+            if (keyCodeCopyWithHeader.match(event)) {
+                copySelectionToClipboard(true);
             }
         });
+
         
         // number of lines in the output. => Dataset<Row> or NamedDataset
         Button clearButton = new Button("", new MDL2IconFont("\uE74D"));
@@ -64,11 +69,11 @@ public class OutputPane {
     private void copyAllToClipboard() {
 
         tableView.getSelectionModel().selectAll();
-        copySelectionToClipboard();
+        copySelectionToClipboard(true);
     }
 
 
-    private void copySelectionToClipboard() {
+    private void copySelectionToClipboard(boolean withHeader) {
 
         TreeSet<Integer> selectedRows = tableView.getSelectionModel().getSelectedCells()
                 .stream()
@@ -80,7 +85,18 @@ public class OutputPane {
                 .map(TablePosition::getColumn)
                 .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
 
-        String content = selectedRows.stream()
+        String content = "";
+
+        if (withHeader) {
+
+            content += selectedColumns.stream()
+                    .map(column -> tableView.getColumns().get(column).getText())
+                    .map(data -> data == null ? "" : data)
+                    .collect(Collectors.joining(";"));
+            content += "\n";
+        }
+
+        content += selectedRows.stream()
                 .map(rowIndex -> selectedColumns.stream()
                         .map(column -> tableView.getColumns().get(column).getCellData(rowIndex))
                         .map(cellData -> cellData == null ? "" : cellData.toString())
