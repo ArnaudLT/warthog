@@ -15,6 +15,7 @@ import org.apache.spark.sql.types.StructField;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 public class OutputPane {
@@ -37,13 +38,21 @@ public class OutputPane {
         this.tableView.getSelectionModel().setCellSelectionEnabled(true);
 
         final KeyCombination keyCodeCopy = KeyCodeCombination.valueOf("CTRL+C");
-        final KeyCombination keyCodeCopyWithHeader = KeyCodeCombination.valueOf("CTRL+SHIFT+C");
+        final KeyCombination keyCodeCopyLineWithHeader = KeyCodeCombination.valueOf("CTRL+SHIFT+C");
+        final KeyCombination keyCodeCopyWithHeader = KeyCodeCombination.valueOf("CTRL+ALT+C");
         this.tableView.setOnKeyPressed(event -> {
             if (keyCodeCopy.match(event)) {
-                copySelectionToClipboard(false);
-            }
-            if (keyCodeCopyWithHeader.match(event)) {
-                copySelectionToClipboard(true);
+
+                copySelectionToClipboard(false, false);
+                event.consume();
+            } else if (keyCodeCopyLineWithHeader.match(event)) {
+
+                copySelectionToClipboard(true, true);
+                event.consume();
+            } else if (keyCodeCopyWithHeader.match(event)) {
+
+                copySelectionToClipboard(true, false);
+                event.consume();
             }
         });
 
@@ -69,21 +78,31 @@ public class OutputPane {
     private void copyAllToClipboard() {
 
         tableView.getSelectionModel().selectAll();
-        copySelectionToClipboard(true);
+        copySelectionToClipboard(true, true);
     }
 
 
-    private void copySelectionToClipboard(boolean withHeader) {
+    private void copySelectionToClipboard(boolean withHeader, boolean allColumns) {
 
         TreeSet<Integer> selectedRows = tableView.getSelectionModel().getSelectedCells()
                 .stream()
                 .map(TablePositionBase::getRow)
                 .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
 
-        TreeSet<Integer> selectedColumns = tableView.getSelectionModel().getSelectedCells()
-                .stream()
-                .map(TablePosition::getColumn)
-                .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
+        TreeSet<Integer> selectedColumns;
+
+        if (allColumns) {
+
+            selectedColumns = IntStream.range(0, tableView.getColumns().size())
+                    .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
+
+        } else {
+
+            selectedColumns = tableView.getSelectionModel().getSelectedCells()
+                    .stream()
+                    .map(TablePosition::getColumn)
+                    .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
+        }
 
         String content = "";
 

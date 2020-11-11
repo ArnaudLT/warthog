@@ -1,5 +1,7 @@
-### CODE
-=> Improve log management (NamedDataset) / logs are lost in Service (thread) :-)
+### BUGS
+=> logs are lost in Service (thread)
+
+=>
 
 ### FEATURES
 => Improve the dataset manipulation :
@@ -10,11 +12,15 @@
 => Validate transformation before execution ! (and provide feedback to user)
     => Visual warning when using map/array column in where, group by, ...
 
-=> Capability to change the size of the font and the color theme (DARK/LIGHT)
+=> Capability to change the size of the font
 
-=> Auto-completion
+=> Auto-completion ?
 
 => Capability to add column ? (primitive types)
+
+=> log management (file + rotation)
+
+=> TableView -> right clic (?) -> count rows
 
 => Need an easter egg !
 
