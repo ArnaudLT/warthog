@@ -10,21 +10,21 @@ You can use the visual query builder, or the Hive SQL worksheet for more complex
 A visual interface to build queries on a single file. 
 You can easily select, aggregate, apply where clauses and sort your results.
 
-![simple query builder](doc/img/visual_query_builder.JPG)
+![simple query builder](doc/img/visual_query_builder.png =100x20)
 
 * Hive SQL worksheet
 
 For more flexibility, you can build your own SQL queries with the Hive SQL worksheet. 
 Here you can use all the features of the SQL (Hive) language - manual is available here : https://cwiki.apache.org/confluence/display/Hive/LanguageManual
 
-![hive join query](doc/img/hive_join_query.JPG)
+![hive join query](doc/img/hive_join_query.png)
 
 * Quick result overview / Export full result as csv file
 
 To quickly visualize the first rows of your query ('Run -> Overview') 
 or to export all the lines in a csv file ('Run' -> 'Export CSV...')
 
-![export_feature](doc/img/export_feature.JPG)
+![export_feature](doc/img/export_feature.png)
 
 ## Quick start
 
