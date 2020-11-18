@@ -10,7 +10,7 @@ You can use the visual query builder, or the Hive SQL worksheet for more complex
 A visual interface to build queries on a single file. 
 You can easily select, aggregate, apply where clauses and sort your results.
 
-![simple query builder](doc/img/visual_query_builder.png =100x20)
+![simple query builder](doc/img/visual_query_builder.png)
 
 * Hive SQL worksheet
 
