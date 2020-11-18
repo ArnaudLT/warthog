@@ -28,9 +28,9 @@ public class SqlCodeArea {
 
 
     private static final String[] KEYWORDS = new String[] {
-            "ALL", "ALTER", "AND", "ARRAY", "AS", "AUTHORIZATION", "BETWEEN", "BIGINT", "BINARY", "BOOLEAN", "BOTH",
+            "ALL", "ALTER", "AND", "ARRAY", "AS", "ASC", "AUTHORIZATION", "BETWEEN", "BIGINT", "BINARY", "BOOLEAN", "BOTH",
             "BY", "CASE", "CAST", "CHAR", "COLUMN", "CONF", "CREATE", "CROSS", "CUBE", "CURRENT", "CURRENT_DATE",
-            "CURRENT_TIMESTAMP", "CURSOR", "DATABASE", "DATE", "DECIMAL", "DELETE", "DESCRIBE", "DISTINCT", "DOUBLE",
+            "CURRENT_TIMESTAMP", "CURSOR", "DATABASE", "DATE", "DECIMAL", "DELETE", "DESC", "DESCRIBE", "DISTINCT", "DOUBLE",
             "DROP", "ELSE", "END", "EXCHANGE", "EXISTS", "EXTENDED", "EXTERNAL", "FALSE", "FETCH", "FLOAT", "FOLLOWING",
             "FOR", "FROM", "FULL", "FUNCTION", "GRANT", "GROUP", "GROUPING", "HAVING", "IF", "IMPORT", "IN", "INNER",
             "INSERT", "INT", "INTERSECT", "INTERVAL", "INTO", "IS", "JOIN", "LATERAL", "LEFT", "LESS", "LIKE", "LOCAL",
@@ -79,7 +79,7 @@ public class SqlCodeArea {
         final Pattern whiteSpace = Pattern.compile("^\\s+");
         codeArea.addEventHandler( KeyEvent.KEY_PRESSED, keyEvent -> {
 
-            if ( keyEvent.getCode() == KeyCode.ENTER && codeArea.getCurrentParagraph() > 0) {
+            if ( keyEvent.getCode() == KeyCode.ENTER && !keyEvent.isControlDown() && !keyEvent.isAltDown() && codeArea.getCurrentParagraph() > 0) {
                 int caretPosition = codeArea.getCaretPosition();
                 int currentParagraph = codeArea.getCurrentParagraph();
                 Matcher m0 = whiteSpace.matcher(codeArea.getParagraph( currentParagraph-1 ).getSegments().get(0));

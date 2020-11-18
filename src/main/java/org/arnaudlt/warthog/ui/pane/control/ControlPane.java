@@ -148,6 +148,7 @@ public class ControlPane {
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             }
+            event.consume();
         };
     }
 
