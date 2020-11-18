@@ -21,15 +21,10 @@ Here you can use all the features of the SQL (Hive) language - manual is availab
 
 * Quick result overview / Export full result as csv file
 
-To quickly visualize the first rows of your query ('Run -> Overview') 
-or to export all the lines in a csv file ('Run' -> 'Export CSV...')
+To quickly visualize the first rows of your query (_'Run -> Overview'_) 
+or to export all the lines in a csv file (_'Run' -> 'Export CSV...'_)
 
 ![export_feature](doc/img/export_feature.png)
-
-## Quick start
-
-* Import Parquet in your session
-
 
 
 # Environment :

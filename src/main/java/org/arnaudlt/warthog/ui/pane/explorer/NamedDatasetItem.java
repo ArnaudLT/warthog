@@ -30,7 +30,8 @@ public class NamedDatasetItem {
 
     public String getSqlName() {
 
-        if (sqlName.contains(" ")) {
+        // TODO This is a quick win. é, è, ê, ô, ... should be catch
+        if (sqlName.contains(" ")) {  
 
             return "`" + sqlName + "`";
         } else {
