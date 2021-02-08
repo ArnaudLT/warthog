@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +31,6 @@ class NamedDatasetManagerTest {
 
     @Autowired
     private SparkSession sparkSession;
-
 
 
     @Test
@@ -62,6 +62,7 @@ class NamedDatasetManagerTest {
                 .option("sep", ";")
                 .option("header", true)
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
+                .mode(SaveMode.Overwrite)
                 .csv("target/with_map_and_array");
     }
 
@@ -94,7 +95,9 @@ class NamedDatasetManagerTest {
         assertEquals(60, sqlResult.count());
 
         String[] tableNames = sparkSession.sqlContext().tableNames();
-        assertEquals(1, tableNames.length);
+        assertEquals(2, tableNames.length); // 1 default test_table
+
+        Arrays.sort(tableNames);
         assertEquals("cov", tableNames[0]);
     }
 

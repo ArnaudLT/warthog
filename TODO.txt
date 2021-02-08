@@ -4,7 +4,7 @@
 =>
 
 ### FEATURES
-=> Improve the dataset manipulation :
+=> Improve the Visual Query Builder :
     => Something to (un)select all the column at once...
 
 => Implement a Partition By (for the output file)
@@ -17,6 +17,8 @@
 => Auto-completion ?
 
 => Capability to add column ? (primitive types)
+=> Capability to empty a dataset
+=> Capability to add / remove lines
 
 => log management (file + rotation)
 
