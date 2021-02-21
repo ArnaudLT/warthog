@@ -72,6 +72,11 @@ public class NamedDatasetManager {
                             .read()
                             .parquet(file.getAbsolutePath());
                     break;
+                case "orc":
+                    dataset = this.spark
+                            .read()
+                            .orc(file.getAbsolutePath());
+                    break;
                 default:
                     throw new ProcessingException(String.format("Not able to read %s file type", fileType));
             }
