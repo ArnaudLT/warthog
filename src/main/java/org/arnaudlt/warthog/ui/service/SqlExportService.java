@@ -1,4 +1,4 @@
-package org.arnaudlt.warthog.ui.pane.control;
+package org.arnaudlt.warthog.ui.service;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

@@ -157,10 +157,9 @@ public class NamedDatasetManager {
     }
 
 
-    public List<Row> generateRowOverview(String sqlQuery) {
+    public Dataset<Row> generateRowOverview(String sqlQuery) {
 
-        Dataset<Row> sqlResult = this.spark.sqlContext().sql(sqlQuery);
-        return sqlResult.takeAsList(50);
+        return this.spark.sqlContext().sql(sqlQuery);
     }
 
 

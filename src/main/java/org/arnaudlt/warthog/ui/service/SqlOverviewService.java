@@ -1,15 +1,14 @@
-package org.arnaudlt.warthog.ui.pane.control;
+package org.arnaudlt.warthog.ui.service;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 
-import java.util.List;
-
 @Slf4j
-public class SqlOverviewService extends Service<List<Row>> {
+public class SqlOverviewService extends Service<Dataset<Row>> {
 
 
     private final NamedDatasetManager namedDatasetManager;
@@ -24,11 +23,11 @@ public class SqlOverviewService extends Service<List<Row>> {
 
 
     @Override
-    protected Task<List<Row>> createTask() {
+    protected Task<Dataset<Row>> createTask() {
 
         return new Task<>() {
             @Override
-            protected List<Row> call() {
+            protected Dataset<Row> call() {
 
                 log.info("Start generating an overview for the sql query : {}", sqlQuery.replace("\n", " "));
                 return namedDatasetManager.generateRowOverview(sqlQuery);

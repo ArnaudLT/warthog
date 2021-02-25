@@ -358,10 +358,9 @@ public class NamedDataset {
     // ######################### OUTPUT ##################################
     // ###################################################################
 
-    public List<Row> generateRowOverview() {
+    public Dataset<Row> generateRowOverview() {
 
-        Dataset<Row> output = applyTransformation();
-        return output.takeAsList(50);
+        return applyTransformation();
     }
 
 

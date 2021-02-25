@@ -1,6 +1,8 @@
 package org.arnaudlt.warthog.ui.pane.output;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -9,8 +11,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
+import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -23,11 +28,16 @@ public class OutputPane {
 
     private final Stage stage;
 
+    private final PoolService poolService;
+
     private TableView<Row> tableView;
 
+    private Dataset<Row> currentDataset;
 
-    public OutputPane(Stage stage) {
+
+    public OutputPane(Stage stage, PoolService poolService) {
         this.stage = stage;
+        this.poolService = poolService;
     }
 
 
@@ -56,8 +66,6 @@ public class OutputPane {
             }
         });
 
-        
-        // number of lines in the output. => Dataset<Row> or NamedDataset
         Button clearButton = new Button("", new MDL2IconFont("\uE74D"));
         clearButton.setTooltip(new Tooltip("Clear overview"));
         clearButton.setOnAction(event -> clear());
@@ -66,12 +74,41 @@ public class OutputPane {
         copyButton.setTooltip(new Tooltip("Copy all to clipboard"));
         copyButton.setOnAction(event -> copyAllToClipboard());
 
-        VBox buttonBar = new VBox(clearButton, copyButton);
+        Button countRowsButton = new Button("", new MDL2IconFont("\uF272"));
+        countRowsButton.setTooltip(new Tooltip("Count rows"));
+        countRowsButton.setOnAction(getDatasetCountRowsEventHandler());
+
+        VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
         this.tableView.prefWidthProperty().bind(hBox.widthProperty());
 
         return hBox;
+    }
+
+
+    private EventHandler<ActionEvent> getDatasetCountRowsEventHandler() {
+
+        return event -> {
+
+            if (this.currentDataset == null) return;
+
+            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(this.currentDataset);
+            datasetCountRowsService.setOnSucceeded(success -> {
+                log.info("Success count rows : {}", datasetCountRowsService.getValue());
+                Alert countRowsAlert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
+                countRowsAlert.setHeaderText(String.format("Number of rows : %s",datasetCountRowsService.getValue()));
+                countRowsAlert.show();
+            });
+            datasetCountRowsService.setOnFailed(fail -> {
+                log.error("Failed to count rows !", fail.getSource().getException());
+                Alert countRowsAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
+                countRowsAlert.setHeaderText("Failed to count rows, please check the logs.");
+                countRowsAlert.show();
+            });
+            datasetCountRowsService.setExecutor(poolService.getExecutor());
+            datasetCountRowsService.start();
+        };
     }
 
 
@@ -131,26 +168,28 @@ public class OutputPane {
 
     public void clear() {
 
-        this.clearOverview();
+        this.currentDataset = null;
+        this.clearTableView();
     }
 
 
-    protected void clearOverview() {
+    protected void clearTableView() {
 
         this.tableView.getItems().clear();
         this.tableView.getColumns().clear();
     }
 
 
-    public void fill(List<Row> rows) {
+    public void fill(Dataset<Row> rows) {
 
-        fillOverview(rows);
+        this.currentDataset = rows;
+        fillOverview(rows.takeAsList(50));
     }
 
 
     protected void fillOverview(List<Row> rows) {
 
-        clearOverview();
+        clearTableView();
         if (rows == null || rows.isEmpty()) {
 
             // TODO : if rows is null or empty we don't have the columns (model) !

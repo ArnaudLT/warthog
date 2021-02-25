@@ -21,7 +21,7 @@ import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
-import org.arnaudlt.warthog.ui.pane.explorer.NamedDatasetImportService;
+import org.arnaudlt.warthog.ui.service.*;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 
