@@ -14,8 +14,7 @@ import javafx.stage.WindowEvent;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
-import org.apache.log4j.PropertyConfigurator;
+import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class WarthogFXApplication extends Application {
 }
 
 
-@Log4j2
+@Slf4j
 @Component
 class StageInitializer implements ApplicationListener<StageReadyEvent> {
 
@@ -90,11 +89,6 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         stage.setTitle(" - Warthog - ");
         stage.getIcons().add(new Image("/warthog_icon.png"));
         stage.setOnCloseRequest(closeApplication);
-
-        // For logger inside the app
-        Properties loggingProperties = new Properties();
-        loggingProperties.load(getClass().getResourceAsStream("/log4j.properties"));
-        PropertyConfigurator.configure(loggingProperties);
 
         MainPane mainPane = new MainPane(stage, namedDatasetManager, poolService);
         Parent root = mainPane.build();

@@ -12,7 +12,7 @@ import java.io.File;
 public class NamedDatasetImportService extends Service<NamedDataset> {
 
 
-    private NamedDatasetManager namedDatasetManager;
+    private final NamedDatasetManager namedDatasetManager;
 
     private final File file;
 

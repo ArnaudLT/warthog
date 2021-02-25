@@ -358,11 +358,9 @@ public class NamedDataset {
     // ######################### OUTPUT ##################################
     // ###################################################################
 
-
     public List<Row> generateRowOverview() {
 
         Dataset<Row> output = applyTransformation();
-        output = stringify(output);
         return output.takeAsList(50);
     }
 
@@ -370,7 +368,6 @@ public class NamedDataset {
     public void export(String filePath) {
 
         Dataset<Row> output = applyTransformation();
-        output = stringify(output);
         output
                 .coalesce(1)
                 .write()
@@ -378,26 +375,6 @@ public class NamedDataset {
                 .option("header", true)
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
                 .csv(filePath);
-    }
-
-
-    //TODO Should be move somewhere else. (useful from NamedDatasetManager)
-    protected static Dataset<Row> stringify(Dataset<Row> dataset) {
-
-        Dataset<Row> output = dataset;
-
-        StructField[] fields = dataset.schema().fields();
-        for (StructField field : fields) {
-
-            if ("map".equals(field.dataType().typeName())) {
-
-                output = output.withColumn(field.name(), functions.callUDF("mapToString", output.col(field.name())));
-            } else if ("array".equals(field.dataType().typeName())) {
-
-                output = output.withColumn(field.name(), functions.callUDF("arrayToString", output.col(field.name())));
-            }
-        }
-        return output;
     }
 
 

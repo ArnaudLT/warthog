@@ -160,7 +160,6 @@ public class NamedDatasetManager {
     public List<Row> generateRowOverview(String sqlQuery) {
 
         Dataset<Row> sqlResult = this.spark.sqlContext().sql(sqlQuery);
-        sqlResult = NamedDataset.stringify(sqlResult);
         return sqlResult.takeAsList(50);
     }
 
@@ -168,7 +167,6 @@ public class NamedDatasetManager {
     public void export(String sqlQuery, String filePath) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
-        output = NamedDataset.stringify(output);
         output
                 .coalesce(1)
                 .write()

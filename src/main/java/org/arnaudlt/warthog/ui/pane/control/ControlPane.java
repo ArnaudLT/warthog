@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -35,7 +36,7 @@ public class ControlPane {
 
     private NamedDatasetManager namedDatasetManager;
 
-    private PoolService poolService;
+    private final PoolService poolService;
 
     private ExplorerPane explorerPane;
 
@@ -75,7 +76,7 @@ public class ControlPane {
         openFileItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+O"));
         openFileItem.setOnAction(requestImportFile);
 
-        MenuItem openParquetItem = new MenuItem("Import Parquet...");
+        MenuItem openParquetItem = new MenuItem("Import directory...");
         openParquetItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
         openParquetItem.setOnAction(requestImportFolder);
 
@@ -137,14 +138,14 @@ public class ControlPane {
                 final String sqlQuery = this.transformPane.getSqlQuery();
                 SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> failToGenerate(sqlQuery, "overview"));
+                overviewService.setOnFailed(fail -> failToGenerate(sqlQuery, fail, "overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             } else {
 
                 NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "overview"));
+                overviewService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, fail, "overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             }
@@ -169,14 +170,14 @@ public class ControlPane {
                 final String sqlQuery = this.transformPane.getSqlQuery();
                 SqlExportService exportService = new SqlExportService(namedDatasetManager, sqlQuery, filePath);
                 exportService.setOnSucceeded(success -> log.info("Export success !"));
-                exportService.setOnFailed(fail -> failToGenerate(sqlQuery, "export"));
+                exportService.setOnFailed(fail -> failToGenerate(sqlQuery, fail,"export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             } else {
 
                 NamedDatasetExportService exportService = new NamedDatasetExportService(selectedNamedDataset, filePath);
                 exportService.setOnSucceeded(success -> log.info("Export success !"));
-                exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, "export"));
+                exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, fail, "export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             }
@@ -184,8 +185,9 @@ public class ControlPane {
     }
 
 
-    private void failToGenerate(NamedDataset namedDataset, String context) {
+    private void failToGenerate(NamedDataset namedDataset, WorkerStateEvent fail, String context) {
 
+        log.error("Failed to generate output", fail.getSource().getException());
         Alert namedDatasetExportAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
         namedDatasetExportAlert.setHeaderText(String.format("Not able to generate the %s for the dataset :", context));
         namedDatasetExportAlert.setContentText(namedDataset.getName());
@@ -193,8 +195,9 @@ public class ControlPane {
     }
 
 
-    private void failToGenerate(String query, String context) {
+    private void failToGenerate(String query, WorkerStateEvent fail, String context) {
 
+        log.error("Failed to generate output", fail.getSource().getException());
         Alert sqlAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
         sqlAlert.setHeaderText(String.format("Not able to generate the %s for the query :", context));
         sqlAlert.setContentText(query);
@@ -231,14 +234,15 @@ public class ControlPane {
 
         NamedDatasetImportService importService = new NamedDatasetImportService(namedDatasetManager, file);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> failToImport(file));
+        importService.setOnFailed(fail -> failToImport(file, fail));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
 
 
-    private void failToImport(File file) {
+    private void failToImport(File file, WorkerStateEvent fail) {
 
+        log.error("Failed to import", fail.getSource().getException());
         Alert datasetCreationAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
         datasetCreationAlert.setHeaderText(String.format("Not able to add the dataset '%s'", file.getName()));
         datasetCreationAlert.setContentText("Please check the file format and its integrity");
