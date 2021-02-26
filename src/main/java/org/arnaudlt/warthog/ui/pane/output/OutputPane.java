@@ -97,7 +97,7 @@ public class OutputPane {
             datasetCountRowsService.setOnSucceeded(success -> {
                 log.info("Success count rows : {}", datasetCountRowsService.getValue());
                 Alert countRowsAlert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
-                countRowsAlert.setHeaderText(String.format("Number of rows : %s",datasetCountRowsService.getValue()));
+                countRowsAlert.setHeaderText("Number of rows : " + datasetCountRowsService.getValue());
                 countRowsAlert.show();
             });
             datasetCountRowsService.setOnFailed(fail -> {

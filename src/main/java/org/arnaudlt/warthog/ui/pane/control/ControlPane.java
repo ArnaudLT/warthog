@@ -189,7 +189,7 @@ public class ControlPane {
 
         log.error("Failed to generate output", fail.getSource().getException());
         Alert namedDatasetExportAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        namedDatasetExportAlert.setHeaderText(String.format("Not able to generate the %s for the dataset :", context));
+        namedDatasetExportAlert.setHeaderText("Not able to generate the "+ context +" for the dataset :");
         namedDatasetExportAlert.setContentText(namedDataset.getName());
         namedDatasetExportAlert.show();
     }
@@ -199,7 +199,7 @@ public class ControlPane {
 
         log.error("Failed to generate output", fail.getSource().getException());
         Alert sqlAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        sqlAlert.setHeaderText(String.format("Not able to generate the %s for the query :", context));
+        sqlAlert.setHeaderText("Not able to generate the "+ context +" for the query :");
         sqlAlert.setContentText(query);
         sqlAlert.show();
     }
@@ -244,7 +244,7 @@ public class ControlPane {
 
         log.error("Failed to import", fail.getSource().getException());
         Alert datasetCreationAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        datasetCreationAlert.setHeaderText(String.format("Not able to add the dataset '%s'", file.getName()));
+        datasetCreationAlert.setHeaderText("Not able to add the dataset '"+ file.getName() +"'");
         datasetCreationAlert.setContentText("Please check the file format and its integrity");
         datasetCreationAlert.show();
     }
