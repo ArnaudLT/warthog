@@ -2,12 +2,10 @@ package org.arnaudlt.warthog.model.dataset;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.dataset.transformation.*;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -91,7 +89,7 @@ public class NamedDataset {
     }
 
 
-    protected Dataset<Row> applyTransformation() {
+    public Dataset<Row> applyTransformation() {
 
         Dataset<Row> output = applyWhere(this.dataset);
         output = applySelect(output);
@@ -352,28 +350,6 @@ public class NamedDataset {
             column = dataset.col(snc.getName());
         }
         return column;
-    }
-
-    // ###################################################################
-    // ######################### OUTPUT ##################################
-    // ###################################################################
-
-    public Dataset<Row> generateRowOverview() {
-
-        return applyTransformation();
-    }
-
-
-    public void export(String filePath) {
-
-        Dataset<Row> output = applyTransformation();
-        output
-                .coalesce(1)
-                .write()
-                .option("sep", this.getDecoration().getSeparator())
-                .option("header", true)
-                .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
-                .csv(filePath);
     }
 
 

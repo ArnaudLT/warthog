@@ -122,7 +122,7 @@ public class ControlPane {
             HBox dialogHBox = new HBox(new Text("Coming soon :-)"));
 
             Scene dialogScene = new Scene(dialogHBox, 800, 450);
-            JMetro metro = new JMetro(Style.DARK);
+            JMetro metro = new JMetro(Style.LIGHT);
             metro.setAutomaticallyColorPanes(true);
             metro.setScene(dialogScene);
             dialog.setScene(dialogScene);
@@ -178,7 +178,7 @@ public class ControlPane {
                 exportService.start();
             } else {
 
-                NamedDatasetExportToCsvService exportService = new NamedDatasetExportToCsvService(selectedNamedDataset, filePath);
+                NamedDatasetExportToCsvService exportService = new NamedDatasetExportToCsvService(namedDatasetManager, selectedNamedDataset, filePath);
                 exportService.setOnSucceeded(success -> log.info("Export success !"));
                 exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, fail, "export"));
                 exportService.setExecutor(poolService.getExecutor());
@@ -196,11 +196,11 @@ public class ControlPane {
             if (selectedNamedDataset == null) {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlExportToDbService sqlExportToDbService = new SqlExportToDbService(namedDatasetManager, sqlQuery, "petit_test");
-                sqlExportToDbService.setOnSucceeded(success -> log.info("Export to DB success !"));
-                sqlExportToDbService.setOnFailed(fail -> failToGenerate(sqlQuery, fail, "DB export"));
-                sqlExportToDbService.setExecutor(poolService.getExecutor());
-                sqlExportToDbService.start();
+                SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager, sqlQuery);
+                sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Export to DB success !"));
+                sqlExportToDatabaseService.setOnFailed(fail -> failToGenerate(sqlQuery, fail, "DB export"));
+                sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
+                sqlExportToDatabaseService.start();
             } else {
 
                 // TODO to implement

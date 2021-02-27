@@ -29,7 +29,7 @@ public class NamedDatasetOverviewService extends Service<Dataset<Row>> {
             protected Dataset<Row> call() {
 
                 log.info("Start generating an overview for {}", namedDataset.getName());
-                return namedDataset.generateRowOverview();
+                return namedDataset.applyTransformation();
             }
         };
     }

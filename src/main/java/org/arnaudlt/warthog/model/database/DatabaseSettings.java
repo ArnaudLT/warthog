@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.Properties;
 
 @Component
-public class DatabaseConnection {
+public class DatabaseSettings {
 
 
     private final String url;
@@ -19,17 +19,21 @@ public class DatabaseConnection {
 
     private final String saveMode;
 
+    private final String table;
 
-    public DatabaseConnection(@Value("${warthog.datasource.url}") String url,
-                              @Value("${warthog.datasource.username}") String user,
-                              @Value("${warthog.datasource.password}") String password,
-                              @Value("${warthog.datasource.driverClassName}") String driver,
-                              @Value("${warthog.datasource.saveMode}")String saveMode) {
+
+    public DatabaseSettings(@Value("${warthog.datasource.url}") String url,
+                            @Value("${warthog.datasource.username}") String user,
+                            @Value("${warthog.datasource.password}") String password,
+                            @Value("${warthog.datasource.driverClassName}") String driver,
+                            @Value("${warthog.datasource.saveMode}") String saveMode,
+                            @Value("${warthog.datasource.table}") String table) {
         this.url = url;
         this.user = user;
         this.password = password;
         this.driver = driver;
         this.saveMode = saveMode;
+        this.table = table;
     }
 
 
@@ -40,6 +44,11 @@ public class DatabaseConnection {
 
     public String getSaveMode() {
         return saveMode;
+    }
+
+
+    public String getTable() {
+        return table;
     }
 
 

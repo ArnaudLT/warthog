@@ -4,7 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
-import org.arnaudlt.warthog.model.database.DatabaseConnection;
+import org.arnaudlt.warthog.model.database.DatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
@@ -27,7 +27,7 @@ public class NamedDatasetManager {
 
     private final SparkSession spark;
 
-    private final DatabaseConnection databaseConnection;
+    private final DatabaseSettings databaseSettings;
 
     private final UniqueIdGenerator uniqueIdGenerator;
 
@@ -35,10 +35,10 @@ public class NamedDatasetManager {
 
 
     @Autowired
-    public NamedDatasetManager(SparkSession spark, DatabaseConnection databaseConnection, UniqueIdGenerator uniqueIdGenerator) {
+    public NamedDatasetManager(SparkSession spark, DatabaseSettings databaseSettings, UniqueIdGenerator uniqueIdGenerator) {
 
         this.spark = spark;
-        this.databaseConnection = databaseConnection;
+        this.databaseSettings = databaseSettings;
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.observableNamedDatasets = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
     }
@@ -164,6 +164,19 @@ public class NamedDatasetManager {
     }
 
 
+    public void exportToCsv(NamedDataset namedDataset, String filePath) {
+
+        Dataset<Row> output = namedDataset.applyTransformation();
+        output
+                .coalesce(1)
+                .write()
+                .option("sep", namedDataset.getDecoration().getSeparator())
+                .option("header", true)
+                .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
+                .csv(filePath);
+    }
+
+
     public void exportToCsv(String sqlQuery, String filePath) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
@@ -177,14 +190,25 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToDatabase(String sqlQuery, String tableName) {
+    public void exportToDatabase(String sqlQuery) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
 
         output
                 .write()
-                .mode(SaveMode.valueOf(databaseConnection.getSaveMode()))
-                .jdbc(databaseConnection.getUrl(), tableName, databaseConnection.getProperties());
+                .mode(SaveMode.valueOf(databaseSettings.getSaveMode()))
+                .jdbc(databaseSettings.getUrl(), databaseSettings.getTable(), databaseSettings.getProperties());
+    }
+
+
+    public void exportToDatabase(NamedDataset namedDataset) {
+
+        Dataset<Row> output = namedDataset.applyTransformation();
+
+        output
+                .write()
+                .mode(SaveMode.valueOf(databaseSettings.getSaveMode()))
+                .jdbc(databaseSettings.getUrl(), databaseSettings.getTable(), databaseSettings.getProperties());
     }
 
 }

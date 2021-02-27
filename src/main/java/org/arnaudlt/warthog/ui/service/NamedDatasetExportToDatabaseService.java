@@ -3,23 +3,20 @@ package org.arnaudlt.warthog.ui.service;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 
 @Slf4j
-public class SqlExportToDbService extends Service<Void> {
+public class NamedDatasetExportToDatabaseService extends Service<Void> {
 
     private final NamedDatasetManager namedDatasetManager;
 
-    private final String sqlQuery;
-
-    private final String tableName;
+    private final NamedDataset namedDataset;
 
 
-    public SqlExportToDbService(NamedDatasetManager namedDatasetManager, String sqlQuery, String tableName) {
-
+    public NamedDatasetExportToDatabaseService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset) {
         this.namedDatasetManager = namedDatasetManager;
-        this.sqlQuery = sqlQuery;
-        this.tableName = tableName;
+        this.namedDataset = namedDataset;
     }
 
 
@@ -30,8 +27,8 @@ public class SqlExportToDbService extends Service<Void> {
             @Override
             protected Void call() {
 
-                log.info("Start generating a DB export for {}", sqlQuery);
-                namedDatasetManager.exportToDatabase(sqlQuery, tableName);
+                log.info("Start generating a CSV export for {}", namedDataset.getName());
+                namedDatasetManager.exportToDatabase(namedDataset);
                 return null;
             }
         };
