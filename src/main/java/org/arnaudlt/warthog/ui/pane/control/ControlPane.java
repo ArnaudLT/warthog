@@ -99,11 +99,14 @@ public class ControlPane {
         overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ENTER"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
-        MenuItem exportItem = new MenuItem("Export CSV...");
-        exportItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+E"));
-        exportItem.setOnAction(getExportActionEventHandler());
+        MenuItem exportCsvItem = new MenuItem("Export to Csv...");
+        exportCsvItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+E"));
+        exportCsvItem.setOnAction(getExportToCsvActionEventHandler());
 
-        runMenu.getItems().addAll(overviewItem, exportItem);
+        MenuItem exportDbItem = new MenuItem("Export to Database...");
+        exportDbItem.setOnAction(getExportToDbActionEventHandler());
+
+        runMenu.getItems().addAll(overviewItem, exportCsvItem, exportDbItem);
 
         return new MenuBar(fileMenu, runMenu);
     }
@@ -154,7 +157,7 @@ public class ControlPane {
     }
 
 
-    private EventHandler<ActionEvent> getExportActionEventHandler() {
+    private EventHandler<ActionEvent> getExportToCsvActionEventHandler() {
 
         return event -> {
 
@@ -168,18 +171,39 @@ public class ControlPane {
             if (selectedNamedDataset == null) {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlExportService exportService = new SqlExportService(namedDatasetManager, sqlQuery, filePath);
+                SqlExportToCsvService exportService = new SqlExportToCsvService(namedDatasetManager, sqlQuery, filePath);
                 exportService.setOnSucceeded(success -> log.info("Export success !"));
                 exportService.setOnFailed(fail -> failToGenerate(sqlQuery, fail,"export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             } else {
 
-                NamedDatasetExportService exportService = new NamedDatasetExportService(selectedNamedDataset, filePath);
+                NamedDatasetExportToCsvService exportService = new NamedDatasetExportToCsvService(selectedNamedDataset, filePath);
                 exportService.setOnSucceeded(success -> log.info("Export success !"));
                 exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, fail, "export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
+            }
+        };
+    }
+
+
+    private EventHandler<ActionEvent> getExportToDbActionEventHandler() {
+
+        return event -> {
+
+            NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
+            if (selectedNamedDataset == null) {
+
+                final String sqlQuery = this.transformPane.getSqlQuery();
+                SqlExportToDbService sqlExportToDbService = new SqlExportToDbService(namedDatasetManager, sqlQuery, "petit_test");
+                sqlExportToDbService.setOnSucceeded(success -> log.info("Export to DB success !"));
+                sqlExportToDbService.setOnFailed(fail -> failToGenerate(sqlQuery, fail, "DB export"));
+                sqlExportToDbService.setExecutor(poolService.getExecutor());
+                sqlExportToDbService.start();
+            } else {
+
+                // TODO to implement
             }
         };
     }

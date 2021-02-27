@@ -3,6 +3,8 @@ package org.arnaudlt.warthog.model.spark;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import scala.collection.JavaConverters;
@@ -13,13 +15,22 @@ import scala.collection.Seq;
 public class SparkInstance {
 
 
+    private final Integer sparkThreadCount;
+
+
+    @Autowired
+    public SparkInstance(@Value("${warthog.spark.threadCount}") Integer sparkThreadCount) {
+        this.sparkThreadCount = sparkThreadCount;
+    }
+
+
     @Bean
     public SparkSession getSpark() {
 
         SparkSession spark = SparkSession
                 .builder()
                 .appName("dataset-explorer")
-                .master("local[4]")
+                .master("local["+ sparkThreadCount +"]")
                 .config("spark.ui.enabled", false)
                 .enableHiveSupport()
                 .getOrCreate();

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 
 @Slf4j
-public class NamedDatasetExportService extends Service<Void> {
+public class NamedDatasetExportToCsvService extends Service<Void> {
 
 
     private final NamedDataset namedDataset;
@@ -14,7 +14,7 @@ public class NamedDatasetExportService extends Service<Void> {
     private final String filePath;
 
 
-    public NamedDatasetExportService(NamedDataset namedDataset, String filePath) {
+    public NamedDatasetExportToCsvService(NamedDataset namedDataset, String filePath) {
         this.namedDataset = namedDataset;
         this.filePath = filePath;
     }
@@ -27,7 +27,7 @@ public class NamedDatasetExportService extends Service<Void> {
             @Override
             protected Void call() {
 
-                log.info("Start generating an export for {}", namedDataset.getName());
+                log.info("Start generating a CSV export for {}", namedDataset.getName());
                 namedDataset.export(filePath);
                 return null;
             }

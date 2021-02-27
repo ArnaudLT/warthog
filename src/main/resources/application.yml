@@ -1,3 +1,13 @@
 spring:
   main:
     web-application-type: none
+
+warthog:
+  spark:
+    threadCount: 4
+  datasource:
+    saveMode: Overwrite
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: admin
+    driverClassName: org.postgresql.Driver

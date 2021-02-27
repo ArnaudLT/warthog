@@ -2,11 +2,9 @@ package org.arnaudlt.warthog.model.dataset;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.spark.sql.AnalysisException;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
+import org.arnaudlt.warthog.model.database.DatabaseConnection;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
@@ -29,15 +27,18 @@ public class NamedDatasetManager {
 
     private final SparkSession spark;
 
+    private final DatabaseConnection databaseConnection;
+
     private final UniqueIdGenerator uniqueIdGenerator;
 
     private final ObservableList<NamedDataset> observableNamedDatasets;
 
 
     @Autowired
-    public NamedDatasetManager(SparkSession spark, UniqueIdGenerator uniqueIdGenerator) {
+    public NamedDatasetManager(SparkSession spark, DatabaseConnection databaseConnection, UniqueIdGenerator uniqueIdGenerator) {
 
         this.spark = spark;
+        this.databaseConnection = databaseConnection;
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.observableNamedDatasets = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
     }
@@ -163,7 +164,7 @@ public class NamedDatasetManager {
     }
 
 
-    public void export(String sqlQuery, String filePath) {
+    public void exportToCsv(String sqlQuery, String filePath) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
         output
@@ -175,5 +176,15 @@ public class NamedDatasetManager {
                 .csv(filePath);
     }
 
+
+    public void exportToDatabase(String sqlQuery, String tableName) {
+
+        Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
+
+        output
+                .write()
+                .mode(SaveMode.valueOf(databaseConnection.getSaveMode()))
+                .jdbc(databaseConnection.getUrl(), tableName, databaseConnection.getProperties());
+    }
 
 }
