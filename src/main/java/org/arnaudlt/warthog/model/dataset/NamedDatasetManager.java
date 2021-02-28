@@ -155,7 +155,7 @@ public class NamedDatasetManager {
     }
 
 
-    public Dataset<Row> generateRowOverview(String sqlQuery) {
+    public Dataset<Row> prepareDataset(String sqlQuery) {
 
         return this.spark.sqlContext().sql(sqlQuery);
     }

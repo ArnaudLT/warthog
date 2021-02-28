@@ -6,9 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
+import org.arnaudlt.warthog.model.dataset.PreparedDataset;
 
 @Slf4j
-public class NamedDatasetOverviewService extends Service<Dataset<Row>> {
+public class NamedDatasetOverviewService extends Service<PreparedDataset> {
 
 
     private final NamedDataset namedDataset;
@@ -20,14 +21,15 @@ public class NamedDatasetOverviewService extends Service<Dataset<Row>> {
 
 
     @Override
-    protected Task<Dataset<Row>> createTask() {
+    protected Task<PreparedDataset> createTask() {
 
         return new Task<>() {
             @Override
-            protected Dataset<Row> call() {
+            protected PreparedDataset call() {
 
                 log.info("Start generating an overview for {}", namedDataset.getName());
-                return namedDataset.applyTransformation();
+                Dataset<Row> output = namedDataset.applyTransformation();
+                return new PreparedDataset(output, output.takeAsList(50));
             }
         };
     }

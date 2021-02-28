@@ -15,6 +15,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.dataset.PreparedDataset;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 
@@ -33,7 +34,7 @@ public class OutputPane {
 
     private TableView<Row> tableView;
 
-    private Dataset<Row> currentDataset;
+    private PreparedDataset preparedDataset;
 
 
     public OutputPane(Stage stage, PoolService poolService) {
@@ -92,9 +93,9 @@ public class OutputPane {
 
         return event -> {
 
-            if (this.currentDataset == null) return;
+            if (this.preparedDataset == null) return;
 
-            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(this.currentDataset);
+            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(this.preparedDataset.getDataset());
             datasetCountRowsService.setOnSucceeded(success -> {
                 log.info("Success count rows : {}", datasetCountRowsService.getValue());
                 Alert countRowsAlert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
@@ -164,7 +165,7 @@ public class OutputPane {
 
     public void clear() {
 
-        this.currentDataset = null;
+        this.preparedDataset = null;
         this.clearTableView();
     }
 
@@ -176,10 +177,10 @@ public class OutputPane {
     }
 
 
-    public void fill(Dataset<Row> rows) {
+    public void fill(PreparedDataset preparedDataset) {
 
-        this.currentDataset = rows;
-        fillOverview(rows.takeAsList(50));
+        this.preparedDataset = preparedDataset;
+        fillOverview(preparedDataset.getOverview());
     }
 
 
