@@ -30,14 +30,21 @@ public class NamedDatasetItem {
 
     public String getSqlName() {
 
-        // TODO This is a quick win. é, è, ê, ô, ... should be catch
-        if (sqlName.contains(" ")) {  
+        if (containsSpecialCharacter(sqlName)) {
 
             return "`" + sqlName + "`";
         } else {
 
             return sqlName;
         }
+    }
+
+
+    private boolean containsSpecialCharacter(String value) {
+
+        return value
+                .chars()
+                .anyMatch(i -> !((i > 64 && i < 91) || (i > 96 && i < 123) || (i > 47 && i < 58)));
     }
 
 

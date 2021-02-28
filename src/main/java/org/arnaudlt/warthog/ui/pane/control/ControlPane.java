@@ -132,10 +132,8 @@ public class ControlPane {
             grid.setAlignment(Pos.CENTER);
             grid.setHgap(10);
             grid.setVgap(10);
-            grid.setPadding(new Insets(20,25,20,25));
 
             int i = 0;
-            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
 
             Label tableNameLabel = new Label("Table name :");
             TextField tableName = new TextField();
@@ -181,7 +179,7 @@ public class ControlPane {
             });
             grid.addRow(i++, exportButton);
 
-            Scene dialogScene = new Scene(grid, 350, 360);
+            Scene dialogScene = new Scene(grid, 320, 300);
             JMetro metro = new JMetro(Style.LIGHT);
             metro.setAutomaticallyColorPanes(true);
             metro.setScene(dialogScene);
