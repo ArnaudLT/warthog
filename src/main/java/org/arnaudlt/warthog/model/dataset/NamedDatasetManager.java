@@ -27,18 +27,15 @@ public class NamedDatasetManager {
 
     private final SparkSession spark;
 
-    private final DatabaseSettings databaseSettings;
-
     private final UniqueIdGenerator uniqueIdGenerator;
 
     private final ObservableList<NamedDataset> observableNamedDatasets;
 
 
     @Autowired
-    public NamedDatasetManager(SparkSession spark, DatabaseSettings databaseSettings, UniqueIdGenerator uniqueIdGenerator) {
+    public NamedDatasetManager(SparkSession spark, UniqueIdGenerator uniqueIdGenerator) {
 
         this.spark = spark;
-        this.databaseSettings = databaseSettings;
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.observableNamedDatasets = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
     }
@@ -190,7 +187,7 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToDatabase(String sqlQuery) {
+    public void exportToDatabase(String sqlQuery, DatabaseSettings databaseSettings) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
 
@@ -201,7 +198,7 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToDatabase(NamedDataset namedDataset) {
+    public void exportToDatabase(NamedDataset namedDataset, DatabaseSettings databaseSettings) {
 
         Dataset<Row> output = namedDataset.applyTransformation();
 

@@ -5,7 +5,6 @@ import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.arnaudlt.warthog.model.dataset.NamedDataset;
 
 @Slf4j
 public class DatasetCountRowsService extends Service<Long> {

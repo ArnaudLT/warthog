@@ -103,7 +103,9 @@ public class OutputPane {
             datasetCountRowsService.setOnFailed(fail -> {
                 log.error("Failed to count rows !", fail.getSource().getException());
                 Alert countRowsAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-                countRowsAlert.setHeaderText("Failed to count rows, please check the logs.");
+                countRowsAlert.setHeaderText("Failed to count rows");
+                TextArea stack = new TextArea(fail.getSource().getException().toString());
+                countRowsAlert.getDialogPane().setContent(stack);
                 countRowsAlert.show();
             });
             datasetCountRowsService.setExecutor(poolService.getExecutor());

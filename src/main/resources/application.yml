@@ -5,10 +5,3 @@ spring:
 warthog:
   spark:
     threadCount: 4
-  datasource:
-    saveMode: Overwrite
-    table: export_dataset
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: admin
-    driverClassName: org.postgresql.Driver

@@ -24,7 +24,6 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.Properties;
 
 public class WarthogFXApplication extends Application {
 

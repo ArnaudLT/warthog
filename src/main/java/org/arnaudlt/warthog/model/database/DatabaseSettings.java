@@ -1,11 +1,8 @@
 package org.arnaudlt.warthog.model.database;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.util.Properties;
 
-@Component
+
 public class DatabaseSettings {
 
 
@@ -22,12 +19,7 @@ public class DatabaseSettings {
     private final String table;
 
 
-    public DatabaseSettings(@Value("${warthog.datasource.url}") String url,
-                            @Value("${warthog.datasource.username}") String user,
-                            @Value("${warthog.datasource.password}") String password,
-                            @Value("${warthog.datasource.driverClassName}") String driver,
-                            @Value("${warthog.datasource.saveMode}") String saveMode,
-                            @Value("${warthog.datasource.table}") String table) {
+    public DatabaseSettings(String url, String user, String password, String driver, String saveMode, String table) {
         this.url = url;
         this.user = user;
         this.password = password;

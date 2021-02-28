@@ -1,14 +1,19 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
+import javafx.collections.FXCollections;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -18,6 +23,7 @@ import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.database.DatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
@@ -104,11 +110,107 @@ public class ControlPane {
         exportCsvItem.setOnAction(getExportToCsvActionEventHandler());
 
         MenuItem exportDbItem = new MenuItem("Export to Database...");
-        exportDbItem.setOnAction(getExportToDbActionEventHandler());
+        exportDbItem.setOnAction(getExportMenuActionEventHandler());
 
         runMenu.getItems().addAll(overviewItem, exportCsvItem, exportDbItem);
 
         return new MenuBar(fileMenu, runMenu);
+    }
+
+
+    private EventHandler<ActionEvent> getExportMenuActionEventHandler() {
+
+        return actionEvent -> {
+
+            final Stage dialog = new Stage();
+            dialog.setTitle("Export to Database");
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(this.stage);
+            dialog.setResizable(false);
+
+            GridPane grid = new GridPane();
+            grid.setAlignment(Pos.CENTER);
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(20,25,20,25));
+
+            int i = 0;
+            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
+
+            Label tableNameLabel = new Label("Table name :");
+            TextField tableName = new TextField();
+            grid.addRow(i++, tableNameLabel, tableName);
+
+            Label saveModeLabel = new Label("Save mode:");
+            ComboBox<String> saveMode = new ComboBox<>(FXCollections.observableArrayList("Overwrite", "Append"));
+            saveMode.setValue("Overwrite");
+            grid.addRow(i++, saveModeLabel, saveMode);
+
+            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
+
+            Label driverLabel = new Label("Driver :");
+            ComboBox<String> driver = new ComboBox<>(
+                    FXCollections.observableArrayList("org.postgresql.Driver", "oracle.jdbc.driver.OracleDriver"));
+            driver.setValue("org.postgresql.Driver");
+            grid.addRow(i++, driverLabel, driver);
+
+            Label urlLabel = new Label("Url :");
+            TextField url = new TextField();
+            url.setText("jdbc:postgresql://localhost:5432/postgres");
+            grid.addRow(i++, urlLabel, url);
+
+            Label userLabel = new Label("User :");
+            TextField user = new TextField();
+            user.setText("postgres");
+            grid.addRow(i++, userLabel, user);
+
+            Label passwordLabel = new Label("Password :");
+            PasswordField password = new PasswordField();
+            password.setText("admin");
+            grid.addRow(i++, passwordLabel, password);
+
+            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
+
+            Button exportButton = new Button("Export");
+            exportButton.setOnAction(event -> {
+
+                DatabaseSettings dbSettings = new DatabaseSettings(url.getText(), user.getText(), password.getText(),
+                        driver.getValue(), saveMode.getValue(), tableName.getText());
+                exportToDatabase(dbSettings);
+                dialog.close();
+            });
+            grid.addRow(i++, exportButton);
+
+            Scene dialogScene = new Scene(grid, 350, 360);
+            JMetro metro = new JMetro(Style.LIGHT);
+            metro.setAutomaticallyColorPanes(true);
+            metro.setScene(dialogScene);
+            dialog.setScene(dialogScene);
+            dialog.show();
+        };
+    }
+
+
+    private void exportToDatabase(DatabaseSettings databaseSettings) {
+
+        NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
+        if (selectedNamedDataset == null) {
+
+            final String sqlQuery = this.transformPane.getSqlQuery();
+            SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager, sqlQuery, databaseSettings);
+            sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
+            sqlExportToDatabaseService.setOnFailed(fail -> failToGenerate(fail, "database export"));
+            sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
+            sqlExportToDatabaseService.start();
+        } else {
+
+            NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
+                    new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, databaseSettings);
+            namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
+            namedDatasetExportToDatabaseService.setOnFailed(fail -> failToGenerate(fail, "database export"));
+            namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
+            namedDatasetExportToDatabaseService.start();
+        }
     }
 
 
@@ -141,14 +243,14 @@ public class ControlPane {
                 final String sqlQuery = this.transformPane.getSqlQuery();
                 SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> failToGenerate(sqlQuery, fail, "overview"));
+                overviewService.setOnFailed(fail -> failToGenerate(fail, "overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             } else {
 
                 NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, fail, "overview"));
+                overviewService.setOnFailed(fail -> failToGenerate(fail, "overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             }
@@ -172,15 +274,15 @@ public class ControlPane {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
                 SqlExportToCsvService exportService = new SqlExportToCsvService(namedDatasetManager, sqlQuery, filePath);
-                exportService.setOnSucceeded(success -> log.info("Export success !"));
-                exportService.setOnFailed(fail -> failToGenerate(sqlQuery, fail,"export"));
+                exportService.setOnSucceeded(success -> log.info("Csv export succeeded"));
+                exportService.setOnFailed(fail -> failToGenerate(fail,"export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             } else {
 
                 NamedDatasetExportToCsvService exportService = new NamedDatasetExportToCsvService(namedDatasetManager, selectedNamedDataset, filePath);
-                exportService.setOnSucceeded(success -> log.info("Export success !"));
-                exportService.setOnFailed(fail -> failToGenerate(selectedNamedDataset, fail, "export"));
+                exportService.setOnSucceeded(success -> log.info("Csv export succeeded"));
+                exportService.setOnFailed(fail -> failToGenerate(fail, "export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             }
@@ -188,43 +290,13 @@ public class ControlPane {
     }
 
 
-    private EventHandler<ActionEvent> getExportToDbActionEventHandler() {
-
-        return event -> {
-
-            NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
-            if (selectedNamedDataset == null) {
-
-                final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager, sqlQuery);
-                sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Export to DB success !"));
-                sqlExportToDatabaseService.setOnFailed(fail -> failToGenerate(sqlQuery, fail, "DB export"));
-                sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
-                sqlExportToDatabaseService.start();
-            } else {
-
-                // TODO to implement
-            }
-        };
-    }
-
-
-    private void failToGenerate(NamedDataset namedDataset, WorkerStateEvent fail, String context) {
-
-        log.error("Failed to generate output", fail.getSource().getException());
-        Alert namedDatasetExportAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        namedDatasetExportAlert.setHeaderText("Not able to generate the "+ context +" for the dataset :");
-        namedDatasetExportAlert.setContentText(namedDataset.getName());
-        namedDatasetExportAlert.show();
-    }
-
-
-    private void failToGenerate(String query, WorkerStateEvent fail, String context) {
+    private void failToGenerate(WorkerStateEvent fail, String context) {
 
         log.error("Failed to generate output", fail.getSource().getException());
         Alert sqlAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        sqlAlert.setHeaderText("Not able to generate the "+ context +" for the query :");
-        sqlAlert.setContentText(query);
+        sqlAlert.setHeaderText("Not able to generate the "+ context);
+        TextArea stack = new TextArea(fail.getSource().getException().toString());
+        sqlAlert.getDialogPane().setContent(stack);
         sqlAlert.show();
     }
 
@@ -269,7 +341,8 @@ public class ControlPane {
         log.error("Failed to import", fail.getSource().getException());
         Alert datasetCreationAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
         datasetCreationAlert.setHeaderText("Not able to add the dataset '"+ file.getName() +"'");
-        datasetCreationAlert.setContentText("Please check the file format and its integrity");
+        TextArea stack = new TextArea(fail.getSource().getException().toString());
+        datasetCreationAlert.getDialogPane().setContent(stack);
         datasetCreationAlert.show();
     }
 

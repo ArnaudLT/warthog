@@ -7,8 +7,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 
-import java.util.List;
-
 @Slf4j
 public class NamedDatasetOverviewService extends Service<Dataset<Row>> {
 
