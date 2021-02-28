@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -26,10 +24,11 @@ import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.database.DatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
-import org.arnaudlt.warthog.ui.service.*;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
+import org.arnaudlt.warthog.ui.service.*;
 
 import java.io.File;
 import java.util.List;
@@ -290,12 +289,7 @@ public class ControlPane {
 
     private void failToGenerate(WorkerStateEvent fail, String context) {
 
-        log.error("Failed to generate output", fail.getSource().getException());
-        Alert sqlAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        sqlAlert.setHeaderText("Not able to generate the "+ context);
-        TextArea stack = new TextArea(fail.getSource().getException().toString());
-        sqlAlert.getDialogPane().setContent(stack);
-        sqlAlert.show();
+        AlertError.showFailureAlert(fail, "Not able to generate the "+ context);
     }
 
 
@@ -328,20 +322,9 @@ public class ControlPane {
 
         NamedDatasetImportService importService = new NamedDatasetImportService(namedDatasetManager, file);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> failToImport(file, fail));
+        importService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to add the dataset '"+ file.getName() +"'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
-    }
-
-
-    private void failToImport(File file, WorkerStateEvent fail) {
-
-        log.error("Failed to import", fail.getSource().getException());
-        Alert datasetCreationAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        datasetCreationAlert.setHeaderText("Not able to add the dataset '"+ file.getName() +"'");
-        TextArea stack = new TextArea(fail.getSource().getException().toString());
-        datasetCreationAlert.getDialogPane().setContent(stack);
-        datasetCreationAlert.show();
     }
 
 

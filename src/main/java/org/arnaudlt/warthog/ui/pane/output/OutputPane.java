@@ -15,6 +15,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 
 import java.util.List;
@@ -100,14 +101,7 @@ public class OutputPane {
                 countRowsAlert.setHeaderText("Number of rows : " + datasetCountRowsService.getValue());
                 countRowsAlert.show();
             });
-            datasetCountRowsService.setOnFailed(fail -> {
-                log.error("Failed to count rows !", fail.getSource().getException());
-                Alert countRowsAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-                countRowsAlert.setHeaderText("Failed to count rows");
-                TextArea stack = new TextArea(fail.getSource().getException().toString());
-                countRowsAlert.getDialogPane().setContent(stack);
-                countRowsAlert.show();
-            });
+            datasetCountRowsService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Failed to count rows"));
             datasetCountRowsService.setExecutor(poolService.getExecutor());
             datasetCountRowsService.start();
         };
