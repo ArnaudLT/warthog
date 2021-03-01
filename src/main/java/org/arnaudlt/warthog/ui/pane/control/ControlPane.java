@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.collections.FXCollections;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -136,25 +135,45 @@ public class ControlPane {
 
             Label tableNameLabel = new Label("Table name :");
             TextField tableName = new TextField();
-            grid.addRow(i++, tableNameLabel, tableName);
 
-            Label saveModeLabel = new Label("Save mode:");
             ComboBox<String> saveMode = new ComboBox<>(FXCollections.observableArrayList("Overwrite", "Append"));
             saveMode.setValue("Overwrite");
-            grid.addRow(i++, saveModeLabel, saveMode);
+            grid.addRow(i++, tableNameLabel, tableName, saveMode);
 
             grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
 
-            Label driverLabel = new Label("Driver :");
-            ComboBox<String> driver = new ComboBox<>(
-                    FXCollections.observableArrayList("org.postgresql.Driver", "oracle.jdbc.driver.OracleDriver"));
-            driver.setValue("org.postgresql.Driver");
-            grid.addRow(i++, driverLabel, driver);
+            Label connectionTypeLabel = new Label("Type :");
+            ComboBox<String> connectionType = new ComboBox<>(
+                    FXCollections.observableArrayList("PostgreSQL", "Oracle"));
+            connectionType.setValue("PostgreSQL");
 
-            Label urlLabel = new Label("Url :");
-            TextField url = new TextField();
-            url.setText("jdbc:postgresql://localhost:5432/postgres");
-            grid.addRow(i++, urlLabel, url);
+            grid.addRow(i++, connectionTypeLabel, connectionType);
+
+            Label hostLabel = new Label("Host :");
+            TextField host = new TextField();
+            host.setText("localhost");
+
+            Label portLabel = new Label("Port :");
+            portLabel.setMaxWidth(30);
+            TextField port = new TextField();
+            port.setMaxWidth(60);
+            port.setText("5432");
+
+            grid.add(hostLabel, 0, i);
+            grid.add(host, 1, i, 2, 1);
+            grid.add(portLabel, 3, i, 1, 1);
+            grid.add(port, 4, i, 1, 1);
+            i++;
+
+            Label databaseLabel = new Label("Database :");
+            TextField database = new TextField();
+            database.setText("postgres");
+            ComboBox<String> databaseType = new ComboBox<>(
+                    FXCollections.observableArrayList("SID", "Service name"));
+            databaseType.setValue("SID");
+            databaseType.visibleProperty().bind(connectionType.valueProperty().isEqualTo("Oracle"));
+            grid.addRow(i++, databaseLabel, database, databaseType);
+
 
             Label userLabel = new Label("User :");
             TextField user = new TextField();
@@ -171,14 +190,15 @@ public class ControlPane {
             Button exportButton = new Button("Export");
             exportButton.setOnAction(event -> {
 
-                DatabaseSettings dbSettings = new DatabaseSettings(url.getText(), user.getText(), password.getText(),
-                        driver.getValue(), saveMode.getValue(), tableName.getText());
+                DatabaseSettings dbSettings = new DatabaseSettings(connectionType.getValue(), host.getText(),
+                        port.getText(), database.getText(), databaseType.getValue(), user.getText(), password.getText(),
+                        saveMode.getValue(), tableName.getText());
                 exportToDatabase(dbSettings);
                 dialog.close();
             });
             grid.addRow(i++, exportButton);
 
-            Scene dialogScene = new Scene(grid, 320, 300);
+            Scene dialogScene = new Scene(grid, 500, 300);
             JMetro metro = new JMetro(Style.LIGHT);
             metro.setAutomaticallyColorPanes(true);
             metro.setScene(dialogScene);
@@ -196,7 +216,7 @@ public class ControlPane {
             final String sqlQuery = this.transformPane.getSqlQuery();
             SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager, sqlQuery, databaseSettings);
             sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            sqlExportToDatabaseService.setOnFailed(fail -> failToGenerate(fail, "database export"));
+            sqlExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the database export"));
             sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
             sqlExportToDatabaseService.start();
         } else {
@@ -204,7 +224,7 @@ public class ControlPane {
             NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
                     new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, databaseSettings);
             namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            namedDatasetExportToDatabaseService.setOnFailed(fail -> failToGenerate(fail, "database export"));
+            namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the database export"));
             namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
             namedDatasetExportToDatabaseService.start();
         }
@@ -240,14 +260,14 @@ public class ControlPane {
                 final String sqlQuery = this.transformPane.getSqlQuery();
                 SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> failToGenerate(fail, "overview"));
+                overviewService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             } else {
 
                 NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> failToGenerate(fail, "overview"));
+                overviewService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             }
@@ -272,24 +292,18 @@ public class ControlPane {
                 final String sqlQuery = this.transformPane.getSqlQuery();
                 SqlExportToCsvService exportService = new SqlExportToCsvService(namedDatasetManager, sqlQuery, filePath);
                 exportService.setOnSucceeded(success -> log.info("Csv export succeeded"));
-                exportService.setOnFailed(fail -> failToGenerate(fail,"export"));
+                exportService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             } else {
 
                 NamedDatasetExportToCsvService exportService = new NamedDatasetExportToCsvService(namedDatasetManager, selectedNamedDataset, filePath);
                 exportService.setOnSucceeded(success -> log.info("Csv export succeeded"));
-                exportService.setOnFailed(fail -> failToGenerate(fail, "export"));
+                exportService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             }
         };
-    }
-
-
-    private void failToGenerate(WorkerStateEvent fail, String context) {
-
-        AlertError.showFailureAlert(fail, "Not able to generate the "+ context);
     }
 
 
