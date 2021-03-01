@@ -44,7 +44,13 @@ public class NamedDatasetItem {
 
         return value
                 .chars()
-                .anyMatch(i -> !((i > 64 && i < 91) || (i > 96 && i < 123) || (i > 47 && i < 58)));
+                .anyMatch(i -> !(
+                        (i > 64 && i < 91) ||
+                        (i > 96 && i < 123) ||
+                        (i > 47 && i < 58) ||
+                        (i == 45) ||
+                        (i == 95)
+                ));
     }
 
 
