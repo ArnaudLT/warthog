@@ -1,7 +1,5 @@
 ### BUGS
-=> logs are lost in Service (thread)
 
-=>
 
 ### FEATURES
 => Improve the Visual Query Builder :
@@ -21,8 +19,6 @@
 => Capability to add / remove lines
 
 => log management (file + rotation)
-
-=> TableView -> right clic (?) -> count rows
 
 => Need an easter egg !
 

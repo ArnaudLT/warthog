@@ -1,9 +1,14 @@
 package org.arnaudlt.warthog.model.database;
 
+import java.util.List;
 import java.util.Properties;
 
 
 public class DatabaseSettings {
+
+    private static final List<String> knownConnectionTypes = List.of("Oracle", "PostgreSQL");
+
+    private static final List<String> knownDatabaseType = List.of("SID", "Service name");
 
     private final String connectionType;
 
@@ -82,5 +87,15 @@ public class DatabaseSettings {
 
     public String getTable() {
         return table;
+    }
+
+
+    public static List<String> getKnownConnectionTypes() {
+        return knownConnectionTypes;
+    }
+
+
+    public static List<String> getKnownDatabaseType() {
+        return knownDatabaseType;
     }
 }

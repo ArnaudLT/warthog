@@ -140,11 +140,11 @@ public class ControlPane {
             saveMode.setValue("Overwrite");
             grid.addRow(i++, tableNameLabel, tableName, saveMode);
 
-            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
+            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 5, 1);
 
             Label connectionTypeLabel = new Label("Type :");
             ComboBox<String> connectionType = new ComboBox<>(
-                    FXCollections.observableArrayList("PostgreSQL", "Oracle"));
+                    FXCollections.observableArrayList(DatabaseSettings.getKnownConnectionTypes()));
             connectionType.setValue("PostgreSQL");
 
             grid.addRow(i++, connectionTypeLabel, connectionType);
@@ -169,11 +169,10 @@ public class ControlPane {
             TextField database = new TextField();
             database.setText("postgres");
             ComboBox<String> databaseType = new ComboBox<>(
-                    FXCollections.observableArrayList("SID", "Service name"));
+                    FXCollections.observableArrayList(DatabaseSettings.getKnownDatabaseType()));
             databaseType.setValue("SID");
             databaseType.visibleProperty().bind(connectionType.valueProperty().isEqualTo("Oracle"));
             grid.addRow(i++, databaseLabel, database, databaseType);
-
 
             Label userLabel = new Label("User :");
             TextField user = new TextField();
@@ -185,7 +184,7 @@ public class ControlPane {
             password.setText("admin");
             grid.addRow(i++, passwordLabel, password);
 
-            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
+            grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 5, 1);
 
             Button exportButton = new Button("Export");
             exportButton.setOnAction(event -> {
