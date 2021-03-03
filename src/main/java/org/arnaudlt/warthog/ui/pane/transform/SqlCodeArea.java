@@ -65,13 +65,8 @@ public class SqlCodeArea {
     public SqlCodeArea(PoolService poolService) {
 
         this.poolService = poolService;
-        this.codeArea = new CodeArea(
-                "/*\n" +
-                "   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V)\n" +
-                "   Select the query you want to run and press 'CTRL+ENTER'\n" +
-                "   https://cwiki.apache.org/confluence/display/Hive/LanguageManual\n" +
-                "*/\n"
-        );
+        this.codeArea = new CodeArea();
+
         this.codeArea.getStyleClass().add("sql-area");
         this.codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, i -> "%03d"));
 
@@ -95,6 +90,13 @@ public class SqlCodeArea {
                 .awaitLatest(this.codeArea.multiPlainChanges())
                 .filterMap(t -> t.isSuccess() ? Optional.of(t.get()) : Optional.empty())
                 .subscribe(this::applyHighlighting);
+
+        this.codeArea.appendText("/*\n" +
+                "   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V)\n" +
+                "   Select the query you want to run and press 'CTRL+ENTER'\n" +
+                "   https://cwiki.apache.org/confluence/display/Hive/LanguageManual\n" +
+                "*/\n"
+        );
     }
 
 
