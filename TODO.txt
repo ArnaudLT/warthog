@@ -1,32 +1,46 @@
 ### BUGS
 
+=> Issue with the SQL coloration when using ' (blue coloration continue...)
 
 ### FEATURES
-=> Improve the Visual Query Builder :
-    => Something to (un)select all the column at once...
 
-=> Implement a Partition By (for the output file)
+=> Query builder :
 
-=> Validate transformation before execution ! (and provide feedback to user)
-    => Visual warning when using map/array column in where, group by, ...
+    => Improve the Visual Query Builder :
+        => Something to (un)select all the columns in one click
 
-=> Capability to change the size of the font
+    => Validate transformation before execution (and provide feedback to user).
+        => Visual warning when using map/array column in where, group by, ...
 
-=> Auto-completion ?
 
-=> Capability to add column ? (primitive types)
-=> Capability to empty a dataset
-=> Capability to add / remove lines
+=> SQL :
+
+    => Auto-completion
+    => Execute the query based on the cursor (no need to select)
+
+
+=> Export :
+
+    => Implement a Partition By for Csv export
+
+
+=> UI :
+    => Capability to change the size of the font
+
+
+=> Dataset modifications :
+    => Capability to add column ? (primitive types)
+    => Capability to empty a dataset
+    => Capability to add / remove lines
+
 
 => log management (file + rotation)
-
-=> Need an easter egg !
 
 
 ### DEPLOY
 
 => Deploy :
-    => -Dhadoop.home.dir=C:\Users\Arnaud\software\winutils
+    => -Dhadoop.home.dir=C:\<path>\winutils
     => How to handle the binary : \bin\winutils.exe
 
 => enableHiveSupport on SparkSession  :
