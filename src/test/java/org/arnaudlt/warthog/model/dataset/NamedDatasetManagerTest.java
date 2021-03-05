@@ -96,9 +96,15 @@ class NamedDatasetManagerTest {
 
         String[] tableNames = sparkSession.sqlContext().tableNames();
         assertEquals(1, tableNames.length);
+        assertTrue(List.of(tableNames).contains("cov"));
 
-        Arrays.sort(tableNames);
-        assertEquals("cov", tableNames[0]);
+        namedDataset.getDataset().createTempView("renamed_cov");
+        sparkSession.catalog().dropTempView("cov");
+
+        tableNames = sparkSession.sqlContext().tableNames();
+        assertFalse(List.of(tableNames).contains("cov"));
+        assertTrue(List.of(tableNames).contains("renamed_cov"));
+
     }
 
 

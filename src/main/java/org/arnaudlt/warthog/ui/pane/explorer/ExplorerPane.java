@@ -50,8 +50,6 @@ public class ExplorerPane {
 
         VBox vBox = new VBox(treeExplorer);
         this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
-        //this.treeExplorer.setEditable(true);
-        //this.treeExplorer.setCellFactory(RenameMenuTreeCell::new);
 
         return vBox;
     }
@@ -174,38 +172,4 @@ public class ExplorerPane {
         this.controlPane = controlPane;
     }
 
-
-    private static class RenameMenuTreeCell extends TextFieldTreeCell<NamedDatasetItem> {
-
-        private final ContextMenu menu = new ContextMenu();
-
-        public RenameMenuTreeCell(TreeView<NamedDatasetItem> treeView) {
-            super(new StringConverter<>() {
-                @Override
-                public String toString(NamedDatasetItem namedDatasetItem) {
-                    return namedDatasetItem.getLabel();
-                }
-
-                @Override
-                public NamedDatasetItem fromString(String s) {
-                    NamedDatasetItem editingItem = treeView.getSelectionModel().getSelectedItem().getValue();
-                    editingItem.setLabel(s);
-                    return editingItem;
-                }
-            });
-
-            MenuItem renameItem = new MenuItem("Rename");
-            menu.getItems().add(renameItem);
-            renameItem.setOnAction(arg0 -> startEdit());
-        }
-
-        @Override
-        public void updateItem(NamedDatasetItem item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (!isEditing()) {
-                setContextMenu(menu);
-            }
-        }
-    }
 }
