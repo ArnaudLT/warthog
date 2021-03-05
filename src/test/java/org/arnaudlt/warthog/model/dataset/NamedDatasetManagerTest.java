@@ -104,7 +104,6 @@ class NamedDatasetManagerTest {
         tableNames = sparkSession.sqlContext().tableNames();
         assertFalse(List.of(tableNames).contains("cov"));
         assertTrue(List.of(tableNames).contains("renamed_cov"));
-
     }
 
 

@@ -34,9 +34,6 @@
     => Capability to add / remove lines
 
 
-=> log management (file + rotation)
-
-
 ### DEPLOY
 
 => Deploy :
