@@ -30,7 +30,7 @@ public class SqlOverviewService extends Service<PreparedDataset> {
             @Override
             protected PreparedDataset call() {
 
-                log.info("Start generating an overview for the sql query : {}", sqlQuery.replace("\n", " "));
+                log.info("Start generating an overview for the sql query : \"{}\"", sqlQuery.replace("\n", " "));
                 Dataset<Row> row = namedDatasetManager.prepareDataset(sqlQuery);
                 return new PreparedDataset(row, row.takeAsList(50));
             }

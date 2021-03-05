@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -19,7 +20,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+@Slf4j
 public class SqlCodeArea {
 
     private final PoolService poolService;
@@ -155,12 +156,30 @@ public class SqlCodeArea {
         String selectedText = this.codeArea.getSelectedText();
 
         if (selectedText != null && !selectedText.isBlank()) {
+
             return selectedText;
         } else {
-            return codeArea.getText();
+
+            final int caretPosition = this.codeArea.getCaretPosition();
+            int queryStart = findQueryStartPosition(caretPosition-1);
+            int queryEnd = findQueryEndPosition(caretPosition);
+            codeArea.selectRange(queryStart, queryEnd);
+
+            return codeArea.getText(queryStart, queryEnd);
         }
     }
 
+
+    private int findQueryStartPosition(int caretPosition) {
+
+        return Math.max(0, codeArea.getText().lastIndexOf(";", caretPosition)+1);
+    }
+
+
+    private int findQueryEndPosition(int caretPosition) {
+
+        return Math.min(codeArea.getText().length(), codeArea.getText().indexOf(";", caretPosition) + 1);
+    }
 
     public Node getWrappedSqlArea() {
 
