@@ -95,7 +95,7 @@ class NamedDatasetManagerTest {
         assertEquals(60, sqlResult.count());
 
         String[] tableNames = sparkSession.sqlContext().tableNames();
-        assertEquals(2, tableNames.length); // 1 default test_table
+        assertEquals(1, tableNames.length);
 
         Arrays.sort(tableNames);
         assertEquals("cov", tableNames[0]);
