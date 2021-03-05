@@ -3,11 +3,15 @@ package org.arnaudlt.warthog.ui.pane.explorer;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedColumn;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -30,7 +34,7 @@ public class ExplorerPane {
 
     private TreeView<NamedDatasetItem> treeExplorer;
 
-    private Map<NamedDataset, TreeItem<NamedDatasetItem>> namedDatasetToTreeItem;
+    private final Map<NamedDataset, TreeItem<NamedDatasetItem>> namedDatasetToTreeItem;
 
 
     public ExplorerPane(Stage stage) {
@@ -46,6 +50,8 @@ public class ExplorerPane {
 
         VBox vBox = new VBox(treeExplorer);
         this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
+        //this.treeExplorer.setEditable(true);
+        //this.treeExplorer.setCellFactory(RenameMenuTreeCell::new);
 
         return vBox;
     }
@@ -103,7 +109,11 @@ public class ExplorerPane {
 
     public void addNamedDatasetItem(NamedDataset namedDataset) {
 
-        TreeItem<NamedDatasetItem> item = new TreeItem<>(new NamedDatasetItem(namedDataset, namedDataset.getName(), namedDataset.getViewName()));
+        TreeItem<NamedDatasetItem> item = new TreeItem<>(new NamedDatasetItem(
+                namedDataset,
+                namedDataset.getLocalTemporaryViewName(),
+                namedDataset.getLocalTemporaryViewName()));
+
         for (NamedColumn namedColumn : namedDataset.getCatalog().getColumns()) {
 
             NamedDatasetItem child = new NamedDatasetItem(namedDataset, namedColumn.getName() + " - " + namedColumn.getType(), namedColumn.getName());
@@ -162,5 +172,40 @@ public class ExplorerPane {
 
     public void setControlPane(ControlPane controlPane) {
         this.controlPane = controlPane;
+    }
+
+
+    private static class RenameMenuTreeCell extends TextFieldTreeCell<NamedDatasetItem> {
+
+        private final ContextMenu menu = new ContextMenu();
+
+        public RenameMenuTreeCell(TreeView<NamedDatasetItem> treeView) {
+            super(new StringConverter<>() {
+                @Override
+                public String toString(NamedDatasetItem namedDatasetItem) {
+                    return namedDatasetItem.getLabel();
+                }
+
+                @Override
+                public NamedDatasetItem fromString(String s) {
+                    NamedDatasetItem editingItem = treeView.getSelectionModel().getSelectedItem().getValue();
+                    editingItem.setLabel(s);
+                    return editingItem;
+                }
+            });
+
+            MenuItem renameItem = new MenuItem("Rename");
+            menu.getItems().add(renameItem);
+            renameItem.setOnAction(arg0 -> startEdit());
+        }
+
+        @Override
+        public void updateItem(NamedDatasetItem item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (!isEditing()) {
+                setContextMenu(menu);
+            }
+        }
     }
 }

@@ -26,6 +26,8 @@ public class NamedDataset {
 
     private final Decoration decoration;
 
+    private String localTemporaryViewName;
+
 
     public NamedDataset(int id, String name, Dataset<Row> dataset, Catalog catalog, Transformation transformation, Decoration decoration) {
 
@@ -65,6 +67,17 @@ public class NamedDataset {
 
     public Decoration getDecoration() {
         return decoration;
+    }
+
+
+    public void setLocalTemporaryViewName(String localTemporaryViewName) {
+        this.localTemporaryViewName = localTemporaryViewName;
+    }
+
+
+    public String getLocalTemporaryViewName() {
+
+        return localTemporaryViewName;
     }
 
 
@@ -352,13 +365,4 @@ public class NamedDataset {
         return column;
     }
 
-
-    public String getViewName() {
-
-        return this.getName().trim()
-                .replace(".", "_")
-                .replace(" ", "_")
-                .replace("-", "_")
-                + "_" + this.id;
-    }
 }

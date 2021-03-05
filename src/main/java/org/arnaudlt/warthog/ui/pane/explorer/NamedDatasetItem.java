@@ -6,7 +6,7 @@ public class NamedDatasetItem {
 
     private final NamedDataset namedDataset;
 
-    private final String label;
+    private String label;
 
     private final String sqlName;
 
@@ -20,6 +20,11 @@ public class NamedDatasetItem {
 
     public NamedDataset getNamedDataset() {
         return namedDataset;
+    }
+
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
 
