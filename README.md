@@ -4,7 +4,10 @@ Warthog helps you to explore, export and to cross data between parquet, json, or
 You can use the visual query builder, or the Hive SQL worksheet for more complex queries.  
 
 Feel free to contribute with a pull request, a suggestion or a donation :
-https://www.paypal.com/donate?hosted_button_id=8922HWPF2RUKJ
+
+[![Donate](doc/img/donate_r2.png)](https://www.paypal.com/donate?hosted_button_id=TXQ7GEXCRPFYJ)
+
+
 
 ## Main Features
 
