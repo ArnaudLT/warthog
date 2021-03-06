@@ -1,6 +1,5 @@
 ### BUGS
 
-=> Issue with the SQL coloration when using ' (blue coloration continue...)
 
 ### FEATURES
 
