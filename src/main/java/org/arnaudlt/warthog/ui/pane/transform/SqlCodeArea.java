@@ -167,15 +167,9 @@ public class SqlCodeArea {
             }
 
             final int caretPosition = this.codeArea.getCaretPosition();
-            int queryStart = Math.max(0, this.codeArea.getText().lastIndexOf(";", caretPosition - 1));
-            if (queryStart > 0) {
-                queryStart++;
-            }
 
-            int queryEnd = this.codeArea.getText().indexOf(";", caretPosition);
-            if (queryEnd == - 1) {
-                queryEnd = this.codeArea.getText().length();
-            }
+            int queryStart = getQueryStartPosition(caretPosition);
+            int queryEnd = getQueryEndPosition(caretPosition);
 
             String activeQuery = codeArea.getText(queryStart, queryEnd);
             if (activeQuery.strip().isBlank()) {
@@ -185,6 +179,24 @@ public class SqlCodeArea {
             codeArea.selectRange(queryStart, queryEnd);
             return activeQuery;
         }
+    }
+
+
+    private int getQueryEndPosition(int caretPosition) {
+        int queryEnd = this.codeArea.getText().indexOf(";", caretPosition);
+        if (queryEnd == - 1) {
+            queryEnd = this.codeArea.getText().length();
+        }
+        return queryEnd;
+    }
+
+
+    private int getQueryStartPosition(int caretPosition) {
+        int queryStart = Math.max(0, this.codeArea.getText().lastIndexOf(";", caretPosition - 1));
+        if (queryStart > 0) {
+            queryStart++;
+        }
+        return queryStart;
     }
 
 
