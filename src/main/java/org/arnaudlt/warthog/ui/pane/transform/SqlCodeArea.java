@@ -150,7 +150,7 @@ public class SqlCodeArea {
         return null;
     }
 
-
+    //TODO Rework that dirty code (need unit tests)
     public String getActiveQuery() {
 
         String selectedText = this.codeArea.getSelectedText();
@@ -160,26 +160,33 @@ public class SqlCodeArea {
             return selectedText;
         } else {
 
-            final int caretPosition = this.codeArea.getCaretPosition();
-            int queryStart = findQueryStartPosition(caretPosition-1);
-            int queryEnd = findQueryEndPosition(caretPosition);
-            codeArea.selectRange(queryStart, queryEnd);
+            if (!this.codeArea.getText().contains(";")) {
 
-            return codeArea.getText(queryStart, queryEnd);
+                codeArea.selectAll();
+                return this.codeArea.getText();
+            }
+
+            final int caretPosition = this.codeArea.getCaretPosition();
+            int queryStart = Math.max(0, this.codeArea.getText().lastIndexOf(";", caretPosition - 1));
+            if (queryStart > 0) {
+                queryStart++;
+            }
+
+            int queryEnd = this.codeArea.getText().indexOf(";", caretPosition);
+            if (queryEnd == - 1) {
+                queryEnd = this.codeArea.getText().length();
+            }
+
+            String activeQuery = codeArea.getText(queryStart, queryEnd);
+            if (activeQuery.strip().isBlank()) {
+                codeArea.selectAll();
+                return this.codeArea.getText();
+            }
+            codeArea.selectRange(queryStart, queryEnd);
+            return activeQuery;
         }
     }
 
-
-    private int findQueryStartPosition(int caretPosition) {
-
-        return Math.max(0, codeArea.getText().lastIndexOf(";", caretPosition)+1);
-    }
-
-
-    private int findQueryEndPosition(int caretPosition) {
-
-        return Math.min(codeArea.getText().length(), codeArea.getText().indexOf(";", caretPosition) + 1);
-    }
 
     public Node getWrappedSqlArea() {
 
