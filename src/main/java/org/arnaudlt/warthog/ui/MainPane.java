@@ -5,32 +5,35 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
-import org.arnaudlt.warthog.PoolService;
-import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.control.ControlPane;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class MainPane {
 
-    private final ControlPane controlPane;
+    private ControlPane controlPane;
 
-    private final ExplorerPane explorerPane;
+    private ExplorerPane explorerPane;
 
-    private final TransformPane transformPane;
+    private TransformPane transformPane;
 
-    private final OutputPane outputPane;
+    private OutputPane outputPane;
+
+    private Stage stage;
 
 
-    public MainPane(Stage stage, NamedDatasetManager namedDatasetManager, PoolService poolService) {
+    @Autowired
+    public MainPane(ControlPane controlPane, ExplorerPane explorerPane, TransformPane transformPane,
+                    OutputPane outputPane) {
 
-        this.outputPane = new OutputPane(stage, poolService);
-        this.transformPane = new TransformPane(stage, poolService);
-
-        this.controlPane = new ControlPane(stage, namedDatasetManager, poolService);
-        this.explorerPane = new ExplorerPane(stage);
+        this.controlPane = controlPane;
+        this.explorerPane = explorerPane;
+        this.transformPane = transformPane;
+        this.outputPane = outputPane;
 
         this.controlPane.setExplorerPane(this.explorerPane);
         this.controlPane.setTransformPane(this.transformPane);
@@ -41,6 +44,11 @@ public class MainPane {
 
 
     public Parent build() {
+
+        this.controlPane.setStage(stage);
+        this.explorerPane.setStage(stage);
+        this.transformPane.setStage(stage);
+        this.outputPane.setStage(stage);
 
         Node controlNode = this.controlPane.buildControlPane();
         Node explorerNode = this.explorerPane.buildExplorerPane();
@@ -58,5 +66,10 @@ public class MainPane {
         splitPane.setDividerPositions(0, 0.58, 0.42);
 
         return splitPane;
+    }
+
+    public void setStage(Stage stage) {
+
+        this.stage = stage;
     }
 }

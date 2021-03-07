@@ -70,13 +70,17 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 
     private PoolService poolService;
 
+    private MainPane mainPane;
+
 
     @Autowired
-    StageInitializer(ApplicationContext applicationContext, NamedDatasetManager namedDatasetManager, PoolService poolService) {
+    StageInitializer(ApplicationContext applicationContext, NamedDatasetManager namedDatasetManager,
+                     PoolService poolService, MainPane mainPane) {
 
         this.applicationContext = applicationContext;
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
+        this.mainPane = mainPane;
     }
 
 
@@ -89,7 +93,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         stage.getIcons().add(new Image("/warthog_icon.png"));
         stage.setOnCloseRequest(closeApplication);
 
-        MainPane mainPane = new MainPane(stage, namedDatasetManager, poolService);
+        mainPane.setStage(stage);
         Parent root = mainPane.build();
 
         Scene scene = new Scene(root, 1280, 720);

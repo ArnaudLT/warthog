@@ -10,6 +10,8 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -17,10 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @Slf4j
+@Component
 public class TransformPane {
 
 
-    private final Stage stage;
+    private Stage stage;
 
     private final PoolService poolService;
 
@@ -29,9 +32,9 @@ public class TransformPane {
     private ConcurrentMap<NamedDataset, NamedDatasetTab> namedDatasetToTab;
 
 
-    public TransformPane(Stage stage, PoolService poolService) {
+    @Autowired
+    public TransformPane(PoolService poolService) {
 
-        this.stage = stage;
         this.poolService = poolService;
     }
 
@@ -137,6 +140,11 @@ public class TransformPane {
         } else {
             return null;
         }
+    }
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 }

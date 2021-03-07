@@ -17,16 +17,19 @@ import org.arnaudlt.warthog.model.dataset.NamedColumn;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.ui.pane.control.ControlPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Component
 public class ExplorerPane {
 
 
-    private final Stage stage;
+    private Stage stage;
 
     private TransformPane transformPane;
 
@@ -37,9 +40,9 @@ public class ExplorerPane {
     private final Map<NamedDataset, TreeItem<NamedDatasetItem>> namedDatasetToTreeItem;
 
 
-    public ExplorerPane(Stage stage) {
+    @Autowired
+    public ExplorerPane() {
 
-        this.stage = stage;
         this.namedDatasetToTreeItem = new HashMap<>();
     }
 
@@ -170,6 +173,11 @@ public class ExplorerPane {
 
     public void setControlPane(ControlPane controlPane) {
         this.controlPane = controlPane;
+    }
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 }

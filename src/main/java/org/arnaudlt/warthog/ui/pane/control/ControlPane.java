@@ -24,15 +24,18 @@ import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
 import java.util.Set;
 
 @Slf4j
+@Component
 public class ControlPane {
 
-    private final Stage stage;
+    private Stage stage;
 
     private NamedDatasetManager namedDatasetManager;
 
@@ -45,9 +48,9 @@ public class ControlPane {
     private OutputPane outputPane;
 
 
-    public ControlPane(Stage stage, NamedDatasetManager namedDatasetManager, PoolService poolService) {
+    @Autowired
+    public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService) {
 
-        this.stage = stage;
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
     }
@@ -259,6 +262,11 @@ public class ControlPane {
 
     public void setOutputPane(OutputPane outputPane) {
         this.outputPane = outputPane;
+    }
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 

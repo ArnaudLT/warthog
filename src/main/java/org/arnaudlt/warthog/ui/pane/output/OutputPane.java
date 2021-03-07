@@ -18,6 +18,8 @@ import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -25,10 +27,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
+@Component
 public class OutputPane {
 
 
-    private final Stage stage;
+    private Stage stage;
 
     private final PoolService poolService;
 
@@ -37,8 +40,9 @@ public class OutputPane {
     private PreparedDataset preparedDataset;
 
 
-    public OutputPane(Stage stage, PoolService poolService) {
-        this.stage = stage;
+    @Autowired
+    public OutputPane(PoolService poolService) {
+
         this.poolService = poolService;
     }
 
@@ -203,4 +207,8 @@ public class OutputPane {
         this.tableView.getItems().addAll(rows);
     }
 
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 }
