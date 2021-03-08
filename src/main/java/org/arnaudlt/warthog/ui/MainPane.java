@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class MainPane {
 
-    private ControlPane controlPane;
+    private final ControlPane controlPane;
 
-    private ExplorerPane explorerPane;
+    private final ExplorerPane explorerPane;
 
-    private TransformPane transformPane;
+    private final TransformPane transformPane;
 
-    private OutputPane outputPane;
+    private final OutputPane outputPane;
 
     private Stage stage;
 
@@ -45,15 +45,10 @@ public class MainPane {
 
     public Parent build() {
 
-        this.controlPane.setStage(stage);
-        this.explorerPane.setStage(stage);
-        this.transformPane.setStage(stage);
-        this.outputPane.setStage(stage);
-
-        Node controlNode = this.controlPane.buildControlPane();
-        Node explorerNode = this.explorerPane.buildExplorerPane();
-        Node transformNode = this.transformPane.buildTransformPane();
-        Node outputNode = this.outputPane.buildOutputPane();
+        Node controlNode = this.controlPane.buildControlPane(stage);
+        Node explorerNode = this.explorerPane.buildExplorerPane(stage);
+        Node transformNode = this.transformPane.buildTransformPane(stage);
+        Node outputNode = this.outputPane.buildOutputPane(stage);
 
         SplitPane middleSplitPane = new SplitPane();
         middleSplitPane.setOrientation(Orientation.HORIZONTAL);

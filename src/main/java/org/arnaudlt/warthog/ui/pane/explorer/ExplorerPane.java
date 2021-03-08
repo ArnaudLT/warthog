@@ -3,15 +3,11 @@ package org.arnaudlt.warthog.ui.pane.explorer;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedColumn;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -47,7 +43,9 @@ public class ExplorerPane {
     }
 
 
-    public Node buildExplorerPane() {
+    public Node buildExplorerPane(Stage stage) {
+
+        this.stage = stage;
 
         this.treeExplorer = buildTreeView();
 
@@ -175,9 +173,5 @@ public class ExplorerPane {
         this.controlPane = controlPane;
     }
 
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
 
 }

@@ -39,7 +39,9 @@ public class TransformPane {
     }
 
 
-    public Node buildTransformPane() {
+    public Node buildTransformPane(Stage stage) {
+
+        this.stage = stage;
 
         this.namedDatasetsTabPane = new TabPane();
         this.namedDatasetsTabPane.setSide(Side.BOTTOM);
@@ -142,9 +144,5 @@ public class TransformPane {
         }
     }
 
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
 
 }

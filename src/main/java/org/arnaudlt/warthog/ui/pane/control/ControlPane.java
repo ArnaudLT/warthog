@@ -41,6 +41,8 @@ public class ControlPane {
 
     private final PoolService poolService;
 
+    private final ExportDatabaseDialog exportDatabaseDialog;
+
     private ExplorerPane explorerPane;
 
     private TransformPane transformPane;
@@ -49,14 +51,17 @@ public class ControlPane {
 
 
     @Autowired
-    public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService) {
+    public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService, ExportDatabaseDialog exportDatabaseDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
+        this.exportDatabaseDialog = exportDatabaseDialog;
     }
 
 
-    public Node buildControlPane() {
+    public Node buildControlPane(Stage stage) {
+
+        this.stage = stage;
 
         MenuBar menuBar = buildMenuBar();
 
@@ -67,6 +72,8 @@ public class ControlPane {
         hBox.setMaxHeight(30);
         hBox.setMinHeight(30);
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
+
+        this.exportDatabaseDialog.setStage(this.stage);
 
         return hBox;
     }
@@ -119,8 +126,7 @@ public class ControlPane {
 
         return actionEvent -> {
 
-            ExportDatabaseDialog exportDatabaseDialog =
-                    new ExportDatabaseDialog(stage, namedDatasetManager, poolService, transformPane);
+            exportDatabaseDialog.setStage(stage);
             exportDatabaseDialog.showDatabaseSettingsDialog();
         };
     }
@@ -262,11 +268,6 @@ public class ControlPane {
 
     public void setOutputPane(OutputPane outputPane) {
         this.outputPane = outputPane;
-    }
-
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
     }
 
 

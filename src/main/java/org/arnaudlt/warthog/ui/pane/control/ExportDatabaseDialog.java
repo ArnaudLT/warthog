@@ -19,13 +19,16 @@ import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetExportToDatabaseService;
 import org.arnaudlt.warthog.ui.service.SqlExportToDatabaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 @Slf4j
+@Component
 public class ExportDatabaseDialog {
 
 
-    private final Stage stage;
+    private Stage stage;
 
     private final NamedDatasetManager namedDatasetManager;
 
@@ -34,8 +37,8 @@ public class ExportDatabaseDialog {
     private final TransformPane transformPane;
 
 
-    public ExportDatabaseDialog(Stage stage, NamedDatasetManager namedDatasetManager, PoolService poolService, TransformPane transformPane) {
-        this.stage = stage;
+    @Autowired
+    public ExportDatabaseDialog(NamedDatasetManager namedDatasetManager, PoolService poolService, TransformPane transformPane) {
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.transformPane = transformPane;
@@ -150,6 +153,11 @@ public class ExportDatabaseDialog {
             namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
             namedDatasetExportToDatabaseService.start();
         }
+    }
+
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 
 }

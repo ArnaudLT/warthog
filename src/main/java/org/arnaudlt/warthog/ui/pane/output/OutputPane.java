@@ -5,13 +5,15 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.PoolService;
@@ -47,7 +49,9 @@ public class OutputPane {
     }
 
 
-    public Node buildOutputPane() {
+    public Node buildOutputPane(Stage stage) {
+
+        this.stage = stage;
 
         this.tableView = new TableView<>();
         this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -207,8 +211,4 @@ public class OutputPane {
         this.tableView.getItems().addAll(rows);
     }
 
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
 }
