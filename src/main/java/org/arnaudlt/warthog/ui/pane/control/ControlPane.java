@@ -73,7 +73,7 @@ public class ControlPane {
         hBox.setMinHeight(30);
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
 
-        this.exportDatabaseDialog.setStage(this.stage);
+        this.exportDatabaseDialog.buildDatabaseSettingsDialog(stage);
 
         return hBox;
     }
@@ -126,8 +126,7 @@ public class ControlPane {
 
         return actionEvent -> {
 
-            exportDatabaseDialog.setStage(stage);
-            exportDatabaseDialog.showDatabaseSettingsDialog();
+            this.exportDatabaseDialog.showDatabaseSettingsDialog();
         };
     }
 

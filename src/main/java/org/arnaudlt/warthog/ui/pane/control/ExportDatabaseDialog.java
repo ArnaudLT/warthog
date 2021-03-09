@@ -28,13 +28,13 @@ import org.springframework.stereotype.Component;
 public class ExportDatabaseDialog {
 
 
-    private Stage stage;
-
     private final NamedDatasetManager namedDatasetManager;
 
     private final PoolService poolService;
 
     private final TransformPane transformPane;
+
+    private Stage dialog;
 
 
     @Autowired
@@ -45,13 +45,13 @@ public class ExportDatabaseDialog {
     }
 
 
-    public void showDatabaseSettingsDialog() {
+    public void buildDatabaseSettingsDialog(Stage stage) {
 
-        final Stage dialog = new Stage();
-        dialog.setTitle("Export to Database");
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(this.stage);
-        dialog.setResizable(false);
+        this.dialog = new Stage();
+        this.dialog.setTitle("Export to Database");
+        this.dialog.initModality(Modality.APPLICATION_MODAL);
+        this.dialog.initOwner(stage);
+        this.dialog.setResizable(false);
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -129,6 +129,11 @@ public class ExportDatabaseDialog {
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);
         dialog.setScene(dialogScene);
+    }
+
+
+    public void showDatabaseSettingsDialog() {
+
         dialog.show();
     }
 
@@ -153,11 +158,6 @@ public class ExportDatabaseDialog {
             namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
             namedDatasetExportToDatabaseService.start();
         }
-    }
-
-
-    public void setStage(Stage stage) {
-        this.stage = stage;
     }
 
 }
