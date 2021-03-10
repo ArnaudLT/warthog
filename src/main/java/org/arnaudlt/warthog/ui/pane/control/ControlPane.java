@@ -4,17 +4,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -43,6 +38,8 @@ public class ControlPane {
 
     private final ExportDatabaseDialog exportDatabaseDialog;
 
+    private final SettingsDialog settingsDialog;
+
     private ExplorerPane explorerPane;
 
     private TransformPane transformPane;
@@ -51,11 +48,13 @@ public class ControlPane {
 
 
     @Autowired
-    public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService, ExportDatabaseDialog exportDatabaseDialog) {
+    public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
+                       ExportDatabaseDialog exportDatabaseDialog, SettingsDialog settingsDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.exportDatabaseDialog = exportDatabaseDialog;
+        this.settingsDialog = settingsDialog;
     }
 
 
@@ -73,7 +72,8 @@ public class ControlPane {
         hBox.setMinHeight(30);
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
 
-        this.exportDatabaseDialog.buildDatabaseSettingsDialog(stage);
+        this.settingsDialog.buildSettingsDialog(stage);
+        this.exportDatabaseDialog.buildExportDatabaseDialog(stage);
 
         return hBox;
     }
@@ -124,29 +124,13 @@ public class ControlPane {
 
     private EventHandler<ActionEvent> getExportMenuActionEventHandler() {
 
-        return actionEvent -> {
-
-            this.exportDatabaseDialog.showDatabaseSettingsDialog();
-        };
+        return actionEvent -> this.exportDatabaseDialog.showExportDatabaseDialog();
     }
 
 
     private EventHandler<ActionEvent> getSettingsActionEventHandler() {
 
-        return actionEvent -> {
-
-            final Stage dialog = new Stage();
-            dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.initOwner(this.stage);
-            HBox dialogHBox = new HBox(new Text("Coming soon :-)"));
-
-            Scene dialogScene = new Scene(dialogHBox, 800, 450);
-            JMetro metro = new JMetro(Style.LIGHT);
-            metro.setAutomaticallyColorPanes(true);
-            metro.setScene(dialogScene);
-            dialog.setScene(dialogScene);
-            dialog.show();
-        };
+        return actionEvent -> this.settingsDialog.showSettingsDialog();
     }
 
 

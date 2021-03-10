@@ -45,7 +45,7 @@ public class ExportDatabaseDialog {
     }
 
 
-    public void buildDatabaseSettingsDialog(Stage stage) {
+    public void buildExportDatabaseDialog(Stage stage) {
 
         this.dialog = new Stage();
         this.dialog.setTitle("Export to Database");
@@ -132,7 +132,7 @@ public class ExportDatabaseDialog {
     }
 
 
-    public void showDatabaseSettingsDialog() {
+    public void showExportDatabaseDialog() {
 
         dialog.show();
     }
