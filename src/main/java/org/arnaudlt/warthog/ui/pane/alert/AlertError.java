@@ -15,11 +15,18 @@ public class AlertError {
 
     public static void showFailureAlert(WorkerStateEvent fail, String text) {
 
-        log.error(text, fail.getSource().getException());
+        showFailureAlert(fail.getSource().getException(), text);
+    }
+
+
+    public static void showFailureAlert(Throwable exception, String text) {
+
+        log.error(text, exception);
         Alert countRowsAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
         countRowsAlert.setHeaderText(text);
-        TextArea stack = new TextArea(fail.getSource().getException().toString());
+        TextArea stack = new TextArea(exception.toString());
         countRowsAlert.getDialogPane().setContent(stack);
         countRowsAlert.show();
     }
+
 }

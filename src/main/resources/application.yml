@@ -1,7 +1,13 @@
 spring:
   main:
     web-application-type: none
+  output:
+    ansi:
+      enabled: always
 
 warthog:
+  overview:
+    rows: 50
   spark:
-    threadCount: 4
+    threads: 4
+    ui: true

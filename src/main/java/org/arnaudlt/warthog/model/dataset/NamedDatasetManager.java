@@ -2,6 +2,7 @@ package org.arnaudlt.warthog.model.dataset;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.database.DatabaseSettings;
@@ -20,10 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class NamedDatasetManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(NamedDatasetManager.class);
 
     private final SparkSession spark;
 
@@ -129,7 +129,7 @@ public class NamedDatasetManager {
                 }
             }
             namedDataset.setLocalTemporaryViewName(localTempViewName);
-            LOGGER.info("Named dataset {} registered (view : `{}`)", namedDataset.getName(), namedDataset.getLocalTemporaryViewName());
+            log.info("Named dataset {} registered (view : `{}`)", namedDataset.getName(), namedDataset.getLocalTemporaryViewName());
         }
     }
 
@@ -143,10 +143,10 @@ public class NamedDatasetManager {
 
             this.observableNamedDatasets.remove(namedDataset);
             this.spark.catalog().dropTempView(namedDataset.getLocalTemporaryViewName());
-            LOGGER.info("Deregister the named dataset {}", namedDataset.getName());
+            log.info("Deregister the named dataset {}", namedDataset.getName());
         } else {
 
-            LOGGER.error("The named dataset {} is not register - cannot be deregistered", namedDataset.getName());
+            log.error("The named dataset {} is not register - cannot be deregistered", namedDataset.getName());
             throw new ProcessingException(String.format("The named dataset %s is not register - cannot be deregistered", namedDataset.getName()));
         }
     }

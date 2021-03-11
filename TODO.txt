@@ -33,6 +33,10 @@
     => Capability to add / remove lines
 
 
+=> Global
+    => Kill a SQL query execution
+
+
 ### DEPLOY
 
 => Deploy :

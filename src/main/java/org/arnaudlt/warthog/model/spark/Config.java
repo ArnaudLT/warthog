@@ -1,8 +1,10 @@
 package org.arnaudlt.warthog.model.spark;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
+import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,28 +12,47 @@ import org.springframework.context.annotation.Configuration;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
+import java.io.*;
 
+@Slf4j
 @Configuration
-public class SparkInstance {
+public class Config {
 
 
-    private final Integer sparkThreadCount;
+    @Bean
+    public GlobalSettings getGlobalSettings(@Value("${warthog.spark.threads}") Integer sparkThreads,
+                                            @Value("${warthog.spark.ui}") Boolean sparkUI,
+                                            @Value("${warthog.overview.rows}") Integer overviewRows) {
 
+        GlobalSettings settings;
+        try {
 
-    @Autowired
-    public SparkInstance(@Value("${warthog.spark.threadCount}") Integer sparkThreadCount) {
-        this.sparkThreadCount = sparkThreadCount;
+            settings = GlobalSettings.deserialize();
+        } catch (IOException | ClassNotFoundException e) {
+
+            log.warn("Unable to read settings");
+            settings = new GlobalSettings(sparkThreads, sparkUI, overviewRows);
+            try {
+
+                GlobalSettings.serialize(settings);
+            } catch (IOException ioException) {
+                log.error("Unable to write settings", ioException);
+            }
+        }
+
+        return settings;
     }
 
 
     @Bean
-    public SparkSession getSpark() {
+    @Autowired
+    public SparkSession getSpark(GlobalSettings globalSettings) {
 
         SparkSession spark = SparkSession
                 .builder()
-                .appName("dataset-explorer")
-                .master("local["+ sparkThreadCount +"]")
-                .config("spark.ui.enabled", false)
+                .appName("Warthog")
+                .master("local["+ globalSettings.getSparkThreads() +"]")
+                .config("spark.ui.enabled", globalSettings.getSparkUI())
                 .enableHiveSupport()
                 .getOrCreate();
 
@@ -54,3 +75,4 @@ public class SparkInstance {
 
 
 }
+

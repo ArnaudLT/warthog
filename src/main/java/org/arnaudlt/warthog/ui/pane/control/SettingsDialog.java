@@ -8,14 +8,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 
 @Slf4j
@@ -49,27 +53,51 @@ public class SettingsDialog {
 
         int i = 0;
 
-        Label rowCountLabel = new Label("Number of rows to display :");
-        TextField rowCount = new TextField(globalSettings.getNumberOfRowsToDisplay().toString());
+        Label spark = new Label("Spark");
+        spark.setFont(Font.font(18));
+        Label needToRestart = new Label("(need to restart Warthog)");
+        grid.addRow(i++, spark, needToRestart);
 
-        grid.addRow(i++, rowCountLabel, rowCount);
+        Label sparkThreadsLabel = new Label("Threads :");
+        TextField sparkThreads = new TextField(globalSettings.getSparkThreads().toString());
+        grid.addRow(i++, sparkThreadsLabel, sparkThreads);
 
-        Separator separatorOne = new Separator(Orientation.HORIZONTAL);
-        grid.add(separatorOne, 0, i++, 2, 1);
+        Label sparkUILabel = new Label("Monitoring UI :");
+        TextField sparkUI = new TextField(globalSettings.getSparkUI().toString());
+        grid.addRow(i++, sparkUILabel, sparkUI);
+
+        Separator s1 = new Separator(Orientation.HORIZONTAL);
+        grid.add(s1, 0, i++, 2, 1);
+
+        Label overview = new Label("Overview");
+        overview.setFont(Font.font(18));
+        grid.addRow(i++, overview);
+
+        Label rowsLabel = new Label("Rows :");
+        TextField rows = new TextField(globalSettings.getOverviewRows().toString());
+        grid.addRow(i++, rowsLabel, rows);
+
+        Separator s3 = new Separator(Orientation.HORIZONTAL);
+        grid.add(s3, 0, i++, 2, 1);
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(event -> {
 
-            // TODO check validity
-            globalSettings.setNumberOfRowsToDisplay(Integer.parseInt(rowCount.getText()));
-
-            // TODO persist ?
-
+            try {
+                // TODO check validity
+                globalSettings.setOverviewRows(Integer.parseInt(rows.getText()));
+                globalSettings.setSparkThreads(Integer.parseInt(sparkThreads.getText()));
+                globalSettings.setSparkUI(Boolean.parseBoolean(sparkUI.getText()));
+                GlobalSettings.serialize(globalSettings);
+            } catch (Exception e) {
+                AlertError.showFailureAlert(e, "Unable to save settings");
+                return;
+            }
             dialog.close();
         });
         grid.addRow(i++, saveButton);
 
-        Scene dialogScene = new Scene(grid, 500, 300);
+        Scene dialogScene = new Scene(grid, 300, 300);
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);
