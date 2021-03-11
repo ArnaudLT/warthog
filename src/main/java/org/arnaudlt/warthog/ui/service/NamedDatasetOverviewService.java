@@ -14,9 +14,12 @@ public class NamedDatasetOverviewService extends Service<PreparedDataset> {
 
     private final NamedDataset namedDataset;
 
+    private final Integer overviewRows;
 
-    public NamedDatasetOverviewService(NamedDataset namedDataset) {
+
+    public NamedDatasetOverviewService(NamedDataset namedDataset, Integer overviewRows) {
         this.namedDataset = namedDataset;
+        this.overviewRows = overviewRows;
     }
 
 
@@ -29,7 +32,7 @@ public class NamedDatasetOverviewService extends Service<PreparedDataset> {
 
                 log.info("Start generating an overview for {}", namedDataset.getName());
                 Dataset<Row> output = namedDataset.applyTransformation();
-                return new PreparedDataset(output, output.takeAsList(50));
+                return new PreparedDataset(output, output.takeAsList(overviewRows));
             }
         };
     }

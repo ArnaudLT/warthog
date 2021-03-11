@@ -1,12 +1,10 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -18,8 +16,6 @@ import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 
 @Slf4j
@@ -63,7 +59,8 @@ public class SettingsDialog {
         grid.addRow(i++, sparkThreadsLabel, sparkThreads);
 
         Label sparkUILabel = new Label("Monitoring UI :");
-        TextField sparkUI = new TextField(globalSettings.getSparkUI().toString());
+        ComboBox<String> sparkUI = new ComboBox<>(FXCollections.observableArrayList("true", "false"));
+        sparkUI.setValue(Boolean.TRUE.equals(globalSettings.getSparkUI()) ? "true" : "false");
         grid.addRow(i++, sparkUILabel, sparkUI);
 
         Separator s1 = new Separator(Orientation.HORIZONTAL);
@@ -84,10 +81,10 @@ public class SettingsDialog {
         saveButton.setOnAction(event -> {
 
             try {
-                // TODO check validity
+
                 globalSettings.setOverviewRows(Integer.parseInt(rows.getText()));
                 globalSettings.setSparkThreads(Integer.parseInt(sparkThreads.getText()));
-                globalSettings.setSparkUI(Boolean.parseBoolean(sparkUI.getText()));
+                globalSettings.setSparkUI(Boolean.parseBoolean(sparkUI.getValue()));
                 GlobalSettings.serialize(globalSettings);
             } catch (Exception e) {
                 AlertError.showFailureAlert(e, "Unable to save settings");
@@ -95,7 +92,7 @@ public class SettingsDialog {
             }
             dialog.close();
         });
-        grid.addRow(i++, saveButton);
+        grid.addRow(i, saveButton);
 
         Scene dialogScene = new Scene(grid, 300, 300);
         JMetro metro = new JMetro(Style.LIGHT);

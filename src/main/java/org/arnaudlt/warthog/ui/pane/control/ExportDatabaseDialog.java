@@ -122,7 +122,7 @@ public class ExportDatabaseDialog {
             exportToDatabase(dbSettings);
             dialog.close();
         });
-        grid.addRow(i++, exportButton);
+        grid.addRow(i, exportButton);
 
         Scene dialogScene = new Scene(grid, 500, 300);
         JMetro metro = new JMetro(Style.LIGHT);

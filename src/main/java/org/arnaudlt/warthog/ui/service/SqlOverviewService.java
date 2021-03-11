@@ -16,10 +16,13 @@ public class SqlOverviewService extends Service<PreparedDataset> {
 
     private final String sqlQuery;
 
+    private final Integer overviewRows;
 
-    public SqlOverviewService(NamedDatasetManager namedDatasetManager, String sqlQuery) {
+
+    public SqlOverviewService(NamedDatasetManager namedDatasetManager, String sqlQuery, Integer overviewRows) {
         this.namedDatasetManager = namedDatasetManager;
         this.sqlQuery = sqlQuery;
+        this.overviewRows = overviewRows;
     }
 
 
@@ -32,7 +35,7 @@ public class SqlOverviewService extends Service<PreparedDataset> {
 
                 log.info("Start generating an overview for the sql query : \"{}\"", sqlQuery.replace("\n", " "));
                 Dataset<Row> row = namedDatasetManager.prepareDataset(sqlQuery);
-                return new PreparedDataset(row, row.takeAsList(50));
+                return new PreparedDataset(row, row.takeAsList(overviewRows));
             }
         };
     }

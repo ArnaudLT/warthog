@@ -11,8 +11,6 @@ import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.UniqueIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

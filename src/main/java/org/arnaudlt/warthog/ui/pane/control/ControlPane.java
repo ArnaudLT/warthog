@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
@@ -40,6 +41,8 @@ public class ControlPane {
 
     private final SettingsDialog settingsDialog;
 
+    private final GlobalSettings globalSettings;
+
     private ExplorerPane explorerPane;
 
     private TransformPane transformPane;
@@ -49,12 +52,13 @@ public class ControlPane {
 
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
-                       ExportDatabaseDialog exportDatabaseDialog, SettingsDialog settingsDialog) {
+                       ExportDatabaseDialog exportDatabaseDialog, SettingsDialog settingsDialog, GlobalSettings globalSettings) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.exportDatabaseDialog = exportDatabaseDialog;
         this.settingsDialog = settingsDialog;
+        this.globalSettings = globalSettings;
     }
 
 
@@ -72,7 +76,6 @@ public class ControlPane {
         hBox.setMinHeight(30);
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
 
-        this.settingsDialog.buildSettingsDialog(stage);
         this.exportDatabaseDialog.buildExportDatabaseDialog(stage);
 
         return hBox;
@@ -95,7 +98,7 @@ public class ControlPane {
         deleteItem.setOnAction(requestDelete);
 
         MenuItem settingsItem = new MenuItem("Settings...");
-        settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+S"));
+        settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
         SeparatorMenuItem separator1 = new SeparatorMenuItem();
@@ -130,7 +133,10 @@ public class ControlPane {
 
     private EventHandler<ActionEvent> getSettingsActionEventHandler() {
 
-        return actionEvent -> this.settingsDialog.showSettingsDialog();
+        return actionEvent -> {
+            this.settingsDialog.buildSettingsDialog(stage);
+            this.settingsDialog.showSettingsDialog();
+        };
     }
 
 
@@ -142,14 +148,14 @@ public class ControlPane {
             if (selectedNamedDataset == null) {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery);
+                SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the overview"));
                 overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             } else {
 
-                NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset);
+                NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset, globalSettings.getOverviewRows());
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the overview"));
                 overviewService.setExecutor(poolService.getExecutor());
