@@ -3,7 +3,7 @@ package org.arnaudlt.warthog.ui.service;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.database.DatabaseSettings;
+import org.arnaudlt.warthog.model.setting.DatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
@@ -39,6 +40,8 @@ public class ControlPane {
 
     private final ExportDatabaseDialog exportDatabaseDialog;
 
+    private final ExportFileDialog exportFileDialog;
+
     private final SettingsDialog settingsDialog;
 
     private final GlobalSettings globalSettings;
@@ -52,11 +55,13 @@ public class ControlPane {
 
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
-                       ExportDatabaseDialog exportDatabaseDialog, SettingsDialog settingsDialog, GlobalSettings globalSettings) {
+                       ExportDatabaseDialog exportDatabaseDialog, ExportFileDialog exportFileDialog,
+                       SettingsDialog settingsDialog, GlobalSettings globalSettings) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.exportDatabaseDialog = exportDatabaseDialog;
+        this.exportFileDialog = exportFileDialog;
         this.settingsDialog = settingsDialog;
         this.globalSettings = globalSettings;
     }
@@ -77,6 +82,7 @@ public class ControlPane {
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
 
         this.exportDatabaseDialog.buildExportDatabaseDialog(stage);
+        this.exportFileDialog.buildExportFileDialog(stage);
 
         return hBox;
     }
@@ -112,20 +118,27 @@ public class ControlPane {
         overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ENTER"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
-        MenuItem exportCsvItem = new MenuItem("Export to Csv...");
+        SeparatorMenuItem separator3 = new SeparatorMenuItem();
+
+        MenuItem exportCsvItem = new MenuItem("Export as Csv...");
         exportCsvItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+E"));
         exportCsvItem.setOnAction(getExportToCsvActionEventHandler());
 
-        MenuItem exportDbItem = new MenuItem("Export to Database...");
-        exportDbItem.setOnAction(getExportMenuActionEventHandler());
+        SeparatorMenuItem separator4 = new SeparatorMenuItem();
 
-        runMenu.getItems().addAll(overviewItem, exportCsvItem, exportDbItem);
+        MenuItem export2CsvItem = new MenuItem("Export to File...");
+        export2CsvItem.setOnAction(getExportToFileActionEventHandler());
+
+        MenuItem exportDbItem = new MenuItem("Export to Database...");
+        exportDbItem.setOnAction(getExportToDatabaseActionEventHandler());
+
+        runMenu.getItems().addAll(overviewItem, separator3, exportCsvItem, separator4, export2CsvItem, exportDbItem);
 
         return new MenuBar(fileMenu, runMenu);
     }
 
 
-    private EventHandler<ActionEvent> getExportMenuActionEventHandler() {
+    private EventHandler<ActionEvent> getExportToDatabaseActionEventHandler() {
 
         return actionEvent -> this.exportDatabaseDialog.showExportDatabaseDialog();
     }
@@ -175,26 +188,34 @@ public class ControlPane {
 
             if (exportFile == null) return;
             String filePath = exportFile.getAbsolutePath();
+            ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, "csv", "Overwrite", ";", true);
 
             NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
             if (selectedNamedDataset == null) {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlExportToCsvService exportService = new SqlExportToCsvService(namedDatasetManager, sqlQuery, filePath);
-                exportService.setOnSucceeded(success -> log.info("Csv export succeeded"));
-                exportService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the export"));
+                SqlExportToFileService exportService = new SqlExportToFileService(namedDatasetManager, sqlQuery, exportFileSettings);
+                exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
+                exportService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the Csv export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             } else {
 
-                NamedDatasetExportToCsvService exportService = new NamedDatasetExportToCsvService(namedDatasetManager, selectedNamedDataset, filePath);
-                exportService.setOnSucceeded(success -> log.info("Csv export succeeded"));
-                exportService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the export"));
+                NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(namedDatasetManager, selectedNamedDataset, exportFileSettings);
+                exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
+                exportService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the Csv export"));
                 exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             }
         };
     }
+
+
+    private EventHandler<ActionEvent> getExportToFileActionEventHandler() {
+
+        return event -> this.exportFileDialog.showExportFileDialog();
+    }
+
 
 
     private final EventHandler<ActionEvent> requestImportFile = actionEvent -> {

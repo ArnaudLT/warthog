@@ -5,22 +5,24 @@ import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 
 @Slf4j
-public class NamedDatasetExportToCsvService extends Service<Void> {
+public class NamedDatasetExportToFileService extends Service<Void> {
 
 
     private final NamedDatasetManager namedDatasetManager;
 
     private final NamedDataset namedDataset;
 
-    private final String filePath;
+    private final ExportFileSettings exportFileSettings;
 
 
-    public NamedDatasetExportToCsvService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset, String filePath) {
+    public NamedDatasetExportToFileService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset,
+                                           ExportFileSettings exportFileSettings) {
         this.namedDatasetManager = namedDatasetManager;
         this.namedDataset = namedDataset;
-        this.filePath = filePath;
+        this.exportFileSettings = exportFileSettings;
     }
 
 
@@ -31,8 +33,8 @@ public class NamedDatasetExportToCsvService extends Service<Void> {
             @Override
             protected Void call() {
 
-                log.info("Start generating a CSV export for {}", namedDataset.getName());
-                namedDatasetManager.exportToCsv(namedDataset, filePath);
+                log.info("Start generating an export for {}", namedDataset.getName());
+                namedDatasetManager.export(namedDataset, exportFileSettings);
                 return null;
             }
         };

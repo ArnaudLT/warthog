@@ -1,12 +1,13 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
-import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
@@ -44,13 +45,14 @@ public class SettingsDialog {
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
+        grid.setPadding(new Insets(20,20,20,20));
         grid.setHgap(10);
         grid.setVgap(10);
 
         int i = 0;
 
         Label spark = new Label("Spark");
-        spark.setFont(Font.font(18));
+        spark.setFont(Font.font(null, FontWeight.BOLD, null, 14));
         Label needToRestart = new Label("(need to restart Warthog)");
         grid.addRow(i++, spark, needToRestart);
 
@@ -59,15 +61,18 @@ public class SettingsDialog {
         grid.addRow(i++, sparkThreadsLabel, sparkThreads);
 
         Label sparkUILabel = new Label("Monitoring UI :");
-        ComboBox<String> sparkUI = new ComboBox<>(FXCollections.observableArrayList("true", "false"));
-        sparkUI.setValue(Boolean.TRUE.equals(globalSettings.getSparkUI()) ? "true" : "false");
+        Tooltip monitoringUI = new Tooltip("Accessible on http://localhost:4040");
+        sparkUILabel.setTooltip(monitoringUI);
+        CheckBox sparkUI = new CheckBox();
+        sparkUI.setTooltip(monitoringUI);
+        sparkUI.setSelected(globalSettings.getSparkUI());
         grid.addRow(i++, sparkUILabel, sparkUI);
 
         Separator s1 = new Separator(Orientation.HORIZONTAL);
         grid.add(s1, 0, i++, 2, 1);
 
         Label overview = new Label("Overview");
-        overview.setFont(Font.font(18));
+        overview.setFont(Font.font(null, FontWeight.BOLD, null, 14));
         grid.addRow(i++, overview);
 
         Label rowsLabel = new Label("Rows :");
@@ -84,7 +89,7 @@ public class SettingsDialog {
 
                 globalSettings.setOverviewRows(Integer.parseInt(rows.getText()));
                 globalSettings.setSparkThreads(Integer.parseInt(sparkThreads.getText()));
-                globalSettings.setSparkUI(Boolean.parseBoolean(sparkUI.getValue()));
+                globalSettings.setSparkUI(sparkUI.isSelected());
                 GlobalSettings.serialize(globalSettings);
             } catch (Exception e) {
                 AlertError.showFailureAlert(e, "Unable to save settings");
@@ -94,7 +99,7 @@ public class SettingsDialog {
         });
         grid.addRow(i, saveButton);
 
-        Scene dialogScene = new Scene(grid, 300, 300);
+        Scene dialogScene = new Scene(grid);
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);

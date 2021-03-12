@@ -1,4 +1,4 @@
-package org.arnaudlt.warthog.model.database;
+package org.arnaudlt.warthog.model.setting;
 
 import java.util.List;
 import java.util.Properties;

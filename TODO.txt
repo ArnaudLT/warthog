@@ -15,23 +15,18 @@
 => SQL :
 
     => Auto-completion
-    => Execute the query based on the cursor (no need to select)
-
 
 => Export :
 
     => Implement a Partition By for Csv export
 
-
 => UI :
     => Capability to change the size of the font
-
 
 => Dataset modifications :
     => Capability to add column ? (primitive types)
     => Capability to empty a dataset
     => Capability to add / remove lines
-
 
 => Global
     => Kill a SQL query execution

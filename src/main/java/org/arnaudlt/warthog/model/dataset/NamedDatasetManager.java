@@ -5,10 +5,11 @@ import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
-import org.arnaudlt.warthog.model.database.DatabaseSettings;
+import org.arnaudlt.warthog.model.setting.DatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
+import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.UniqueIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,29 +182,48 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToCsv(NamedDataset namedDataset, String filePath) {
+    public void export(String sqlQuery, ExportFileSettings exportFileSettings) {
 
-        Dataset<Row> output = namedDataset.applyTransformation();
-        output
-                .coalesce(1)
-                .write()
-                .option("sep", namedDataset.getDecoration().getSeparator())
-                .option("header", true)
-                .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
-                .csv(filePath);
+        Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
+        export(output, exportFileSettings);
     }
 
 
-    public void exportToCsv(String sqlQuery, String filePath) {
+    public void export(NamedDataset namedDataset, ExportFileSettings exportFileSettings) {
 
-        Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
-        output
+        Dataset<Row> output = namedDataset.applyTransformation();
+        export(output, exportFileSettings);
+    }
+
+
+    public void export(Dataset<Row> output, ExportFileSettings exportFileSettings) {
+
+        DataFrameWriter<Row> dfw = output
                 .coalesce(1)
                 .write()
-                .option("sep", ";")
-                .option("header", true)
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
-                .csv(filePath);
+                .mode(exportFileSettings.getSaveMode());
+
+        final String format = exportFileSettings.getFormat();
+        if ("csv".equals(format)) {
+
+            dfw
+                .option("sep", exportFileSettings.getSeparator())
+                .option("header", exportFileSettings.getHeader())
+                .csv(exportFileSettings.getFilePath());
+        } else if ("json".equals(format)) {
+
+            dfw
+                .json(exportFileSettings.getFilePath());
+        } else if ("parquet".equals(format)) {
+
+            dfw
+                .parquet(exportFileSettings.getFilePath());
+        } else if ("orc".equals(format)) {
+
+            dfw
+                .orc(exportFileSettings.getFilePath());
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,7 +13,7 @@ import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
-import org.arnaudlt.warthog.model.database.DatabaseSettings;
+import org.arnaudlt.warthog.model.setting.DatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
@@ -55,6 +56,7 @@ public class ExportDatabaseDialog {
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
+        grid.setPadding(new Insets(20,20,20,20));
         grid.setHgap(10);
         grid.setVgap(10);
 
@@ -124,7 +126,7 @@ public class ExportDatabaseDialog {
         });
         grid.addRow(i, exportButton);
 
-        Scene dialogScene = new Scene(grid, 500, 300);
+        Scene dialogScene = new Scene(grid);
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);

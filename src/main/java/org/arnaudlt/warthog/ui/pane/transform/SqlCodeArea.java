@@ -94,7 +94,7 @@ public class SqlCodeArea {
 
         this.codeArea.appendText("/*\n" +
                 "   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V)\n" +
-                "   Select the query you want to run and press 'CTRL+ENTER'\n" +
+                "   Press 'CTRL+ENTER' to run your query\n" +
                 "   https://cwiki.apache.org/confluence/display/Hive/LanguageManual\n" +
                 "*/\n"
         );
