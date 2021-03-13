@@ -13,12 +13,10 @@
 
 
 => SQL :
-
     => Auto-completion
 
 => Export :
-
-    => Implement a Partition By for Csv export
+    => Implement a Partition By file export
 
 => UI :
     => Capability to change the size of the font

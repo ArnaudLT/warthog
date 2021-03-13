@@ -126,13 +126,13 @@ public class ControlPane {
 
         SeparatorMenuItem separator4 = new SeparatorMenuItem();
 
-        MenuItem export2CsvItem = new MenuItem("Export to File...");
-        export2CsvItem.setOnAction(getExportToFileActionEventHandler());
+        MenuItem exportToFileItem = new MenuItem("Export to File...");
+        exportToFileItem.setOnAction(getExportToFileActionEventHandler());
 
         MenuItem exportDbItem = new MenuItem("Export to Database...");
         exportDbItem.setOnAction(getExportToDatabaseActionEventHandler());
 
-        runMenu.getItems().addAll(overviewItem, separator3, exportCsvItem, separator4, export2CsvItem, exportDbItem);
+        runMenu.getItems().addAll(overviewItem, separator3, exportCsvItem, separator4, exportToFileItem, exportDbItem);
 
         return new MenuBar(fileMenu, runMenu);
     }

@@ -57,7 +57,7 @@ public class SettingsDialog {
         grid.addRow(i++, spark, needToRestart);
 
         Label sparkThreadsLabel = new Label("Threads :");
-        TextField sparkThreads = new TextField(globalSettings.getSparkThreads().toString());
+        Spinner<Integer> sparkThreads = new Spinner<>(1, 100, globalSettings.getSparkThreads(), 1);
         grid.addRow(i++, sparkThreadsLabel, sparkThreads);
 
         Label sparkUILabel = new Label("Monitoring UI :");
@@ -76,7 +76,8 @@ public class SettingsDialog {
         grid.addRow(i++, overview);
 
         Label rowsLabel = new Label("Rows :");
-        TextField rows = new TextField(globalSettings.getOverviewRows().toString());
+        Spinner<Integer> rows = new Spinner<>(1, 1000, globalSettings.getOverviewRows(), 1);
+        rows.setEditable(true);
         grid.addRow(i++, rowsLabel, rows);
 
         Separator s3 = new Separator(Orientation.HORIZONTAL);
@@ -87,8 +88,8 @@ public class SettingsDialog {
 
             try {
 
-                globalSettings.setOverviewRows(Integer.parseInt(rows.getText()));
-                globalSettings.setSparkThreads(Integer.parseInt(sparkThreads.getText()));
+                globalSettings.setOverviewRows(rows.getValue());
+                globalSettings.setSparkThreads(sparkThreads.getValue());
                 globalSettings.setSparkUI(sparkUI.isSelected());
                 GlobalSettings.serialize(globalSettings);
             } catch (Exception e) {
