@@ -94,7 +94,7 @@ public class ExportFileDialog {
         grid.addRow(i++, modeLabel, saveMode);
 
         // Start conditional display
-        BooleanBinding csvSelected = format.valueProperty().isEqualTo("csv");
+        BooleanBinding csvSelected = format.valueProperty().isEqualTo(Format.CSV);
         Separator s = new Separator(Orientation.HORIZONTAL);
         s.visibleProperty().bind(csvSelected);
         grid.add(s, 0, i++, 3, 1);

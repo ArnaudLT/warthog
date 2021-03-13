@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 public class ExplorerPane {
 
 
-    private Stage stage;
-
     private TransformPane transformPane;
 
     private ControlPane controlPane;
@@ -44,8 +42,6 @@ public class ExplorerPane {
 
 
     public Node buildExplorerPane(Stage stage) {
-
-        this.stage = stage;
 
         this.treeExplorer = buildTreeView();
 

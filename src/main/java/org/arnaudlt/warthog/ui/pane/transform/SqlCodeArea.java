@@ -96,6 +96,7 @@ public class SqlCodeArea {
                 "   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V)\n" +
                 "   Press 'CTRL+ENTER' to run your query\n" +
                 "   https://cwiki.apache.org/confluence/display/Hive/LanguageManual\n" +
+                "   https://spark.apache.org/docs/latest/sql-ref.html\n" +
                 "*/\n"
         );
     }
