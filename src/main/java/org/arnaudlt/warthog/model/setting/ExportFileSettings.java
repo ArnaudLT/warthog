@@ -1,10 +1,12 @@
 package org.arnaudlt.warthog.model.setting;
 
+import org.arnaudlt.warthog.model.util.Format;
+
 public class ExportFileSettings {
 
     private final String filePath;
 
-    private final String format;
+    private final Format format;
 
     private final String saveMode;
 
@@ -15,7 +17,7 @@ public class ExportFileSettings {
     private final Boolean header;
 
 
-    public ExportFileSettings(String filePath, String format, String saveMode, String separator, Boolean header) {
+    public ExportFileSettings(String filePath, Format format, String saveMode, String separator, Boolean header) {
         this.filePath = filePath;
         this.format = format;
         this.saveMode = saveMode;
@@ -29,7 +31,7 @@ public class ExportFileSettings {
     }
 
 
-    public String getFormat() {
+    public Format getFormat() {
         return format;
     }
 

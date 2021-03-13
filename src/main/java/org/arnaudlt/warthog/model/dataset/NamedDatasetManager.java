@@ -11,6 +11,7 @@ import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
+import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.UniqueIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.arnaudlt.warthog.model.util.Format.*;
 
 @Slf4j
 @Component
@@ -44,13 +47,13 @@ public class NamedDatasetManager {
 
         try {
 
-            String fileType = FileUtil.getFileType(file);
+            Format fileType = FileUtil.getFileType(file);
             String separator = ";";
             double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(file);
 
             Dataset<Row> dataset;
             switch (fileType) {
-                case "csv":
+                case CSV:
                     separator = FileUtil.inferSeparator(file);
                     dataset = this.spark
                             .read()
@@ -59,17 +62,17 @@ public class NamedDatasetManager {
                             .option("sep", separator)
                             .csv(file.getAbsolutePath());
                     break;
-                case "json":
+                case JSON:
                     dataset = this.spark
                             .read()
                             .json(file.getAbsolutePath());
                     break;
-                case "parquet":
+                case PARQUET:
                     dataset = this.spark
                             .read()
                             .parquet(file.getAbsolutePath());
                     break;
-                case "orc":
+                case ORC:
                     dataset = this.spark
                             .read()
                             .orc(file.getAbsolutePath());
@@ -204,26 +207,29 @@ public class NamedDatasetManager {
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
                 .mode(exportFileSettings.getSaveMode());
 
-        final String format = exportFileSettings.getFormat();
-        if ("csv".equals(format)) {
+        final Format format = exportFileSettings.getFormat();
 
-            dfw
-                .option("sep", exportFileSettings.getSeparator())
-                .option("header", exportFileSettings.getHeader())
-                .csv(exportFileSettings.getFilePath());
-        } else if ("json".equals(format)) {
-
-            dfw
-                .json(exportFileSettings.getFilePath());
-        } else if ("parquet".equals(format)) {
-
-            dfw
-                .parquet(exportFileSettings.getFilePath());
-        } else if ("orc".equals(format)) {
-
-            dfw
-                .orc(exportFileSettings.getFilePath());
+        switch (format) {
+            case CSV:
+                dfw
+                    .option("sep", exportFileSettings.getSeparator())
+                    .option("header", exportFileSettings.getHeader())
+                    .csv(exportFileSettings.getFilePath());
+                break;
+            case JSON:
+                dfw
+                    .json(exportFileSettings.getFilePath());
+                break;
+            case PARQUET:
+                dfw
+                    .parquet(exportFileSettings.getFilePath());
+                break;
+            case ORC:
+                dfw
+                    .orc(exportFileSettings.getFilePath());
+                break;
         }
+
     }
 
 

@@ -13,28 +13,28 @@ class FileUtilTest {
     @Test
     void getFileTypeParquetFile() throws IOException {
 
-        String fileType = FileUtil.getFileType(new File("src/test/plop.parquet"));
-        Assert.assertEquals("parquet", fileType);
+        Format fileType = FileUtil.getFileType(new File("src/test/plop.parquet"));
+        Assert.assertEquals(Format.PARQUET, fileType);
     }
 
     @Test
     void getFileTypeCsvFile() throws IOException {
 
-        String fileType = FileUtil.getFileType(new File("src/test/resources/code-insee-sample.csv"));
-        Assert.assertEquals("csv", fileType);
+        Format fileType = FileUtil.getFileType(new File("src/test/resources/code-insee-sample.csv"));
+        Assert.assertEquals(Format.CSV, fileType);
     }
 
     @Test
     void getFileTypeOrcDirectory() throws IOException {
 
-        String fileType = FileUtil.getFileType(new File("src/test/resources/covid19-orc"));
-        Assert.assertEquals("orc", fileType);
+        Format fileType = FileUtil.getFileType(new File("src/test/resources/covid19-orc"));
+        Assert.assertEquals(Format.ORC, fileType);
     }
 
     @Test
     void getFileTypeCsvDirectory() throws IOException {
 
-        String fileType = FileUtil.getFileType(new File("src/test/resources/first_join.csv"));
-        Assert.assertEquals("csv", fileType);
+        Format fileType = FileUtil.getFileType(new File("src/test/resources/first_join.csv"));
+        Assert.assertEquals(Format.CSV, fileType);
     }
 }

@@ -21,7 +21,7 @@ public class FileUtil {
     private FileUtil() {}
 
 
-    public static String getFileType(File file) throws IOException {
+    public static Format getFileType(File file) throws IOException {
 
         if (file.isDirectory()) {
 
@@ -31,16 +31,18 @@ public class FileUtil {
                         .map(Path::toFile)
                         .dropWhile(File::isDirectory)
                         .map(FileUtil::getLowerCaseExtension)
-                        .dropWhile(ext -> !isAnAllowedExtension(ext))
+                        .dropWhile(ext -> Format.valueFromLabel(ext) == null)
                         .findAny()
                         .orElseThrow(() -> new ProcessingException(String.format("Not able to determine the file type of %s", file)));
                 log.info("A directory with {} files inside", fileType);
-                return fileType;
+                return Format.valueFromLabel(fileType);
             }
 
         } else if (file.getName().contains(".")) {
 
-            return getLowerCaseExtension(file);
+            String fileType = getLowerCaseExtension(file);
+            log.info("A directory with {} files inside", fileType);
+            return Format.valueFromLabel(fileType);
         }
 
         throw new ProcessingException(String.format("Not able to determine the file type of %s", file));
@@ -50,15 +52,6 @@ public class FileUtil {
     public static String getLowerCaseExtension(File file) {
 
         return file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
-    }
-
-
-    public static boolean isAnAllowedExtension(String extension) {
-
-        return "parquet".equals(extension) ||
-                "orc".equals(extension) ||
-                "json".equals(extension) ||
-                "csv".equals(extension);
     }
 
 

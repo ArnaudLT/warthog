@@ -18,6 +18,7 @@ import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
+import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetExportToFileService;
@@ -81,8 +82,8 @@ public class ExportFileDialog {
         grid.addRow(i++, outputLabel, output, outputButton);
 
         Label formatLabel = new Label("Export type :");
-        ComboBox<String> format = new ComboBox<>(FXCollections.observableArrayList("csv", "json", "parquet", "orc"));
-        format.setValue("csv");
+        ComboBox<Format> format = new ComboBox<>(FXCollections.observableArrayList(Format.values()));
+        format.setValue(Format.CSV);
         format.setMinWidth(100);
         grid.addRow(i++, formatLabel, format);
 

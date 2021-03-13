@@ -16,6 +16,7 @@ import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
@@ -188,7 +189,7 @@ public class ControlPane {
 
             if (exportFile == null) return;
             String filePath = exportFile.getAbsolutePath();
-            ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, "csv", "Overwrite", ";", true);
+            ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, Format.CSV, "Overwrite", ";", true);
 
             NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
             if (selectedNamedDataset == null) {
