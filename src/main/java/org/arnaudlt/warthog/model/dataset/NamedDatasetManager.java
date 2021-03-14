@@ -5,7 +5,7 @@ import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
-import org.arnaudlt.warthog.model.setting.DatabaseSettings;
+import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
@@ -20,8 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.arnaudlt.warthog.model.util.Format.*;
 
 @Slf4j
 @Component
@@ -233,25 +231,25 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToDatabase(String sqlQuery, DatabaseSettings databaseSettings) {
+    public void exportToDatabase(String sqlQuery, ExportDatabaseSettings exportDatabaseSettings) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
 
         output
                 .write()
-                .mode(SaveMode.valueOf(databaseSettings.getSaveMode()))
-                .jdbc(databaseSettings.getUrl(), databaseSettings.getTable(), databaseSettings.getProperties());
+                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
+                .jdbc(exportDatabaseSettings.getUrl(), exportDatabaseSettings.getTable(), exportDatabaseSettings.getProperties());
     }
 
 
-    public void exportToDatabase(NamedDataset namedDataset, DatabaseSettings databaseSettings) {
+    public void exportToDatabase(NamedDataset namedDataset, ExportDatabaseSettings exportDatabaseSettings) {
 
         Dataset<Row> output = namedDataset.applyTransformation();
 
         output
                 .write()
-                .mode(SaveMode.valueOf(databaseSettings.getSaveMode()))
-                .jdbc(databaseSettings.getUrl(), databaseSettings.getTable(), databaseSettings.getProperties());
+                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
+                .jdbc(exportDatabaseSettings.getUrl(), exportDatabaseSettings.getTable(), exportDatabaseSettings.getProperties());
     }
 
 }

@@ -1,4 +1,4 @@
-package org.arnaudlt.warthog.ui.pane.alert;
+package org.arnaudlt.warthog.ui.util;
 
 import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.control.Alert;

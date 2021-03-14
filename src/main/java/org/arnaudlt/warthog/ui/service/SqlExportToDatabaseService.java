@@ -3,7 +3,7 @@ package org.arnaudlt.warthog.ui.service;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.setting.DatabaseSettings;
+import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 
 @Slf4j
@@ -13,14 +13,14 @@ public class SqlExportToDatabaseService extends Service<Void> {
 
     private final String sqlQuery;
 
-    private final DatabaseSettings databaseSettings;
+    private final ExportDatabaseSettings exportDatabaseSettings;
 
 
-    public SqlExportToDatabaseService(NamedDatasetManager namedDatasetManager, String sqlQuery, DatabaseSettings databaseSettings) {
+    public SqlExportToDatabaseService(NamedDatasetManager namedDatasetManager, String sqlQuery, ExportDatabaseSettings exportDatabaseSettings) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.sqlQuery = sqlQuery;
-        this.databaseSettings = databaseSettings;
+        this.exportDatabaseSettings = exportDatabaseSettings;
     }
 
 
@@ -32,7 +32,7 @@ public class SqlExportToDatabaseService extends Service<Void> {
             protected Void call() {
 
                 log.info("Start generating a DB export for {}", sqlQuery);
-                namedDatasetManager.exportToDatabase(sqlQuery, databaseSettings);
+                namedDatasetManager.exportToDatabase(sqlQuery, exportDatabaseSettings);
                 return null;
             }
         };

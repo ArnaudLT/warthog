@@ -3,8 +3,8 @@ package org.arnaudlt.warthog.model.setting;
 import java.util.List;
 import java.util.Properties;
 
-
-public class DatabaseSettings {
+// TODO Temporary ! Must be removed once connection manager is ready.
+public class ExportDatabaseSettings {
 
     private static final List<String> knownConnectionTypes = List.of("Oracle", "PostgreSQL");
 
@@ -29,8 +29,8 @@ public class DatabaseSettings {
     private final String table;
 
 
-    public DatabaseSettings(String connectionType, String host, String port, String database, String databaseType,
-                            String user, String password, String saveMode, String table) {
+    public ExportDatabaseSettings(String connectionType, String host, String port, String database, String databaseType,
+                                  String user, String password, String saveMode, String table) {
         this.connectionType = connectionType;
         this.host = host;
         this.port = port;

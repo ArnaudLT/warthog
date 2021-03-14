@@ -18,7 +18,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
-import org.arnaudlt.warthog.ui.pane.alert.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

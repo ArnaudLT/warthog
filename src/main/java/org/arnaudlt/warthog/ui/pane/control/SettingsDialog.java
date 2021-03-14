@@ -1,8 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -14,7 +12,8 @@ import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
-import org.arnaudlt.warthog.ui.pane.alert.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,11 +42,7 @@ public class SettingsDialog {
         this.dialog.initOwner(stage);
         this.dialog.setResizable(false);
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setPadding(new Insets(20,20,20,20));
-        grid.setHgap(10);
-        grid.setVgap(10);
+        GridPane grid = GridFactory.buildGrid();
 
         int i = 0;
 
@@ -91,7 +86,7 @@ public class SettingsDialog {
                 globalSettings.setOverviewRows(rows.getValue());
                 globalSettings.setSparkThreads(sparkThreads.getValue());
                 globalSettings.setSparkUI(sparkUI.isSelected());
-                GlobalSettings.serialize(globalSettings);
+                globalSettings.persist();
             } catch (Exception e) {
                 AlertError.showFailureAlert(e, "Unable to save settings");
                 return;

@@ -2,9 +2,7 @@ package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -19,10 +17,11 @@ import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.util.Format;
-import org.arnaudlt.warthog.ui.pane.alert.AlertError;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetExportToFileService;
 import org.arnaudlt.warthog.ui.service.SqlExportToFileService;
+import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,11 +58,7 @@ public class ExportFileDialog {
         this.dialog.initOwner(stage);
         this.dialog.setResizable(false);
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setPadding(new Insets(20,20,20,20));
-        grid.setHgap(10);
-        grid.setVgap(10);
+        GridPane grid = GridFactory.buildGrid();
 
         int i = 0;
 

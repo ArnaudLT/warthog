@@ -55,7 +55,7 @@ public class GlobalSettings implements Serializable {
     }
 
 
-    public static void serialize(GlobalSettings settings) throws IOException {
+    public void persist() throws IOException {
 
         log.info("Try to delete the 'settings.ser'");
         new File("settings.ser").delete();
@@ -64,15 +64,15 @@ public class GlobalSettings implements Serializable {
         try (FileOutputStream fos = new FileOutputStream("settings.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            oos.writeObject(settings);
+            oos.writeObject(this);
         }
-        log.info("Settings written : {}", settings);
+        log.info("Settings written : {}", this);
     }
 
 
-    public static GlobalSettings deserialize() throws IOException, ClassNotFoundException {
+    public static GlobalSettings load() throws IOException, ClassNotFoundException {
 
-        log.info("Start to read settings from 'settings.ser'");
+        log.info("Start to load settings from 'settings.ser'");
         GlobalSettings settings;
         try (FileInputStream fis = new FileInputStream("settings.ser");
              ObjectInputStream ois = new ObjectInputStream(fis)) {

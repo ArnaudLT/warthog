@@ -17,7 +17,7 @@ import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.model.util.Format;
-import org.arnaudlt.warthog.ui.pane.alert.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
@@ -41,11 +41,13 @@ public class ControlPane {
 
     private final ExportDatabaseDialog exportDatabaseDialog;
 
+    private final GlobalSettings globalSettings;
+
     private final ExportFileDialog exportFileDialog;
 
     private final SettingsDialog settingsDialog;
 
-    private final GlobalSettings globalSettings;
+    private final ConnectionsManagerDialog connectionsManagerDialog;
 
     private ExplorerPane explorerPane;
 
@@ -56,15 +58,17 @@ public class ControlPane {
 
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
-                       ExportDatabaseDialog exportDatabaseDialog, ExportFileDialog exportFileDialog,
-                       SettingsDialog settingsDialog, GlobalSettings globalSettings) {
+                       ExportDatabaseDialog exportDatabaseDialog, GlobalSettings globalSettings,
+                       ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
+                       ConnectionsManagerDialog connectionsManagerDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.exportDatabaseDialog = exportDatabaseDialog;
+        this.globalSettings = globalSettings;
         this.exportFileDialog = exportFileDialog;
         this.settingsDialog = settingsDialog;
-        this.globalSettings = globalSettings;
+        this.connectionsManagerDialog = connectionsManagerDialog;
     }
 
 
@@ -84,6 +88,7 @@ public class ControlPane {
 
         this.exportDatabaseDialog.buildExportDatabaseDialog(stage);
         this.exportFileDialog.buildExportFileDialog(stage);
+        this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
 
         return hBox;
     }
@@ -100,6 +105,9 @@ public class ControlPane {
         openParquetItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
         openParquetItem.setOnAction(requestImportFolder);
 
+        MenuItem connectionManagerItem = new MenuItem("Connections Manager...");
+        connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
+
         MenuItem deleteItem = new MenuItem("Delete");
         deleteItem.setAccelerator(KeyCodeCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
@@ -108,10 +116,14 @@ public class ControlPane {
         settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
-        SeparatorMenuItem separator1 = new SeparatorMenuItem();
-        SeparatorMenuItem separator2 = new SeparatorMenuItem();
-
-        fileMenu.getItems().addAll(openFileItem, openParquetItem, separator1, settingsItem, separator2, deleteItem);
+        fileMenu.getItems().addAll(
+                openFileItem,
+                openParquetItem,
+                new SeparatorMenuItem(),
+                connectionManagerItem,
+                settingsItem,
+                new SeparatorMenuItem(),
+                deleteItem);
 
         Menu runMenu = new Menu("Run");
 
@@ -127,15 +139,21 @@ public class ControlPane {
 
         SeparatorMenuItem separator4 = new SeparatorMenuItem();
 
-        MenuItem exportToFileItem = new MenuItem("Export to File...");
+        MenuItem exportToFileItem = new MenuItem("Export to file...");
         exportToFileItem.setOnAction(getExportToFileActionEventHandler());
 
-        MenuItem exportDbItem = new MenuItem("Export to Database...");
+        MenuItem exportDbItem = new MenuItem("Export to database...");
         exportDbItem.setOnAction(getExportToDatabaseActionEventHandler());
 
         runMenu.getItems().addAll(overviewItem, separator3, exportCsvItem, separator4, exportToFileItem, exportDbItem);
 
         return new MenuBar(fileMenu, runMenu);
+    }
+
+
+    private EventHandler<ActionEvent> getConnectionsManagerActionEventHandler() {
+
+        return actionEvent -> this.connectionsManagerDialog.showConnectionsManagerDialog();
     }
 
 
@@ -216,7 +234,6 @@ public class ControlPane {
 
         return event -> this.exportFileDialog.showExportFileDialog();
     }
-
 
 
     private final EventHandler<ActionEvent> requestImportFile = actionEvent -> {

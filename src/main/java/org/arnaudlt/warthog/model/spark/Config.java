@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
+import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,20 +28,43 @@ public class Config {
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.deserialize();
+            settings = GlobalSettings.load();
         } catch (IOException | ClassNotFoundException e) {
 
             log.warn("Unable to read settings");
             settings = new GlobalSettings(sparkThreads, sparkUI, overviewRows);
             try {
 
-                GlobalSettings.serialize(settings);
+                settings.persist();
             } catch (IOException ioException) {
                 log.error("Unable to write settings", ioException);
             }
         }
 
         return settings;
+    }
+
+
+    @Bean
+    public ConnectionsCollection getConnectionsCollection() {
+
+        ConnectionsCollection connectionsCollection;
+        try {
+
+            connectionsCollection = ConnectionsCollection.load();
+        } catch (IOException | ClassNotFoundException e) {
+
+            log.warn("Unable to read connections");
+            connectionsCollection = new ConnectionsCollection();
+            try {
+
+                connectionsCollection.persist();
+            } catch (IOException ioException) {
+                log.error("Unable to write connections", ioException);
+            }
+        }
+
+        return connectionsCollection;
     }
 
 

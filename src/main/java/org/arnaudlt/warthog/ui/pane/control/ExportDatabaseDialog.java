@@ -1,9 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -13,13 +11,14 @@ import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
-import org.arnaudlt.warthog.model.setting.DatabaseSettings;
+import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.ui.pane.alert.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetExportToDatabaseService;
 import org.arnaudlt.warthog.ui.service.SqlExportToDatabaseService;
+import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExportDatabaseDialog {
 
+    // TODO should be almost removed once with connection management
 
     private final NamedDatasetManager namedDatasetManager;
 
@@ -54,11 +54,7 @@ public class ExportDatabaseDialog {
         this.dialog.initOwner(stage);
         this.dialog.setResizable(false);
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setPadding(new Insets(20,20,20,20));
-        grid.setHgap(10);
-        grid.setVgap(10);
+        GridPane grid = GridFactory.buildGrid();
 
         int i = 0;
 
@@ -73,7 +69,7 @@ public class ExportDatabaseDialog {
 
         Label connectionTypeLabel = new Label("Type :");
         ComboBox<String> connectionType = new ComboBox<>(
-                FXCollections.observableArrayList(DatabaseSettings.getKnownConnectionTypes()));
+                FXCollections.observableArrayList(ExportDatabaseSettings.getKnownConnectionTypes()));
         connectionType.setValue("PostgreSQL");
 
         grid.addRow(i++, connectionTypeLabel, connectionType);
@@ -98,7 +94,7 @@ public class ExportDatabaseDialog {
         TextField database = new TextField();
         database.setText("postgres");
         ComboBox<String> databaseType = new ComboBox<>(
-                FXCollections.observableArrayList(DatabaseSettings.getKnownDatabaseType()));
+                FXCollections.observableArrayList(ExportDatabaseSettings.getKnownDatabaseType()));
         databaseType.setValue("SID");
         databaseType.visibleProperty().bind(connectionType.valueProperty().isEqualTo("Oracle"));
         grid.addRow(i++, databaseLabel, database, databaseType);
@@ -118,7 +114,7 @@ public class ExportDatabaseDialog {
         Button exportButton = new Button("Export");
         exportButton.setOnAction(event -> {
 
-            DatabaseSettings dbSettings = new DatabaseSettings(connectionType.getValue(), host.getText(),
+            ExportDatabaseSettings dbSettings = new ExportDatabaseSettings(connectionType.getValue(), host.getText(),
                     port.getText(), database.getText(), databaseType.getValue(), user.getText(), password.getText(),
                     saveMode.getValue(), tableName.getText());
             exportToDatabase(dbSettings);
@@ -140,13 +136,13 @@ public class ExportDatabaseDialog {
     }
 
 
-    private void exportToDatabase(DatabaseSettings databaseSettings) {
+    private void exportToDatabase(ExportDatabaseSettings exportDatabaseSettings) {
 
         NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
         if (selectedNamedDataset == null) {
 
             final String sqlQuery = this.transformPane.getSqlQuery();
-            SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager, sqlQuery, databaseSettings);
+            SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager, sqlQuery, exportDatabaseSettings);
             sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
             sqlExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the database export"));
             sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
@@ -154,7 +150,7 @@ public class ExportDatabaseDialog {
         } else {
 
             NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
-                    new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, databaseSettings);
+                    new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, exportDatabaseSettings);
             namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
             namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the database export"));
             namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
