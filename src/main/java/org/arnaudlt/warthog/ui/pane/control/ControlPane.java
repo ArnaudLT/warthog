@@ -76,7 +76,7 @@ public class ControlPane {
 
         this.stage = stage;
 
-        MenuBar menuBar = buildMenuBar();
+        MenuBar menuBar = buildNewMenuBar();
 
         ProgressBar progressBar = new ProgressBar();
         progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
@@ -94,36 +94,36 @@ public class ControlPane {
     }
 
 
-    private MenuBar buildMenuBar() {
+    private MenuBar buildNewMenuBar() {
+
         Menu fileMenu = new Menu("File");
 
-        MenuItem openFileItem = new MenuItem("Import file...");
+        MenuItem openFileItem = new MenuItem("Import local file...");
         openFileItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+O"));
         openFileItem.setOnAction(requestImportFile);
 
-        MenuItem openParquetItem = new MenuItem("Import directory...");
-        openParquetItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
-        openParquetItem.setOnAction(requestImportFolder);
-
-        MenuItem connectionManagerItem = new MenuItem("Connections Manager...");
-        connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
+        MenuItem openFolderItem = new MenuItem("Import local directory...");
+        openFolderItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
+        openFolderItem.setOnAction(requestImportFolder);
 
         MenuItem deleteItem = new MenuItem("Delete");
         deleteItem.setAccelerator(KeyCodeCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
+        fileMenu.getItems().addAll(openFileItem, openFolderItem, new SeparatorMenuItem(), deleteItem);
+
+
+        Menu editMenu = new Menu("Edit");
+
         MenuItem settingsItem = new MenuItem("Settings...");
         settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
-        fileMenu.getItems().addAll(
-                openFileItem,
-                openParquetItem,
-                new SeparatorMenuItem(),
-                //connectionManagerItem,
-                settingsItem,
-                new SeparatorMenuItem(),
-                deleteItem);
+        MenuItem connectionManagerItem = new MenuItem("Connections Manager...");
+        connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
+
+        editMenu.getItems().addAll(settingsItem, connectionManagerItem);
+
 
         Menu runMenu = new Menu("Run");
 
@@ -131,23 +131,19 @@ public class ControlPane {
         overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ENTER"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
-        SeparatorMenuItem separator3 = new SeparatorMenuItem();
-
         MenuItem exportCsvItem = new MenuItem("Export as Csv...");
         exportCsvItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+E"));
         exportCsvItem.setOnAction(getExportToCsvActionEventHandler());
 
-        SeparatorMenuItem separator4 = new SeparatorMenuItem();
-
-        MenuItem exportToFileItem = new MenuItem("Export to file...");
+        MenuItem exportToFileItem = new MenuItem("Export locally...");
         exportToFileItem.setOnAction(getExportToFileActionEventHandler());
 
-        MenuItem exportDbItem = new MenuItem("Export to database...");
+        MenuItem exportDbItem = new MenuItem("Export to...");
         exportDbItem.setOnAction(getExportToDatabaseActionEventHandler());
 
-        runMenu.getItems().addAll(overviewItem, separator3, exportCsvItem, separator4, exportToFileItem, exportDbItem);
+        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportDbItem);
 
-        return new MenuBar(fileMenu, runMenu);
+        return new MenuBar(fileMenu, editMenu, runMenu);
     }
 
 

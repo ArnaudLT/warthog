@@ -76,7 +76,7 @@ public class ExportFileDialog {
         });
         grid.addRow(i++, outputLabel, output, outputButton);
 
-        Label formatLabel = new Label("Export type :");
+        Label formatLabel = new Label("Format :");
         ComboBox<Format> format = new ComboBox<>(FXCollections.observableArrayList(Format.values()));
         format.setValue(Format.CSV);
         format.setMinWidth(100);
