@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
+import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
@@ -231,25 +232,25 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToDatabase(String sqlQuery, ExportDatabaseSettings exportDatabaseSettings) {
+    public void exportToDatabase(String sqlQuery, Connection databaseConnection, String table, String saveMode) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
 
         output
                 .write()
-                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
-                .jdbc(exportDatabaseSettings.getUrl(), exportDatabaseSettings.getTable(), exportDatabaseSettings.getProperties());
+                .mode(SaveMode.valueOf(saveMode))
+                .jdbc(databaseConnection.getDatabaseUrl(), table, databaseConnection.getDatabaseProperties());
     }
 
 
-    public void exportToDatabase(NamedDataset namedDataset, ExportDatabaseSettings exportDatabaseSettings) {
+    public void exportToDatabase(NamedDataset namedDataset, Connection databaseConnection, String table, String saveMode) {
 
         Dataset<Row> output = namedDataset.applyTransformation();
 
         output
                 .write()
-                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
-                .jdbc(exportDatabaseSettings.getUrl(), exportDatabaseSettings.getTable(), exportDatabaseSettings.getProperties());
+                .mode(SaveMode.valueOf(saveMode))
+                .jdbc(databaseConnection.getDatabaseUrl(), table, databaseConnection.getDatabaseProperties());
     }
 
 }

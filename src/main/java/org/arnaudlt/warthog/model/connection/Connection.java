@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Properties;
 
 @EqualsAndHashCode
 @Getter
@@ -95,4 +96,42 @@ public class Connection implements Serializable {
                 ", password='" + password + '\'' +
                 '}';
     }
+
+
+    public Properties getDatabaseProperties() {
+
+        final Properties dbProperties = new Properties();
+        dbProperties.put("user", user);
+        dbProperties.put("password", password);
+
+        if (ConnectionType.ORACLE_DATABASE.equals(connectionType)) {
+
+            dbProperties.put("driver", "oracle.jdbc.driver.OracleDriver");
+        } else if (ConnectionType.POSTGRESQL.equals(connectionType)) {
+
+            dbProperties.put("driver", "org.postgresql.Driver");
+        }
+        return dbProperties;
+    }
+
+
+    public String getDatabaseUrl() {
+
+        String url = null;
+        if (ConnectionType.ORACLE_DATABASE.equals(connectionType) && "SID".equals(databaseType)) {
+
+            // jdbc:oracle:thin:@localhost:49161:xe
+            url = "jdbc:oracle:thin:@" + host + ":" + port + ":" + database;
+        } else if (ConnectionType.ORACLE_DATABASE.equals(connectionType) && "Service name".equals(databaseType)) {
+
+            // jdbc:oracle:thin:@//localhost:49161/xe
+            url = "jdbc:oracle:thin:@//" + host + ":" + port + "/" + database;
+        } else if (ConnectionType.POSTGRESQL.equals(connectionType)) {
+
+            // jdbc:postgresql://localhost:5432/postgres
+            url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+        }
+        return url;
+    }
+
 }

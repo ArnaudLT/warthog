@@ -39,7 +39,7 @@ public class ControlPane {
 
     private final PoolService poolService;
 
-    private final ExportDatabaseDialog exportDatabaseDialog;
+    private final ExportDialog exportDialog;
 
     private final GlobalSettings globalSettings;
 
@@ -58,13 +58,13 @@ public class ControlPane {
 
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
-                       ExportDatabaseDialog exportDatabaseDialog, GlobalSettings globalSettings,
+                       ExportDialog exportDialog, GlobalSettings globalSettings,
                        ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
                        ConnectionsManagerDialog connectionsManagerDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
-        this.exportDatabaseDialog = exportDatabaseDialog;
+        this.exportDialog = exportDialog;
         this.globalSettings = globalSettings;
         this.exportFileDialog = exportFileDialog;
         this.settingsDialog = settingsDialog;
@@ -86,7 +86,7 @@ public class ControlPane {
         hBox.setMinHeight(30);
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
 
-        this.exportDatabaseDialog.buildExportDatabaseDialog(stage);
+        this.exportDialog.buildExportDatabaseDialog(stage);
         this.exportFileDialog.buildExportFileDialog(stage);
         this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
 
@@ -106,23 +106,27 @@ public class ControlPane {
         openFolderItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
         openFolderItem.setOnAction(requestImportFolder);
 
+        MenuItem importFromItem = new MenuItem("Import...");
+        importFromItem.setOnAction(requestImportFrom);
+
         MenuItem deleteItem = new MenuItem("Delete");
         deleteItem.setAccelerator(KeyCodeCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
-        fileMenu.getItems().addAll(openFileItem, openFolderItem, new SeparatorMenuItem(), deleteItem);
-
+        fileMenu.getItems().addAll(openFileItem, openFolderItem,  new SeparatorMenuItem(),
+                importFromItem, new SeparatorMenuItem(),
+                deleteItem);
 
         Menu editMenu = new Menu("Edit");
+
+        MenuItem connectionManagerItem = new MenuItem("Connections Manager...");
+        connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
 
         MenuItem settingsItem = new MenuItem("Settings...");
         settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
-        MenuItem connectionManagerItem = new MenuItem("Connections Manager...");
-        connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
-
-        editMenu.getItems().addAll(settingsItem, connectionManagerItem);
+        editMenu.getItems().addAll(connectionManagerItem, settingsItem);
 
 
         Menu runMenu = new Menu("Run");
@@ -138,10 +142,10 @@ public class ControlPane {
         MenuItem exportToFileItem = new MenuItem("Export locally...");
         exportToFileItem.setOnAction(getExportToFileActionEventHandler());
 
-        MenuItem exportDbItem = new MenuItem("Export to...");
-        exportDbItem.setOnAction(getExportToDatabaseActionEventHandler());
+        MenuItem exportItem = new MenuItem("Export...");
+        exportItem.setOnAction(getExportActionEventHandler());
 
-        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportDbItem);
+        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem);
 
         return new MenuBar(fileMenu, editMenu, runMenu);
     }
@@ -153,9 +157,9 @@ public class ControlPane {
     }
 
 
-    private EventHandler<ActionEvent> getExportToDatabaseActionEventHandler() {
+    private EventHandler<ActionEvent> getExportActionEventHandler() {
 
-        return actionEvent -> this.exportDatabaseDialog.showExportDatabaseDialog();
+        return actionEvent -> this.exportDialog.showExportDatabaseDialog();
     }
 
 
@@ -254,6 +258,12 @@ public class ControlPane {
 
             importFile(file);
         }
+    };
+
+
+    private final EventHandler<ActionEvent> requestImportFrom = actionEvent -> {
+
+        log.info("Request import from...");
     };
 
 

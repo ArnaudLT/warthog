@@ -3,6 +3,7 @@ package org.arnaudlt.warthog.ui.service;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
@@ -14,13 +15,20 @@ public class NamedDatasetExportToDatabaseService extends Service<Void> {
 
     private final NamedDataset namedDataset;
 
-    private final ExportDatabaseSettings exportDatabaseSettings;
+    private final Connection databaseConnection;
+
+    private final String table;
+
+    private final String saveMode;
 
 
-    public NamedDatasetExportToDatabaseService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset, ExportDatabaseSettings exportDatabaseSettings) {
+    public NamedDatasetExportToDatabaseService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset,
+                                               Connection databaseConnection, String table, String saveMode) {
         this.namedDatasetManager = namedDatasetManager;
         this.namedDataset = namedDataset;
-        this.exportDatabaseSettings = exportDatabaseSettings;
+        this.databaseConnection = databaseConnection;
+        this.table = table;
+        this.saveMode = saveMode;
     }
 
 
@@ -32,7 +40,7 @@ public class NamedDatasetExportToDatabaseService extends Service<Void> {
             protected Void call() {
 
                 log.info("Start generating a CSV export for {}", namedDataset.getName());
-                namedDatasetManager.exportToDatabase(namedDataset, exportDatabaseSettings);
+                namedDatasetManager.exportToDatabase(namedDataset, databaseConnection, table, saveMode);
                 return null;
             }
         };
