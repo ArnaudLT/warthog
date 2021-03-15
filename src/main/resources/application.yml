@@ -10,4 +10,4 @@ warthog:
     rows: 50
   spark:
     threads: 4
-    ui: true
+    ui: false
