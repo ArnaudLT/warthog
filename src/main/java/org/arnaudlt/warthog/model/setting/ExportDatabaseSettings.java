@@ -3,7 +3,7 @@ package org.arnaudlt.warthog.model.setting;
 import java.util.List;
 import java.util.Properties;
 
-// TODO Temporary ! Must be removed once connection manager is ready.
+// TODO Temporary ! Must be removed once connections manager is ready.
 public class ExportDatabaseSettings {
 
     private static final List<String> knownConnectionTypes = List.of("Oracle", "PostgreSQL");

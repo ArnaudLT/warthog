@@ -14,6 +14,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.MDL2IconCollection;
+import jfxtras.styles.jmetro.MDL2IconFont;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
@@ -35,7 +37,7 @@ public class ConnectionsManagerDialog {
 
     private final ConnectionsCollection connectionsCollection;
 
-    private Stage dialog;
+    private Stage connectionManagerStage;
 
     private TreeView<Connection> connectionsList;
 
@@ -66,11 +68,11 @@ public class ConnectionsManagerDialog {
 
     public void buildConnectionsManagerDialog(Stage stage) {
 
-        dialog = new Stage();
-        dialog.setTitle("Connection Manager");
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.initOwner(stage);
-        dialog.setResizable(false);
+        connectionManagerStage = new Stage();
+        connectionManagerStage.setTitle("Connections Manager");
+        connectionManagerStage.initModality(Modality.APPLICATION_MODAL);
+        connectionManagerStage.initOwner(stage);
+        connectionManagerStage.setResizable(false);
 
         HBox hBox = new HBox();
 
@@ -82,32 +84,16 @@ public class ConnectionsManagerDialog {
 
         connectionsList.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 
-            if (newSelection == null || newSelection.getValue() == null) return;
-            displayConnection(newSelection.getValue());
+            if (newSelection == null || newSelection.getValue() == null) {
+                clearConnectionDetailsView();
+            } else {
+                displayConnection(newSelection.getValue());
+            }
         });
 
         for (Connection oneConnection : this.connectionsCollection) {
             root.getChildren().add(new TreeItem<>(oneConnection));
         }
-
-/*
-        Connection fakeAZConnection1 = new Connection("Azure storage sample", ConnectionType.AZURE_STORAGE);
-        fakeAZConnection1.setConfigurationFilePath("C:\\Users\\Arnaud\\Downloads\\samples\\config.snp");
-        root.getChildren().add(new TreeItem<>(fakeAZConnection1));
-        Connection fakeORAConnection2 = new Connection("Oracle database sample", ConnectionType.ORACLE_DATABASE);
-
-        root.getChildren().add(new TreeItem<>(fakeORAConnection2));
-        Connection fakePGConnection3 = new Connection("PostgreSQL sample", ConnectionType.POSTGRESQL);
-        root.getChildren().add(new TreeItem<>(fakePGConnection3));
-
-        connectionsCollection.getConnections().addAll(Arrays.asList(fakeAZConnection1, fakeORAConnection2, fakePGConnection3));
-        try {
-            connectionsCollection.persist();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-*/
-
 
         GridPane connectionTypeHeader = GridFactory.buildGrid(new Insets(20,20,0,20));
 
@@ -115,6 +101,7 @@ public class ConnectionsManagerDialog {
 
         Label connectionNameLabel = new Label("Name :");
         connectionName = new TextField();
+        connectionName.setPrefWidth(250);
         int i = 0;
         connectionTypeHeader.addRow(i++, connectionNameLabel, connectionName, connectionType);
 
@@ -128,21 +115,71 @@ public class ConnectionsManagerDialog {
         azureStorageConnectionNode.visibleProperty().bind(connectionType.valueProperty().isEqualTo(ConnectionType.AZURE_STORAGE));
 
         Group group = new Group(databaseConnectionNode, azureStorageConnectionNode);
+
+
+        Button createConnectionButton = new Button("", new MDL2IconFont("\uE710"));
+        createConnectionButton.setTooltip(new Tooltip("Create a new connection"));
+        createConnectionButton.setOnAction(event -> {
+
+            Connection newConnection = new Connection("new connection", ConnectionType.ORACLE_DATABASE);
+            this.connectionsCollection.getConnections().add(newConnection);
+
+            TreeItem<Connection> newConnectionItem = new TreeItem<>(newConnection);
+            this.connectionsList.getRoot().getChildren().add(newConnectionItem);
+            this.connectionsList.getSelectionModel().select(newConnectionItem);
+        });
+
+        Button cloneConnectionButton = new Button("", new MDL2IconFont("\uE8C8"));
+        cloneConnectionButton.setTooltip(new Tooltip("Clone selected connection"));
+        cloneConnectionButton.setOnAction(event -> {
+
+            TreeItem<Connection> connectionToClone = connectionsList.getSelectionModel().getSelectedItem();
+            if (connectionToClone != null && connectionToClone.getValue() != null) {
+
+                Connection newConnection = new Connection(connectionToClone.getValue());
+                this.connectionsCollection.getConnections().add(newConnection);
+
+                TreeItem<Connection> newConnectionItem = new TreeItem<>(newConnection);
+                this.connectionsList.getRoot().getChildren().add(newConnectionItem);
+                this.connectionsList.getSelectionModel().select(newConnectionItem);
+            }
+        });
+
+        Button deleteConnectionButton = new Button("", new MDL2IconFont("\uE74D"));
+        deleteConnectionButton.setTooltip(new Tooltip("Delete selected connection"));
+        deleteConnectionButton.setOnAction(event -> {
+
+            TreeItem<Connection> connectionToDeleteItem = connectionsList.getSelectionModel().getSelectedItem();
+            if (connectionToDeleteItem != null && connectionToDeleteItem.getValue() != null) {
+
+                this.connectionsCollection.getConnections().remove(connectionToDeleteItem.getValue());
+                this.connectionsList.getRoot().getChildren().remove(connectionToDeleteItem);
+                try {
+                    this.connectionsCollection.persist();
+                } catch (IOException e) {
+                    AlertError.showFailureAlert(e, "Unable to save connections");
+                }
+            }
+        });
+
+        this.connectionsList.getSelectionModel().selectFirst();
+
+        HBox controlButtons = new HBox(createConnectionButton, cloneConnectionButton, deleteConnectionButton);
         VBox connectionDetails = new VBox(connectionTypeHeader, group);
 
-        hBox.getChildren().add(connectionsList);
+        hBox.getChildren().add(new VBox(controlButtons, connectionsList));
         hBox.getChildren().add(connectionDetails);
         Scene dialogScene = new Scene(hBox, 750, 400);
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);
-        dialog.setScene(dialogScene);
+        connectionManagerStage.setScene(dialogScene);
     }
 
 
     public Node getAzureStorageConnectionNode() {
 
-        GridPane grid = GridFactory.buildGrid();
+        GridPane grid = GridFactory.buildGrid(new Insets(10,20,0,20));
 
         int i = 0;
 
@@ -154,7 +191,7 @@ public class ConnectionsManagerDialog {
 
             FileChooser fc = new FileChooser();
             fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text file", "*.txt"));
-            File exportFile = fc.showOpenDialog(dialog);
+            File exportFile = fc.showOpenDialog(connectionManagerStage);
 
             if (exportFile == null) return;
             configurationFilePath.setText(exportFile.getAbsolutePath());
@@ -169,11 +206,11 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> selectedConnectionItem = this.connectionsList.getSelectionModel().getSelectedItem();
 
             Connection connection = selectedConnectionItem.getValue();
-            connection.clean(); // not mandatory if the connection type has not changed
+            connection.cleanUselessAttributs(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());
             connection.setConnectionType(connectionType.getValue());
             connection.setConfigurationFilePath(configurationFilePath.getText());
-            log.info("Save ... {}", connection.toExtraString());
+            log.info("Saving {}", connection);
 
             try {
                 this.connectionsCollection.persist();
@@ -190,7 +227,7 @@ public class ConnectionsManagerDialog {
 
     public Node getDatabaseConnectionNode() {
 
-        GridPane grid = GridFactory.buildGrid();
+        GridPane grid = GridFactory.buildGrid(new Insets(10,20,0,20));
 
         int i = 0;
 
@@ -233,7 +270,7 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> selectedConnectionItem = this.connectionsList.getSelectionModel().getSelectedItem();
 
             Connection connection = selectedConnectionItem.getValue();
-            connection.clean(); // not mandatory if the connection type has not changed
+            connection.cleanUselessAttributs(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());
             connection.setConnectionType(connectionType.getValue());
             connection.setHost(host.getText());
@@ -260,7 +297,7 @@ public class ConnectionsManagerDialog {
         this.connectionName.setText(connection.getName());
         this.connectionType.setValue(connection.getConnectionType());
 
-        clear();
+        clearConnectionDetailsView();
 
         switch (connection.getConnectionType()) {
 
@@ -282,7 +319,7 @@ public class ConnectionsManagerDialog {
     }
 
 
-    public void clear() {
+    public void clearConnectionDetailsView() {
 
         this.configurationFilePath.setText("");
         this.host.setText("");
@@ -296,6 +333,6 @@ public class ConnectionsManagerDialog {
 
     public void showConnectionsManagerDialog() {
 
-        this.dialog.show();
+        this.connectionManagerStage.show();
     }
 }

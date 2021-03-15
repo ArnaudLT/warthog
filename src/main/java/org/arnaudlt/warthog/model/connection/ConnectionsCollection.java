@@ -1,13 +1,13 @@
 package org.arnaudlt.warthog.model.connection;
 
-import javafx.scene.control.TreeItem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Slf4j
 @Getter
@@ -16,11 +16,12 @@ public class ConnectionsCollection implements Serializable, Iterable<Connection>
 
     public static final long serialVersionUID = 7372913086816112179L;
 
-    private HashSet<Connection> connections;
+
+    private List<Connection> connections;
 
 
     public ConnectionsCollection() {
-        this.connections = new HashSet<>();
+        this.connections = new ArrayList<>();
     }
 
     public void persist() throws IOException {
@@ -49,6 +50,7 @@ public class ConnectionsCollection implements Serializable, Iterable<Connection>
         }
         return connectionsCollection;
     }
+
 
     @Override
     public Iterator<Connection> iterator() {

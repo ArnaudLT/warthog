@@ -44,13 +44,24 @@ public class Connection implements Serializable {
     }
 
 
-    public void clean() {
+    public Connection(Connection value) {
+        this.name = value.name;
+        this.connectionType = value.connectionType;
+        this.configurationFilePath = value.configurationFilePath;
+        this.host = value.host;
+        this.port = value.port;
+        this.database = value.database;
+        this.databaseType = value.databaseType;
+        this.user = value.user;
+        this.password = value.password;
+    }
+
+
+    public void cleanUselessAttributs() {
 
         switch (connectionType) {
 
             case ORACLE_DATABASE:
-                this.configurationFilePath = "";
-                break;
             case POSTGRESQL:
                 this.configurationFilePath = "";
                 break;
