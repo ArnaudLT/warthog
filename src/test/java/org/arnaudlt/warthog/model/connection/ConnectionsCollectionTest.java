@@ -24,7 +24,7 @@ class ConnectionsCollectionTest {
         ConnectionsCollection connectionsCollection = new ConnectionsCollection();
         connectionsCollection.getConnections().addAll(Arrays.asList(fakeAZConnection1, fakeORAConnection2, fakePGConnection3));
 
-        connectionsCollection.persist();
+        //connectionsCollection.persist();
     }
 
     @Test

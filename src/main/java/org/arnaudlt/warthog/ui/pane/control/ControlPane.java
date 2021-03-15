@@ -120,7 +120,7 @@ public class ControlPane {
                 openFileItem,
                 openParquetItem,
                 new SeparatorMenuItem(),
-                connectionManagerItem,
+                //connectionManagerItem,
                 settingsItem,
                 new SeparatorMenuItem(),
                 deleteItem);
