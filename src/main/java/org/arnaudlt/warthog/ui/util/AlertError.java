@@ -6,6 +6,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 @Slf4j
 public class AlertError {
 
@@ -30,4 +32,11 @@ public class AlertError {
         alert.show();
     }
 
+
+    public static Optional<ButtonType> showConfirmationAlert(String text) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText(text);
+        return alert.showAndWait();
+    }
 }

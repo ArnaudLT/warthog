@@ -152,13 +152,17 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> connectionToDeleteItem = connectionsList.getSelectionModel().getSelectedItem();
             if (connectionToDeleteItem != null && connectionToDeleteItem.getValue() != null) {
 
-                this.connectionsCollection.getConnections().remove(connectionToDeleteItem.getValue());
-                this.connectionsList.getRoot().getChildren().remove(connectionToDeleteItem);
-                try {
-                    this.connectionsCollection.persist();
-                } catch (IOException e) {
-                    AlertError.showFailureAlert(e, "Unable to save connections");
-                }
+                AlertError.showConfirmationAlert("Do you want to delete connection : " + connectionToDeleteItem.getValue())
+                        .filter(button -> button == ButtonType.OK)
+                        .ifPresent(b -> {
+                            this.connectionsCollection.getConnections().remove(connectionToDeleteItem.getValue());
+                            this.connectionsList.getRoot().getChildren().remove(connectionToDeleteItem);
+                            try {
+                                this.connectionsCollection.persist();
+                            } catch (IOException e) {
+                                AlertError.showFailureAlert(e, "Unable to save changes");
+                            }
+                        });
             }
         });
 
