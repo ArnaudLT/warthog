@@ -1,8 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -16,7 +14,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.MDL2IconCollection;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +23,7 @@ import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -223,6 +221,7 @@ public class ConnectionsManagerDialog {
             } catch (IOException e) {
                 AlertError.showFailureAlert(e, "Unable to save connections");
             }
+            Utils.refreshTreeViewAllItems(this.connectionsList);
 
         });
         grid.addRow(i, saveButton);
@@ -292,6 +291,7 @@ public class ConnectionsManagerDialog {
             } catch (IOException e) {
                 AlertError.showFailureAlert(e, "Unable to save connections");
             }
+            Utils.refreshTreeViewAllItems(this.connectionsList);
         });
         grid.addRow(i, saveButton);
         return grid;

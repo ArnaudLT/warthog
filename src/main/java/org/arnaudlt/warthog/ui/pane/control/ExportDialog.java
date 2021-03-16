@@ -13,14 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
-import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetExportToDatabaseService;
 import org.arnaudlt.warthog.ui.service.SqlExportToDatabaseService;
+import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +36,8 @@ public class ExportDialog {
     private final PoolService poolService;
 
     private final TransformPane transformPane;
+
+    private ComboBox<Connection> connectionsListBox;
 
     private Stage dialog;
 
@@ -63,8 +65,7 @@ public class ExportDialog {
         int i = 0;
 
         Label connectionLabel = new Label("Connection :");
-
-        ComboBox<Connection> connectionsListBox = new ComboBox<>(connectionsCollection.getConnections());
+        connectionsListBox = new ComboBox<>(connectionsCollection.getConnections());
 
         grid.addRow(i++, connectionLabel, connectionsListBox);
 
@@ -72,10 +73,15 @@ public class ExportDialog {
 
         Label tableNameLabel = new Label("Table name :");
         TextField tableName = new TextField();
+
+        grid.addRow(i++, tableNameLabel, tableName);
+
+        Label saveModeBoxLabel = new Label("Mode :");
+
         ComboBox<String> saveModeBox = new ComboBox<>(FXCollections.observableArrayList("Overwrite", "Append"));
         saveModeBox.setValue("Overwrite");
 
-        grid.addRow(i++, tableNameLabel, tableName, saveModeBox);
+        grid.addRow(i++, saveModeBoxLabel, saveModeBox);
 
         grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 3, 1);
 
@@ -101,6 +107,7 @@ public class ExportDialog {
 
     public void showExportDatabaseDialog() {
 
+        Utils.refreshComboBoxAllItems(connectionsListBox);
         dialog.show();
     }
 

@@ -104,6 +104,7 @@ public class ExportFileDialog {
         Label headerLabel = new Label("Header :");
         headerLabel.visibleProperty().bind(csvSelected);
         CheckBox header = new CheckBox();
+        header.setSelected(true);
         header.visibleProperty().bind(csvSelected);
         grid.addRow(i++, headerLabel, header);
         // End conditional display
