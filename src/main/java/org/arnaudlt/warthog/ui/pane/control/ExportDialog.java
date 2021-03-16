@@ -63,8 +63,10 @@ public class ExportDialog {
         int i = 0;
 
         Label connectionLabel = new Label("Connection :");
-        ComboBox<Connection> connectionsBox = new ComboBox<>(FXCollections.observableArrayList(this.connectionsCollection.getConnections()));
-        grid.addRow(i++, connectionLabel, connectionsBox);
+
+        ComboBox<Connection> connectionsListBox = new ComboBox<>(connectionsCollection.getConnections());
+
+        grid.addRow(i++, connectionLabel, connectionsListBox);
 
         grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 3, 1);
 
@@ -80,7 +82,7 @@ public class ExportDialog {
         Button exportButton = new Button("Export");
         exportButton.setOnAction(event -> {
 
-            Connection selectedConnection = connectionsBox.getSelectionModel().getSelectedItem();
+            Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
             if (selectedConnection != null) {
                 // TODO encapsuler les details de l'export ? (table, mode, ... ?)
                 exportToDatabase(selectedConnection, tableName.getText(), saveModeBox.getValue());

@@ -1,6 +1,10 @@
 package org.arnaudlt.warthog.model.connection;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,17 +16,23 @@ import java.util.List;
 @Slf4j
 @Getter
 @Setter
-public class ConnectionsCollection implements Serializable, Iterable<Connection> {
+public class ConnectionsCollection implements Iterable<Connection> {
 
     public static final long serialVersionUID = 7372913086816112179L;
 
 
-    private List<Connection> connections;
+    private ObservableList<Connection> connections;
 
 
     public ConnectionsCollection() {
-        this.connections = new ArrayList<>();
+        this.connections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
     }
+
+
+    public ConnectionsCollection(List<Connection> connections) {
+        this.connections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(connections));
+    }
+
 
     public void persist() throws IOException {
 
@@ -33,7 +43,8 @@ public class ConnectionsCollection implements Serializable, Iterable<Connection>
         try (FileOutputStream fos = new FileOutputStream("connections.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 
-            oos.writeObject(this);
+            SerializableConnectionsCollection serializableConnectionsCollection = this.getSerializableConnectionsCollection();
+            oos.writeObject(serializableConnectionsCollection);
         }
         log.info("Connections written in 'connections.ser'");
     }
@@ -46,9 +57,22 @@ public class ConnectionsCollection implements Serializable, Iterable<Connection>
         try (FileInputStream fis = new FileInputStream("connections.ser");
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-            connectionsCollection = (ConnectionsCollection) ois.readObject();
+             SerializableConnectionsCollection serializableConnectionsCollection = (SerializableConnectionsCollection) ois.readObject();
+             connectionsCollection = getConnectionsCollection(serializableConnectionsCollection);
         }
         return connectionsCollection;
+    }
+
+
+    private SerializableConnectionsCollection getSerializableConnectionsCollection() {
+
+        return new SerializableConnectionsCollection(new ArrayList<>(this.connections));
+    }
+
+
+    private static ConnectionsCollection getConnectionsCollection(SerializableConnectionsCollection serializableConnectionsCollection) {
+
+        return new ConnectionsCollection(serializableConnectionsCollection.connections);
     }
 
 
@@ -56,5 +80,15 @@ public class ConnectionsCollection implements Serializable, Iterable<Connection>
     public Iterator<Connection> iterator() {
 
         return this.connections.iterator();
+    }
+
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SerializableConnectionsCollection implements Serializable {
+
+        private List<Connection> connections;
     }
 }
