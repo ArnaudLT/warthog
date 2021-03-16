@@ -22,11 +22,12 @@ public class AlertError {
     public static void showFailureAlert(Throwable exception, String text) {
 
         log.error(text, exception);
-        Alert countRowsAlert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
-        countRowsAlert.setHeaderText(text);
+        Alert alert = new Alert(Alert.AlertType.ERROR, "", ButtonType.CLOSE);
+        alert.setHeaderText(text);
         TextArea stack = new TextArea(exception.toString());
-        countRowsAlert.getDialogPane().setContent(stack);
-        countRowsAlert.show();
+        alert.getDialogPane().setExpandableContent(stack);
+        alert.getDialogPane().setExpanded(true);
+        alert.show();
     }
 
 }
