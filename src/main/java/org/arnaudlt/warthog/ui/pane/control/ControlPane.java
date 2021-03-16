@@ -17,11 +17,11 @@ import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.model.util.Format;
-import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.pane.output.OutputPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.*;
+import org.arnaudlt.warthog.ui.util.AlertError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -86,7 +86,7 @@ public class ControlPane {
         hBox.setMinHeight(30);
         hBox.setAlignment(Pos.BASELINE_LEFT); // bas
 
-        this.exportDialog.buildExportDatabaseDialog(stage);
+        this.exportDialog.buildExportDialog(stage);
         this.exportFileDialog.buildExportFileDialog(stage);
         this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
 

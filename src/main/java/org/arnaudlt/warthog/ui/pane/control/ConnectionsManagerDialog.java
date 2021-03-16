@@ -187,14 +187,14 @@ public class ConnectionsManagerDialog {
 
         int i = 0;
 
-        Label outputLabel = new Label("Spn file :");
+        Label outputLabel = new Label("SPN configuration file :");
         configurationFilePath = new TextField();
         configurationFilePath.setMinWidth(300);
         Button outputButton = new Button("...");
         outputButton.setOnAction(event -> {
 
             FileChooser fc = new FileChooser();
-            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text file", "*.txt"));
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration file", "*.conf"));
             File exportFile = fc.showOpenDialog(connectionManagerStage);
 
             if (exportFile == null) return;

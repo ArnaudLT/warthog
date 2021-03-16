@@ -20,8 +20,10 @@ public class Utils {
         }
         comboBox.getSelectionModel().select(selectedItem);
     }
+    
 
-
+    // TODO Hack to force the refresh of the names in the combo box.
+    // Can be 'fixed' with a callback and a StringProperty for the displayed name ... so I prefer the HACK !
     public static <T> void refreshTreeViewAllItems(TreeView<T> treeView) {
 
         TreeItem<T> selectedItem = treeView.getSelectionModel().getSelectedItem();
