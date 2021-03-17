@@ -49,6 +49,8 @@ public class ControlPane {
 
     private final ConnectionsManagerDialog connectionsManagerDialog;
 
+    private ImportDialog importDialog;
+
     private ExplorerPane explorerPane;
 
     private TransformPane transformPane;
@@ -60,7 +62,7 @@ public class ControlPane {
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
                        ExportDialog exportDialog, GlobalSettings globalSettings,
                        ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
-                       ConnectionsManagerDialog connectionsManagerDialog) {
+                       ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
@@ -69,6 +71,7 @@ public class ControlPane {
         this.exportFileDialog = exportFileDialog;
         this.settingsDialog = settingsDialog;
         this.connectionsManagerDialog = connectionsManagerDialog;
+        this.importDialog = importDialog;
     }
 
 
@@ -89,6 +92,7 @@ public class ControlPane {
         this.exportDialog.buildExportDialog(stage);
         this.exportFileDialog.buildExportFileDialog(stage);
         this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
+        this.importDialog.buildImportDialog(stage);
 
         return hBox;
     }
@@ -263,13 +267,13 @@ public class ControlPane {
 
     private final EventHandler<ActionEvent> requestImportFrom = actionEvent -> {
 
-        log.info("Request import from...");
+        this.importDialog.showImportDatabaseDialog();
     };
 
 
     public void importFile(File file) {
 
-        NamedDatasetImportService importService = new NamedDatasetImportService(namedDatasetManager, file);
+        NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(namedDatasetManager, file);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to add the dataset '"+ file.getName() +"'"));
         importService.setExecutor(this.poolService.getExecutor());

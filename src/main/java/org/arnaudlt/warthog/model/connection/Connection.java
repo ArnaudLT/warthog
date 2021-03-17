@@ -134,4 +134,8 @@ public class Connection implements Serializable {
         return url;
     }
 
+
+    public static List<String> getKnownDatabaseType() {
+        return knownDatabaseType;
+    }
 }

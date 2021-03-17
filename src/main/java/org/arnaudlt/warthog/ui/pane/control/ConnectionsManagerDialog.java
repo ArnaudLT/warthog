@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
-import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -255,7 +254,7 @@ public class ConnectionsManagerDialog {
         Label databaseLabel = new Label("Database :");
         database = new TextField();
         databaseType = new ComboBox<>(
-                FXCollections.observableArrayList(ExportDatabaseSettings.getKnownDatabaseType()));
+                FXCollections.observableArrayList(Connection.getKnownDatabaseType()));
         databaseType.visibleProperty().bind(connectionType.valueProperty().isEqualTo(ConnectionType.ORACLE_DATABASE));
         grid.addRow(i++, databaseLabel, database, databaseType);
 

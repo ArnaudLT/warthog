@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 
 @Slf4j
 public class SqlExportToDatabaseService extends Service<Void> {
@@ -15,19 +16,16 @@ public class SqlExportToDatabaseService extends Service<Void> {
 
     private final Connection databaseConnection;
 
-    private final String table;
-
-    private final String saveMode;
+    private final ExportDatabaseSettings exportDatabaseSettings;
 
 
     public SqlExportToDatabaseService(NamedDatasetManager namedDatasetManager, String sqlQuery,
-                                      Connection databaseConnection, String table, String saveMode) {
+                                      Connection databaseConnection, ExportDatabaseSettings exportDatabaseSettings) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.sqlQuery = sqlQuery;
         this.databaseConnection = databaseConnection;
-        this.table = table;
-        this.saveMode = saveMode;
+        this.exportDatabaseSettings = exportDatabaseSettings;
     }
 
 
@@ -39,7 +37,7 @@ public class SqlExportToDatabaseService extends Service<Void> {
             protected Void call() {
 
                 log.info("Start generating a DB export for {}", sqlQuery);
-                namedDatasetManager.exportToDatabase(sqlQuery, databaseConnection, table, saveMode);
+                namedDatasetManager.exportToDatabase(sqlQuery, databaseConnection, exportDatabaseSettings);
                 return null;
             }
         };

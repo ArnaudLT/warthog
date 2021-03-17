@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.connection.Connection;
-import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
 import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
+import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.Format;
@@ -80,14 +80,7 @@ public class NamedDatasetManager {
                     throw new ProcessingException(String.format("Not able to read %s file type", fileType));
             }
             Catalog catalog = buildCatalog(dataset);
-
-            List<SelectNamedColumn> selectNamedColumns = catalog.getColumns().stream()
-                    .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
-                    .collect(Collectors.toList());
-
-            List<WhereClause> whereNamedColumns = new ArrayList<>();
-
-            Transformation transformation = new Transformation(selectNamedColumns, whereNamedColumns);
+            Transformation transformation = buildTransformation(catalog);
 
             return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
                     file.getName(), dataset, catalog, transformation, new Decoration(file.toPath(), sizeInMegaBytes, separator));
@@ -96,6 +89,20 @@ public class NamedDatasetManager {
 
             throw new ProcessingException(String.format("Not able to create the named dataset from %s", file),e);
         }
+    }
+
+
+    public NamedDataset createNamedDataset(Connection databaseConnection, String tableName) {
+
+        Dataset<Row> dataset = this.spark
+                .read()
+                .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
+
+        Catalog catalog = buildCatalog(dataset);
+        Transformation transformation = buildTransformation(catalog);
+
+        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog, transformation,
+                new Decoration(null, 0, ""));
     }
 
 
@@ -178,6 +185,18 @@ public class NamedDatasetManager {
     }
 
 
+    private Transformation buildTransformation(Catalog catalog) {
+
+        List<SelectNamedColumn> selectNamedColumns = catalog.getColumns().stream()
+                .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
+                .collect(Collectors.toList());
+
+        List<WhereClause> whereNamedColumns = new ArrayList<>();
+
+        return new Transformation(selectNamedColumns, whereNamedColumns);
+    }
+
+
     public Dataset<Row> prepareDataset(String sqlQuery) {
 
         return this.spark.sqlContext().sql(sqlQuery);
@@ -232,25 +251,25 @@ public class NamedDatasetManager {
     }
 
 
-    public void exportToDatabase(String sqlQuery, Connection databaseConnection, String table, String saveMode) {
+    public void exportToDatabase(String sqlQuery, Connection databaseConnection, ExportDatabaseSettings exportDatabaseSettings) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
 
         output
                 .write()
-                .mode(SaveMode.valueOf(saveMode))
-                .jdbc(databaseConnection.getDatabaseUrl(), table, databaseConnection.getDatabaseProperties());
+                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
+                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.getTableName(), databaseConnection.getDatabaseProperties());
     }
 
 
-    public void exportToDatabase(NamedDataset namedDataset, Connection databaseConnection, String table, String saveMode) {
+    public void exportToDatabase(NamedDataset namedDataset, Connection databaseConnection, ExportDatabaseSettings exportDatabaseSettings) {
 
         Dataset<Row> output = namedDataset.applyTransformation();
 
         output
                 .write()
-                .mode(SaveMode.valueOf(saveMode))
-                .jdbc(databaseConnection.getDatabaseUrl(), table, databaseConnection.getDatabaseProperties());
+                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
+                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.getTableName(), databaseConnection.getDatabaseProperties());
     }
 
 }

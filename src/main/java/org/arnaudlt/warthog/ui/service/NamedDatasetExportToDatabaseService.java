@@ -4,9 +4,9 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
-import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 
 @Slf4j
 public class NamedDatasetExportToDatabaseService extends Service<Void> {
@@ -17,18 +17,15 @@ public class NamedDatasetExportToDatabaseService extends Service<Void> {
 
     private final Connection databaseConnection;
 
-    private final String table;
-
-    private final String saveMode;
+    private final ExportDatabaseSettings exportDatabaseSettings;
 
 
     public NamedDatasetExportToDatabaseService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset,
-                                               Connection databaseConnection, String table, String saveMode) {
+                                               Connection databaseConnection, ExportDatabaseSettings exportDatabaseSettings) {
         this.namedDatasetManager = namedDatasetManager;
         this.namedDataset = namedDataset;
         this.databaseConnection = databaseConnection;
-        this.table = table;
-        this.saveMode = saveMode;
+        this.exportDatabaseSettings = exportDatabaseSettings;
     }
 
 
@@ -40,7 +37,7 @@ public class NamedDatasetExportToDatabaseService extends Service<Void> {
             protected Void call() {
 
                 log.info("Start generating a CSV export for {}", namedDataset.getName());
-                namedDatasetManager.exportToDatabase(namedDataset, databaseConnection, table, saveMode);
+                namedDatasetManager.exportToDatabase(namedDataset, databaseConnection, exportDatabaseSettings);
                 return null;
             }
         };
