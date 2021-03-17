@@ -1,17 +1,15 @@
 package org.arnaudlt.warthog.model.dataset;
 
-import java.nio.file.Path;
-
 public class Decoration {
 
-    private final Path filePath;
+    private final String filePath;
 
     private final double sizeInMegaBytes;
 
     private final String separator;
 
 
-    public Decoration(Path filePath, double sizeInMegaBytes, String separator) {
+    public Decoration(String filePath, double sizeInMegaBytes, String separator) {
 
         this.filePath = filePath;
         this.sizeInMegaBytes = sizeInMegaBytes;
@@ -19,7 +17,7 @@ public class Decoration {
     }
 
 
-    public Path getFilePath() {
+    public String getFilePath() {
         return filePath;
     }
 

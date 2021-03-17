@@ -83,7 +83,7 @@ public class NamedDatasetManager {
             Transformation transformation = buildTransformation(catalog);
 
             return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
-                    file.getName(), dataset, catalog, transformation, new Decoration(file.toPath(), sizeInMegaBytes, separator));
+                    file.getName(), dataset, catalog, transformation, new Decoration(file.toPath().toString(), sizeInMegaBytes, separator));
 
         } catch (Exception e) {
 
@@ -102,7 +102,7 @@ public class NamedDatasetManager {
         Transformation transformation = buildTransformation(catalog);
 
         return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog, transformation,
-                new Decoration(null, 0, ""));
+                new Decoration(databaseConnection.getName() + " - " + tableName, 0, ""));
     }
 
 

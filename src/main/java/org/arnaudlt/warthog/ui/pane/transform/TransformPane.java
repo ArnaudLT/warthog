@@ -70,7 +70,7 @@ public class TransformPane {
             if (selectedNamedDataset != null) {
 
                 return " - Warthog - " +
-                       selectedNamedDataset.getDecoration().getFilePath().toString() + " - " +
+                       selectedNamedDataset.getDecoration().getFilePath() + " - " +
                        formatter.format(selectedNamedDataset.getDecoration().getSizeInMegaBytes()) + "MB";
             }
             return " - Warthog - SQL";

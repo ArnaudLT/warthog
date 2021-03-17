@@ -67,6 +67,7 @@ public class ImportDialog {
 
         Label connectionLabel = new Label("Connection :");
         connectionsListBox = new ComboBox<>(connectionsCollection.getConnections());
+        connectionsListBox.getSelectionModel().selectFirst();
         connectionsListBox.setMinWidth(220);
         connectionsListBox.setMaxWidth(220);
         common.addRow(i++, connectionLabel, connectionsListBox);
