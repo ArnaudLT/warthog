@@ -13,7 +13,7 @@
         <file>warthog.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>warthog.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>logs/warthog.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- keep 5 days' worth of history capped at 100MB total size -->
             <maxHistory>5</maxHistory>
             <totalSizeCap>100MB</totalSizeCap>
