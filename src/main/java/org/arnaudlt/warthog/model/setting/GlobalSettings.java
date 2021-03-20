@@ -34,21 +34,26 @@ public class GlobalSettings implements Serializable {
         return overviewRows;
     }
 
+
     public void setOverviewRows(Integer overviewRows) {
         this.overviewRows = overviewRows;
     }
+
 
     public Integer getSparkThreads() {
         return sparkThreads;
     }
 
+
     public void setSparkThreads(Integer sparkThreads) {
         this.sparkThreads = sparkThreads;
     }
 
+
     public Boolean getSparkUI() {
         return sparkUI;
     }
+
 
     public void setSparkUI(Boolean sparkUI) {
         this.sparkUI = sparkUI;
