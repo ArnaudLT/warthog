@@ -1,8 +1,6 @@
 package org.arnaudlt.warthog.model.setting;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 
@@ -18,11 +16,7 @@ public class GlobalSettings implements Serializable {
     private Integer overviewRows;
 
 
-    @Autowired
-    public GlobalSettings(
-            @Value("${warthog.spark.threads}") Integer sparkThreads,
-            @Value("${warthog.spark.ui}") Boolean sparkUI,
-            @Value("${warthog.overview.rows}") Integer overviewRows) {
+    public GlobalSettings(Integer sparkThreads, Boolean sparkUI, Integer overviewRows) {
 
         this.sparkThreads = sparkThreads;
         this.sparkUI = sparkUI;
