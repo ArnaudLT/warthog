@@ -27,45 +27,51 @@ public class ConnectionsCollection implements Iterable<Connection> {
 
     public static final long serialVersionUID = 7372913086816112179L;
 
+    private String userDirectory;
+
     private Gson gson;
 
     private ObservableList<Connection> connections;
 
 
-    public ConnectionsCollection(Gson gson) {
+    public ConnectionsCollection(Gson gson, String userDirectory) {
         this.gson = gson;
+        this.userDirectory = userDirectory;
         this.connections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
     }
 
 
-    public ConnectionsCollection(Gson gson, List<Connection> connections) {
+    public ConnectionsCollection(Gson gson, String userDirectory, List<Connection> connections) {
         this.gson = gson;
+        this.userDirectory = userDirectory;
         this.connections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(connections));
     }
 
 
     public void persist() throws IOException {
 
-        log.info("Try to delete the 'connections.json'");
-        new File("connections.json").delete();
+        log.info("Try to delete the '{}/connections.json'", userDirectory);
+        new File(userDirectory, "connections.json").delete();
 
-        log.info("Start to write connections in 'connections.json'");
+        log.info("Start to write connections in '{}/connections.json'", userDirectory);
 
         SerializableConnectionsCollection serializableConnectionsCollection = this.getSerializableConnectionsCollection();
         String connectionsJson = gson.toJson(serializableConnectionsCollection);
-        Files.writeString(Paths.get("connections.json"), connectionsJson, StandardOpenOption.CREATE);
 
-        log.info("Connections written in 'connections.json'");
+        Files.createDirectories(Paths.get(userDirectory));
+        Files.writeString(Paths.get(userDirectory, "connections.json"), connectionsJson, StandardOpenOption.CREATE);
+
+        log.info("Connections written in '{}/connections.json'", userDirectory);
     }
 
 
-    public static ConnectionsCollection load(Gson gson) throws IOException {
+    public static ConnectionsCollection load(Gson gson, String userDirectory) throws IOException {
 
-        log.info("Start to load connections from 'connections.json'");
+        log.info("Start to load connections from '{}/connections.json'", userDirectory);
 
         SerializableConnectionsCollection serializableConnectionsCollection =
-                gson.fromJson(new FileReader("connections.json"), SerializableConnectionsCollection.class);
-        ConnectionsCollection connectionsCollection = getConnectionsCollection(gson, serializableConnectionsCollection);
+                gson.fromJson(new FileReader(new File(userDirectory, "connections.json")), SerializableConnectionsCollection.class);
+        ConnectionsCollection connectionsCollection = getConnectionsCollection(gson, userDirectory, serializableConnectionsCollection);
         log.info("{} connections loaded", connectionsCollection.getConnections().size());
 
         return connectionsCollection;
@@ -78,9 +84,9 @@ public class ConnectionsCollection implements Iterable<Connection> {
     }
 
 
-    private static ConnectionsCollection getConnectionsCollection(Gson gson, SerializableConnectionsCollection serializableConnectionsCollection) {
+    private static ConnectionsCollection getConnectionsCollection(Gson gson, String userDirectory, SerializableConnectionsCollection serializableConnectionsCollection) {
 
-        return new ConnectionsCollection(gson, serializableConnectionsCollection.connections);
+        return new ConnectionsCollection(gson, userDirectory, serializableConnectionsCollection.connections);
     }
 
 

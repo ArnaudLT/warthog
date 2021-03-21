@@ -27,7 +27,7 @@ class ConnectionsCollectionTest {
 
         Connection fakePGConnection3 = new Connection("PostgreSQL sample", ConnectionType.POSTGRESQL);
 
-        ConnectionsCollection connectionsCollection = new ConnectionsCollection(gson);
+        ConnectionsCollection connectionsCollection = new ConnectionsCollection(gson, "target");
         connectionsCollection.getConnections().addAll(Arrays.asList(fakeAZConnection1, fakeORAConnection2, fakePGConnection3));
 
         //connectionsCollection.persist();
@@ -36,7 +36,7 @@ class ConnectionsCollectionTest {
     @Test
     void load() throws IOException {
 
-        ConnectionsCollection connectionsCollection = ConnectionsCollection.load(gson);
+        ConnectionsCollection connectionsCollection = ConnectionsCollection.load(gson, "target");
         log.info("Loading connections...");
         for (Connection connection : connectionsCollection) {
 

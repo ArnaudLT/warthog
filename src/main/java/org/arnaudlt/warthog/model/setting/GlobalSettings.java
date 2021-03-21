@@ -14,6 +14,8 @@ public class GlobalSettings implements Serializable {
 
     private transient Gson gson;
 
+    private transient String userDirectory;
+
     // ########## SPARK ##########
     private Integer sparkThreads;
 
@@ -23,9 +25,10 @@ public class GlobalSettings implements Serializable {
     private Integer overviewRows;
 
 
-    public GlobalSettings(Gson gson, Integer sparkThreads, Boolean sparkUI, Integer overviewRows) {
+    public GlobalSettings(Gson gson, String userDirectory, Integer sparkThreads, Boolean sparkUI, Integer overviewRows) {
 
         this.gson = gson;
+        this.userDirectory = userDirectory;
         this.sparkThreads = sparkThreads;
         this.sparkUI = sparkUI;
         this.overviewRows = overviewRows;
@@ -64,22 +67,24 @@ public class GlobalSettings implements Serializable {
 
     public void persist() throws IOException {
 
-        log.info("Try to delete the 'settings.json'");
-        new File("settings.json").delete();
+        log.info("Try to delete the '{}/settings.json'", userDirectory);
+        new File(userDirectory, "settings.json").delete();
 
-        log.info("Start to write settings in 'settings.json'");
+        log.info("Start to write settings in '{}/settings.json'", userDirectory);
         String settingsJson = gson.toJson(this);
-        Files.writeString(Paths.get("settings.json"), settingsJson, StandardOpenOption.CREATE);
+        Files.createDirectories(Paths.get(userDirectory));
+        Files.writeString(Paths.get(userDirectory,"settings.json"), settingsJson, StandardOpenOption.CREATE);
 
         log.info("Settings written : {}", this);
     }
 
 
-    public static GlobalSettings load(Gson gson) throws FileNotFoundException {
+    public static GlobalSettings load(Gson gson, String userDirectory) throws FileNotFoundException {
 
-        log.info("Start to load settings from 'settings.json'");
-        GlobalSettings settings = gson.fromJson(new FileReader("settings.json"), GlobalSettings.class);
+        log.info("Start to load settings from '{}/settings.json'", userDirectory);
+        GlobalSettings settings = gson.fromJson(new FileReader(new File(userDirectory, "settings.json")), GlobalSettings.class);
         settings.setGson(gson);
+        settings.setUserDirectory(userDirectory);
         log.info("Settings read : {}", settings);
         return settings;
     }
@@ -87,6 +92,11 @@ public class GlobalSettings implements Serializable {
 
     private void setGson(Gson gson) {
         this.gson = gson;
+    }
+
+
+    private void setUserDirectory(String userDirectory) {
+        this.userDirectory = userDirectory;
     }
 
 

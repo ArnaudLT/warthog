@@ -6,6 +6,8 @@ spring:
       enabled: always
 
 warthog:
+  user:
+    directory: user
   overview:
     rows: 50
   spark:

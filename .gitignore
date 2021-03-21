@@ -6,5 +6,5 @@ target/
 metastore_db/
 *.log
 
-settings.ser
-connections.ser
+user/
+

@@ -26,6 +26,7 @@ public class UserConfiguration {
     @Bean
     @Autowired
     public GlobalSettings getGlobalSettings(Gson gson,
+                                            @Value("${warthog.user.directory}") String userDirectory,
                                             @Value("${warthog.spark.threads}") Integer sparkThreads,
                                             @Value("${warthog.spark.ui}") Boolean sparkUI,
                                             @Value("${warthog.overview.rows}") Integer overviewRows) {
@@ -33,11 +34,11 @@ public class UserConfiguration {
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.load(gson);
+            settings = GlobalSettings.load(gson, userDirectory);
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
-            settings = new GlobalSettings(gson, sparkThreads, sparkUI, overviewRows);
+            settings = new GlobalSettings(gson, userDirectory, sparkThreads, sparkUI, overviewRows);
             try {
 
                 settings.persist();
@@ -52,16 +53,17 @@ public class UserConfiguration {
 
     @Bean
     @Autowired
-    public ConnectionsCollection getConnectionsCollection(Gson gson) {
+    public ConnectionsCollection getConnectionsCollection(Gson gson,
+                                                          @Value("${warthog.user.directory}") String userDirectory) {
 
         ConnectionsCollection connectionsCollection;
         try {
 
-            connectionsCollection = ConnectionsCollection.load(gson);
+            connectionsCollection = ConnectionsCollection.load(gson, userDirectory);
         } catch (IOException e) {
 
             log.warn("Unable to read connections");
-            connectionsCollection = new ConnectionsCollection(gson);
+            connectionsCollection = new ConnectionsCollection(gson, userDirectory);
             try {
 
                 connectionsCollection.persist();
