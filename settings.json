@@ -1,0 +1,5 @@
+{
+  "sparkThreads": 2,
+  "sparkUI": true,
+  "overviewRows": 25
+}

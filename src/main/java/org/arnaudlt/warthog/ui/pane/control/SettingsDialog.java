@@ -86,7 +86,7 @@ public class SettingsDialog {
                 globalSettings.setOverviewRows(rows.getValue());
                 globalSettings.setSparkThreads(sparkThreads.getValue());
                 globalSettings.setSparkUI(sparkUI.isSelected());
-                globalSettings.persist();
+                globalSettings.persistToJson();
             } catch (Exception e) {
                 AlertError.showFailureAlert(e, "Unable to save settings");
                 return;

@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.model.user;
 
+import jodd.util.BCrypt;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
@@ -22,14 +23,14 @@ public class UserConfiguration {
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.load();
-        } catch (IOException | ClassNotFoundException e) {
+            settings = GlobalSettings.loadFromJson();
+        } catch (IOException e) {
 
             log.warn("Unable to read settings");
             settings = new GlobalSettings(sparkThreads, sparkUI, overviewRows);
             try {
 
-                settings.persist();
+                settings.persistToJson();
             } catch (IOException ioException) {
                 log.error("Unable to write settings", ioException);
             }

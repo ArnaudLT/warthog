@@ -1,18 +1,25 @@
 package org.arnaudlt.warthog.model.setting;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 @Slf4j
 public class GlobalSettings implements Serializable {
 
     public static final long serialVersionUID = 42L;
 
+    // ########## SPARK ##########
     private Integer sparkThreads;
 
     private Boolean sparkUI;
 
+    // ########## OVERVIEW ##########
     private Integer overviewRows;
 
 
@@ -54,30 +61,26 @@ public class GlobalSettings implements Serializable {
     }
 
 
-    public void persist() throws IOException {
+    public void persistToJson() throws IOException {
 
-        log.info("Try to delete the 'settings.ser'");
-        new File("settings.ser").delete();
+        log.info("Try to delete the 'settings.json'");
+        new File("settings.json").delete();
 
-        log.info("Start to write settings in 'settings.ser'");
-        try (FileOutputStream fos = new FileOutputStream("settings.ser");
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+        log.info("Start to write settings in 'settings.json'");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String settingsJson = gson.toJson(this);
+        Files.writeString(Paths.get("settings.json"), settingsJson, StandardOpenOption.CREATE);
 
-            oos.writeObject(this);
-        }
         log.info("Settings written : {}", this);
     }
 
 
-    public static GlobalSettings load() throws IOException, ClassNotFoundException {
+    public static GlobalSettings loadFromJson() throws FileNotFoundException {
 
-        log.info("Start to load settings from 'settings.ser'");
-        GlobalSettings settings;
-        try (FileInputStream fis = new FileInputStream("settings.ser");
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+        log.info("Start to load settings from 'settings.json'");
+        Gson gson = new GsonBuilder().create();
+        GlobalSettings settings = gson.fromJson(new FileReader("settings.json"), GlobalSettings.class);
 
-            settings = (GlobalSettings) ois.readObject();
-        }
         log.info("Settings read : {}", settings);
         return settings;
     }
