@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.model.setting;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -12,7 +11,8 @@ import java.nio.file.StandardOpenOption;
 @Slf4j
 public class GlobalSettings implements Serializable {
 
-    public static final long serialVersionUID = 42L;
+
+    private transient Gson gson;
 
     // ########## SPARK ##########
     private Integer sparkThreads;
@@ -23,8 +23,9 @@ public class GlobalSettings implements Serializable {
     private Integer overviewRows;
 
 
-    public GlobalSettings(Integer sparkThreads, Boolean sparkUI, Integer overviewRows) {
+    public GlobalSettings(Gson gson, Integer sparkThreads, Boolean sparkUI, Integer overviewRows) {
 
+        this.gson = gson;
         this.sparkThreads = sparkThreads;
         this.sparkUI = sparkUI;
         this.overviewRows = overviewRows;
@@ -67,7 +68,6 @@ public class GlobalSettings implements Serializable {
         new File("settings.json").delete();
 
         log.info("Start to write settings in 'settings.json'");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String settingsJson = gson.toJson(this);
         Files.writeString(Paths.get("settings.json"), settingsJson, StandardOpenOption.CREATE);
 
@@ -75,14 +75,18 @@ public class GlobalSettings implements Serializable {
     }
 
 
-    public static GlobalSettings load() throws FileNotFoundException {
+    public static GlobalSettings load(Gson gson) throws FileNotFoundException {
 
         log.info("Start to load settings from 'settings.json'");
-        Gson gson = new GsonBuilder().create();
         GlobalSettings settings = gson.fromJson(new FileReader("settings.json"), GlobalSettings.class);
-
+        settings.setGson(gson);
         log.info("Settings read : {}", settings);
         return settings;
+    }
+
+
+    private void setGson(Gson gson) {
+        this.gson = gson;
     }
 
 

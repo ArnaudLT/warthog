@@ -1,8 +1,11 @@
 package org.arnaudlt.warthog.model.user;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,20 +16,28 @@ import java.io.IOException;
 @Configuration
 public class UserConfiguration {
 
+    @Bean
+    public Gson getGson() {
+
+        return new GsonBuilder().setPrettyPrinting().create();
+    }
+
 
     @Bean
-    public GlobalSettings getGlobalSettings(@Value("${warthog.spark.threads}") Integer sparkThreads,
+    @Autowired
+    public GlobalSettings getGlobalSettings(Gson gson,
+                                            @Value("${warthog.spark.threads}") Integer sparkThreads,
                                             @Value("${warthog.spark.ui}") Boolean sparkUI,
                                             @Value("${warthog.overview.rows}") Integer overviewRows) {
 
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.load();
+            settings = GlobalSettings.load(gson);
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
-            settings = new GlobalSettings(sparkThreads, sparkUI, overviewRows);
+            settings = new GlobalSettings(gson, sparkThreads, sparkUI, overviewRows);
             try {
 
                 settings.persist();
@@ -40,16 +51,17 @@ public class UserConfiguration {
 
 
     @Bean
-    public ConnectionsCollection getConnectionsCollection() {
+    @Autowired
+    public ConnectionsCollection getConnectionsCollection(Gson gson) {
 
         ConnectionsCollection connectionsCollection;
         try {
 
-            connectionsCollection = ConnectionsCollection.load();
+            connectionsCollection = ConnectionsCollection.load(gson);
         } catch (IOException e) {
 
             log.warn("Unable to read connections");
-            connectionsCollection = new ConnectionsCollection();
+            connectionsCollection = new ConnectionsCollection(gson);
             try {
 
                 connectionsCollection.persist();
