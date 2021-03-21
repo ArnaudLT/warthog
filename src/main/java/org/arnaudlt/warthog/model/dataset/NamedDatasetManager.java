@@ -166,6 +166,7 @@ public class NamedDatasetManager {
                 .replace(".", "_")
                 .replace(" ", "_")
                 .replace("-", "_")
+                .replace("=", "_")
                 + "_" + namedDataset.getId();
     }
 
