@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.model.connection;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ class ConnectionsCollectionTest {
     }
 
     @Test
-    void load() throws IOException, ClassNotFoundException {
+    void load() throws IOException {
 
         ConnectionsCollection connectionsCollection = ConnectionsCollection.load();
         log.info("Loading connections...");

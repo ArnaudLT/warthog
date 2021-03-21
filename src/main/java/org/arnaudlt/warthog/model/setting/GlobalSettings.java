@@ -61,7 +61,7 @@ public class GlobalSettings implements Serializable {
     }
 
 
-    public void persistToJson() throws IOException {
+    public void persist() throws IOException {
 
         log.info("Try to delete the 'settings.json'");
         new File("settings.json").delete();
@@ -75,7 +75,7 @@ public class GlobalSettings implements Serializable {
     }
 
 
-    public static GlobalSettings loadFromJson() throws FileNotFoundException {
+    public static GlobalSettings load() throws FileNotFoundException {
 
         log.info("Start to load settings from 'settings.json'");
         Gson gson = new GsonBuilder().create();

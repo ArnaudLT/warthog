@@ -283,7 +283,7 @@ public class ConnectionsManagerDialog {
             connection.setDatabaseType(databaseType.getValue());
             connection.setUser(user.getText());
             connection.setPassword(password.getText());
-            log.info("Save ... {}", connection.toExtraString());
+            log.info("Save ... {}", connection.toString());
 
             try {
                 this.connectionsCollection.persist();

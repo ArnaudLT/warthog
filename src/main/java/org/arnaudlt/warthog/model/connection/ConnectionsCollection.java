@@ -1,5 +1,7 @@
 package org.arnaudlt.warthog.model.connection;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,30 +41,30 @@ public class ConnectionsCollection implements Iterable<Connection> {
 
     public void persist() throws IOException {
 
-        log.info("Try to delete the 'connections.ser'");
-        new File("connections.ser").delete();
+        log.info("Try to delete the 'connections.json'");
+        new File("connections.json").delete();
 
-        log.info("Start to write connections in 'connections.ser'");
-        try (FileOutputStream fos = new FileOutputStream("connections.ser");
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+        log.info("Start to write connections in 'connections.json'");
 
-            SerializableConnectionsCollection serializableConnectionsCollection = this.getSerializableConnectionsCollection();
-            oos.writeObject(serializableConnectionsCollection);
-        }
-        log.info("Connections written in 'connections.ser'");
+        SerializableConnectionsCollection serializableConnectionsCollection = this.getSerializableConnectionsCollection();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String connectionsJson = gson.toJson(serializableConnectionsCollection);
+        Files.writeString(Paths.get("connections.json"), connectionsJson, StandardOpenOption.CREATE);
+
+        log.info("Connections written in 'connections.json'");
     }
 
 
-    public static ConnectionsCollection load() throws IOException, ClassNotFoundException {
+    public static ConnectionsCollection load() throws IOException {
 
-        log.info("Start to load connections from 'connections.ser'");
-        ConnectionsCollection connectionsCollection;
-        try (FileInputStream fis = new FileInputStream("connections.ser");
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+        log.info("Start to load connections from 'connections.json'");
+        Gson gson = new GsonBuilder().create();
 
-             SerializableConnectionsCollection serializableConnectionsCollection = (SerializableConnectionsCollection) ois.readObject();
-             connectionsCollection = getConnectionsCollection(serializableConnectionsCollection);
-        }
+        SerializableConnectionsCollection serializableConnectionsCollection =
+                gson.fromJson(new FileReader("connections.json"), SerializableConnectionsCollection.class);
+        ConnectionsCollection connectionsCollection = getConnectionsCollection(serializableConnectionsCollection);
+        log.info("{} connections loaded", connectionsCollection.getConnections().size());
+
         return connectionsCollection;
     }
 
