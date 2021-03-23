@@ -63,7 +63,16 @@ public class FileUtil {
         for (String separator : testedSeparator) {
 
             if (isAValidSeparator(fileToRead, separator)) {
-                return separator;
+                switch (separator) {
+                    case "\\|":
+                        return "|";
+                    case "\\$":
+                        return "$";
+                    case "\\t":
+                        return "\t";
+                    default:
+                        return separator;
+                }
             }
         }
         throw new ProcessingException(String.format("Not able to determine the delimiter for %s", fileToRead));
