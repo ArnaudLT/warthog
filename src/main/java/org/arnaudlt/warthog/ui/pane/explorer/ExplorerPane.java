@@ -9,12 +9,13 @@ import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.dataset.NamedColumn;
+import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.ui.pane.control.ControlPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import scala.collection.Iterator;
 
 import java.io.File;
 import java.util.*;
@@ -109,14 +110,57 @@ public class ExplorerPane {
                 namedDataset.getLocalTemporaryViewName(),
                 namedDataset.getLocalTemporaryViewName()));
 
-        for (NamedColumn namedColumn : namedDataset.getCatalog().getColumns()) {
+        StructType schema = namedDataset.getDataset().schema();
+        for (StructField field : schema.fields()) {
 
-            NamedDatasetItem child = new NamedDatasetItem(namedDataset, namedColumn.getName() + " - " + namedColumn.getType(), namedColumn.getName());
-            item.getChildren().add(new TreeItem<>(child));
+            NamedDatasetItem child = new NamedDatasetItem(namedDataset,
+                    field.name() + " - " + field.dataType().typeName(), field.name());
+
+            TreeItem<NamedDatasetItem> childItem = new TreeItem<>(child);
+            item.getChildren().add(childItem);
+            addSubItems(childItem, field.dataType());
+
         }
+
         this.treeExplorer.getRoot().getChildren().add(item);
         this.treeExplorer.getSelectionModel().select(item);
         this.namedDatasetToTreeItem.put(namedDataset, item);
+    }
+
+
+    private void addSubItems(TreeItem<NamedDatasetItem> parent, DataType dataType) {
+
+        switch (dataType.typeName()) {
+
+            case "struct":
+                Iterator<StructField> iterator = ((StructType) dataType).iterator();
+                while (iterator.hasNext()) {
+
+                    StructField field = iterator.next();
+                    TreeItem<NamedDatasetItem> child = new TreeItem<>(new NamedDatasetItem(
+                            parent.getValue().getNamedDataset(),
+                            field.name() + " - " + field.dataType().typeName(),
+                            field.name()));
+                    parent.getChildren().add(child);
+                    addSubItems(child, field.dataType());
+                }
+                break;
+            case "map":
+                MapType mapType = (MapType) dataType;
+                parent.getValue().setLabel(parent.getValue().getLabel() +
+                        "<" + mapType.keyType().typeName() + "," + mapType.valueType().typeName() + ">");
+
+                addSubItems(parent, mapType.valueType());
+                break;
+            case "array":
+                ArrayType arrayType = (ArrayType) dataType;
+                parent.getValue().setLabel(parent.getValue().getLabel() +
+                        "<" + arrayType.elementType().typeName() + ">");
+
+                addSubItems(parent, arrayType.elementType());
+                break;
+            default:
+        }
     }
 
 

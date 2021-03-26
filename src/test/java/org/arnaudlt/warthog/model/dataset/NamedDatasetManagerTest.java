@@ -6,17 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.types.*;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import scala.collection.Iterator;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -85,6 +87,17 @@ class NamedDatasetManagerTest {
 
 
     @Test
+    void exportMapWithKeyObject() {
+
+        Dataset<Row> dataset = datasetWithMapKeyObject();
+
+        dataset
+                .write()
+                .parquet("target/with_key_object");
+    }
+
+
+    @Test
     void hiveSupport() throws AnalysisException {
 
         File file = new File("src/test/resources/covid19-sample.csv");
@@ -133,6 +146,20 @@ class NamedDatasetManagerTest {
     }
 
 
+    Dataset<Row> datasetWithMapKeyObject() {
+
+        ArrayList<MapWithKeyObject> items = new ArrayList<>();
+
+        items.add(new MapWithKeyObject(Map.of(
+                new ObjectWithOneArray("number_1", List.of("n1_item1", "n1_item2", "n1_item3", "n1_item4", "n1_item5")), "value_1",
+                new ObjectWithOneArray("number_1", List.of("n2_item1", "n2_item2", "n2_item3", "n2_item4", "n2_item5")), "value_2",
+                new ObjectWithOneArray("number_1", List.of("n3_item1", "n3_item2", "n3_item3", "n3_item4", "n3_item5")), "value_3"
+                )));
+
+        return this.sparkSession.createDataset(items, Encoders.bean(MapWithKeyObject.class)).select("data");
+    }
+
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
@@ -143,5 +170,16 @@ class NamedDatasetManagerTest {
 
         private List<String> items;
     }
+
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class MapWithKeyObject implements Serializable {
+
+        private Map<ObjectWithOneArray, String> data;
+    }
+
 
 }

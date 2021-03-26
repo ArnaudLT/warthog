@@ -4,11 +4,13 @@
 }
 
 .tree-view .tree-cell {
+    -fx-indent: 1.3em;
     -fx-font-size: 1em; /* 12 */
     -fx-padding: 0.3em; /* 6 */
     -fx-background-color: tree_view_background_color;
     -fx-text-fill: text_color;
 }
+
 
 .table-cell {
     -fx-padding: 0.3em 2em 0.3em 1em;
