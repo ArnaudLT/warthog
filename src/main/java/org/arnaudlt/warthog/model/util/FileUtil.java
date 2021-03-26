@@ -41,7 +41,7 @@ public class FileUtil {
         } else if (file.getName().contains(".")) {
 
             String fileType = getLowerCaseExtension(file);
-            log.info("A directory with {} files inside", fileType);
+            log.info("A {} file", fileType);
             return Format.valueFromLabel(fileType);
         }
 

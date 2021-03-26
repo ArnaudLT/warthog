@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
@@ -22,6 +21,7 @@ import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromDatabaseService;
 import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +39,8 @@ public class ImportDialog {
 
     private final ExplorerPane explorerPane;
 
+    private Stage owner;
+
     private ComboBox<Connection> connectionsListBox;
 
     private Stage dialog;
@@ -53,13 +55,10 @@ public class ImportDialog {
     }
 
 
-    public void buildImportDialog(Stage stage) {
+    public void buildImportDialog(Stage owner) {
 
-        this.dialog = new Stage();
-        this.dialog.setTitle("Import");
-        this.dialog.initModality(Modality.APPLICATION_MODAL);
-        this.dialog.initOwner(stage);
-        this.dialog.setResizable(false);
+        this.owner = owner;
+        this.dialog = StageFactory.buildModalStage(owner, "Import");
 
         GridPane common = GridFactory.buildGrid(new Insets(20,20,0,20));
 
@@ -141,7 +140,7 @@ public class ImportDialog {
 
         NamedDatasetImportFromDatabaseService importService = new NamedDatasetImportFromDatabaseService(namedDatasetManager, connection, tableName);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to add the dataset '"+ tableName +"'"));
+        importService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Not able to add the dataset '"+ tableName +"'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }

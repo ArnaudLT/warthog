@@ -33,7 +33,7 @@ import java.util.stream.IntStream;
 public class OutputPane {
 
 
-    private Stage stage;
+    private Stage owner;
 
     private final PoolService poolService;
 
@@ -49,9 +49,9 @@ public class OutputPane {
     }
 
 
-    public Node buildOutputPane(Stage stage) {
+    public Node buildOutputPane(Stage owner) {
 
-        this.stage = stage;
+        this.owner = owner;
 
         this.tableView = new TableView<>();
         this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -110,7 +110,7 @@ public class OutputPane {
                 countRowsAlert.setHeaderText("Number of rows : " + datasetCountRowsService.getValue());
                 countRowsAlert.show();
             });
-            datasetCountRowsService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Failed to count rows"));
+            datasetCountRowsService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Failed to count rows"));
             datasetCountRowsService.setExecutor(poolService.getExecutor());
             datasetCountRowsService.start();
         };

@@ -11,7 +11,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.MDL2IconFont;
@@ -22,6 +21,7 @@ import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +35,8 @@ public class ConnectionsManagerDialog {
 
 
     private final ConnectionsCollection connectionsCollection;
+
+    private Stage owner;
 
     private Stage connectionManagerStage;
 
@@ -65,13 +67,10 @@ public class ConnectionsManagerDialog {
     }
 
 
-    public void buildConnectionsManagerDialog(Stage stage) {
+    public void buildConnectionsManagerDialog(Stage owner) {
 
-        connectionManagerStage = new Stage();
-        connectionManagerStage.setTitle("Connections Manager");
-        connectionManagerStage.initModality(Modality.APPLICATION_MODAL);
-        connectionManagerStage.initOwner(stage);
-        connectionManagerStage.setResizable(false);
+        this.owner = owner;
+        connectionManagerStage = StageFactory.buildModalStage(owner, "Connections Manager");
 
         HBox hBox = new HBox();
 
@@ -151,7 +150,7 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> connectionToDeleteItem = connectionsList.getSelectionModel().getSelectedItem();
             if (connectionToDeleteItem != null && connectionToDeleteItem.getValue() != null) {
 
-                AlertError.showConfirmationAlert("Do you want to delete connection : " + connectionToDeleteItem.getValue())
+                AlertError.showConfirmationAlert(connectionManagerStage, "Do you want to delete connection : " + connectionToDeleteItem.getValue() + " ?")
                         .filter(button -> button == ButtonType.OK)
                         .ifPresent(b -> {
                             this.connectionsCollection.getConnections().remove(connectionToDeleteItem.getValue());
@@ -159,7 +158,7 @@ public class ConnectionsManagerDialog {
                             try {
                                 this.connectionsCollection.persist();
                             } catch (IOException e) {
-                                AlertError.showFailureAlert(e, "Unable to save changes");
+                                AlertError.showFailureAlert(owner, e, "Unable to save changes");
                             }
                         });
             }
@@ -218,7 +217,7 @@ public class ConnectionsManagerDialog {
             try {
                 this.connectionsCollection.persist();
             } catch (IOException e) {
-                AlertError.showFailureAlert(e, "Unable to save connections");
+                AlertError.showFailureAlert(owner, e, "Unable to save connections");
             }
             Utils.refreshTreeViewAllItems(this.connectionsList);
 
@@ -288,7 +287,7 @@ public class ConnectionsManagerDialog {
             try {
                 this.connectionsCollection.persist();
             } catch (IOException e) {
-                AlertError.showFailureAlert(e, "Unable to save connections");
+                AlertError.showFailureAlert(owner, e, "Unable to save connections");
             }
             Utils.refreshTreeViewAllItems(this.connectionsList);
         });

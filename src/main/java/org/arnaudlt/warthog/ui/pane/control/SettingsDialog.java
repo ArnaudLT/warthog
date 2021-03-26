@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
@@ -14,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,13 +34,9 @@ public class SettingsDialog {
     }
 
 
-    public void buildSettingsDialog(Stage stage) {
+    public void buildSettingsDialog(Stage owner) {
 
-        this.dialog = new Stage();
-        this.dialog.setTitle("Settings");
-        this.dialog.initModality(Modality.APPLICATION_MODAL);
-        this.dialog.initOwner(stage);
-        this.dialog.setResizable(false);
+        this.dialog = StageFactory.buildModalStage(owner, "Settings");
 
         GridPane grid = GridFactory.buildGrid();
 
@@ -88,7 +84,7 @@ public class SettingsDialog {
                 globalSettings.setSparkUI(sparkUI.isSelected());
                 globalSettings.persist();
             } catch (Exception e) {
-                AlertError.showFailureAlert(e, "Unable to save settings");
+                AlertError.showFailureAlert(owner, e, "Unable to save settings");
                 return;
             }
             dialog.close();

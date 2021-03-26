@@ -6,11 +6,9 @@ import javafx.scene.layout.GridPane;
 
 public class GridFactory {
 
+
     private GridFactory() {
     }
-
-
-
 
 
     public static GridPane buildGrid() {

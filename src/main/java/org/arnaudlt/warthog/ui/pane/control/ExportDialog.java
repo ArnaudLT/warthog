@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
@@ -26,6 +25,7 @@ import org.arnaudlt.warthog.ui.service.NamedDatasetExportToDatabaseService;
 import org.arnaudlt.warthog.ui.service.SqlExportToDatabaseService;
 import org.arnaudlt.warthog.ui.util.AlertError;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,6 +43,8 @@ public class ExportDialog {
 
     private final TransformPane transformPane;
 
+    private Stage owner;
+
     private ComboBox<Connection> connectionsListBox;
 
     private Stage dialog;
@@ -58,13 +60,10 @@ public class ExportDialog {
     }
 
 
-    public void buildExportDialog(Stage stage) {
+    public void buildExportDialog(Stage owner) {
 
-        this.dialog = new Stage();
-        this.dialog.setTitle("Export");
-        this.dialog.initModality(Modality.APPLICATION_MODAL);
-        this.dialog.initOwner(stage);
-        this.dialog.setResizable(false);
+        this.owner = owner;
+        this.dialog = StageFactory.buildModalStage(owner, "Export");
 
         GridPane common = GridFactory.buildGrid(new Insets(20,20,0,20));
 
@@ -158,7 +157,7 @@ public class ExportDialog {
             SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager,
                     sqlQuery, selectedConnection, exportDatabaseSettings);
             sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            sqlExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the database export"));
+            sqlExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Not able to generate the database export"));
             sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
             sqlExportToDatabaseService.start();
         } else {
@@ -166,7 +165,7 @@ public class ExportDialog {
             NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
                     new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, selectedConnection, exportDatabaseSettings);
             namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(fail, "Not able to generate the database export"));
+            namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Not able to generate the database export"));
             namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
             namedDatasetExportToDatabaseService.start();
         }
