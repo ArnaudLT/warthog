@@ -10,6 +10,8 @@ public class ExportFileSettings {
 
     private final String saveMode;
 
+    private final String partitionBy;
+
     // CSV only
     private final String separator;
 
@@ -17,10 +19,11 @@ public class ExportFileSettings {
     private final Boolean header;
 
 
-    public ExportFileSettings(String filePath, Format format, String saveMode, String separator, Boolean header) {
+    public ExportFileSettings(String filePath, Format format, String saveMode, String partitionBy, String separator, Boolean header) {
         this.filePath = filePath;
         this.format = format;
         this.saveMode = saveMode;
+        this.partitionBy = partitionBy;
         this.separator = separator;
         this.header = header;
     }
@@ -41,6 +44,11 @@ public class ExportFileSettings {
     }
 
 
+    public String getPartitionBy() {
+        return partitionBy;
+    }
+
+
     public String getSeparator() {
         return separator;
     }
@@ -49,4 +57,7 @@ public class ExportFileSettings {
     public Boolean getHeader() {
         return header;
     }
+
+
+
 }

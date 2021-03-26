@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -225,6 +226,14 @@ public class NamedDatasetManager {
                 .write()
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
                 .mode(exportFileSettings.getSaveMode());
+
+        if (!exportFileSettings.getPartitionBy().isBlank()) {
+
+            dfw = dfw.partitionBy(
+                    Arrays.stream(exportFileSettings.getPartitionBy().split(",", -1))
+                        .map(String::trim)
+                        .toArray(String[]::new));
+        }
 
         final Format format = exportFileSettings.getFormat();
 

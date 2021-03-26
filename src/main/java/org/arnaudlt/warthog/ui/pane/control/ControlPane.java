@@ -211,7 +211,7 @@ public class ControlPane {
 
             if (exportFile == null) return;
             String filePath = exportFile.getAbsolutePath();
-            ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, Format.CSV, "Overwrite", ";", true);
+            ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, Format.CSV, "Overwrite", "", ";", true);
 
             NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
             if (selectedNamedDataset == null) {

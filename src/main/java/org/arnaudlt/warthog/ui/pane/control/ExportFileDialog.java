@@ -88,6 +88,11 @@ public class ExportFileDialog {
         saveMode.setMinWidth(100);
         grid.addRow(i++, modeLabel, saveMode);
 
+        Label partitionByLabel = new Label("Partitions :");
+        TextField partitionBy = new TextField();
+        partitionBy.setTooltip(new Tooltip("Comma separated list of attributs"));
+        grid.addRow(i++, partitionByLabel, partitionBy);
+
         // Start conditional display
         BooleanBinding csvSelected = format.valueProperty().isEqualTo(Format.CSV);
         Separator s = new Separator(Orientation.HORIZONTAL);
@@ -115,7 +120,7 @@ public class ExportFileDialog {
         exportButton.setOnAction(event -> {
 
             ExportFileSettings exportFileSettings = new ExportFileSettings(output.getText(), format.getValue(),
-                    saveMode.getValue(), separator.getText(), header.isSelected());
+                    saveMode.getValue(), partitionBy.getText(), separator.getText(), header.isSelected());
             exportToFile(exportFileSettings);
             dialog.close();
         });
