@@ -187,7 +187,7 @@ public class ConnectionsManagerDialog {
 
         Label outputLabel = new Label("SPN configuration file :");
         configurationFilePath = new TextField();
-        configurationFilePath.setMinWidth(300);
+        configurationFilePath.setPrefWidth(250);
         Button outputButton = new Button("...");
         outputButton.setOnAction(event -> {
 
