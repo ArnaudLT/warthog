@@ -10,10 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 
 @Slf4j
-public class AlertError {
+public class AlertFactory {
 
 
-    private AlertError() {}
+    private AlertFactory() {}
 
 
     public static void showFailureAlert(Stage owner, WorkerStateEvent fail, String text) {
@@ -33,6 +33,16 @@ public class AlertError {
         alert.getDialogPane().setExpanded(true);
         alert.initOwner(owner);
 
+        alert.show();
+    }
+
+
+    public static void showInformationAlert(Stage owner, String text) {
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
+        alert.setHeaderText("");
+        alert.setContentText(text);
+        alert.initOwner(owner);
         alert.show();
     }
 

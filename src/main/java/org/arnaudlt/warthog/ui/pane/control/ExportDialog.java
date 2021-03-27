@@ -23,7 +23,7 @@ import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetExportToDatabaseService;
 import org.arnaudlt.warthog.ui.service.SqlExportToDatabaseService;
-import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -157,7 +157,7 @@ public class ExportDialog {
             SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager,
                     sqlQuery, selectedConnection, exportDatabaseSettings);
             sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            sqlExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Not able to generate the database export"));
+            sqlExportToDatabaseService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the database export"));
             sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
             sqlExportToDatabaseService.start();
         } else {
@@ -165,7 +165,7 @@ public class ExportDialog {
             NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
                     new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, selectedConnection, exportDatabaseSettings);
             namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Not able to generate the database export"));
+            namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the database export"));
             namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
             namedDatasetExportToDatabaseService.start();
         }

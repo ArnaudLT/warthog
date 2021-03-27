@@ -18,12 +18,13 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
-import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -105,12 +106,10 @@ public class OutputPane {
 
             DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(this.preparedDataset.getDataset());
             datasetCountRowsService.setOnSucceeded(success -> {
-                log.info("Success count rows : {}", datasetCountRowsService.getValue());
-                Alert countRowsAlert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
-                countRowsAlert.setHeaderText("Number of rows : " + datasetCountRowsService.getValue());
-                countRowsAlert.show();
+
+                AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue()));
             });
-            datasetCountRowsService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Failed to count rows"));
+            datasetCountRowsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Failed to count rows"));
             datasetCountRowsService.setExecutor(poolService.getExecutor());
             datasetCountRowsService.start();
         };

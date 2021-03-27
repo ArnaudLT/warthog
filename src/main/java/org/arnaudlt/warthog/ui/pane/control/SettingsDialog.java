@@ -11,7 +11,7 @@ import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
-import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class SettingsDialog {
                 globalSettings.setSparkUI(sparkUI.isSelected());
                 globalSettings.persist();
             } catch (Exception e) {
-                AlertError.showFailureAlert(owner, e, "Unable to save settings");
+                AlertFactory.showFailureAlert(owner, e, "Unable to save settings");
                 return;
             }
             dialog.close();

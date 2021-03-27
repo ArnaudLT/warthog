@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
-import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -150,7 +150,7 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> connectionToDeleteItem = connectionsList.getSelectionModel().getSelectedItem();
             if (connectionToDeleteItem != null && connectionToDeleteItem.getValue() != null) {
 
-                AlertError.showConfirmationAlert(connectionManagerStage, "Do you want to delete connection : " + connectionToDeleteItem.getValue() + " ?")
+                AlertFactory.showConfirmationAlert(connectionManagerStage, "Do you want to delete connection : " + connectionToDeleteItem.getValue() + " ?")
                         .filter(button -> button == ButtonType.OK)
                         .ifPresent(b -> {
                             this.connectionsCollection.getConnections().remove(connectionToDeleteItem.getValue());
@@ -158,7 +158,7 @@ public class ConnectionsManagerDialog {
                             try {
                                 this.connectionsCollection.persist();
                             } catch (IOException e) {
-                                AlertError.showFailureAlert(owner, e, "Unable to save changes");
+                                AlertFactory.showFailureAlert(owner, e, "Unable to save changes");
                             }
                         });
             }
@@ -217,7 +217,7 @@ public class ConnectionsManagerDialog {
             try {
                 this.connectionsCollection.persist();
             } catch (IOException e) {
-                AlertError.showFailureAlert(owner, e, "Unable to save connections");
+                AlertFactory.showFailureAlert(owner, e, "Unable to save connections");
             }
             Utils.refreshTreeViewAllItems(this.connectionsList);
 
@@ -287,7 +287,7 @@ public class ConnectionsManagerDialog {
             try {
                 this.connectionsCollection.persist();
             } catch (IOException e) {
-                AlertError.showFailureAlert(owner, e, "Unable to save connections");
+                AlertFactory.showFailureAlert(owner, e, "Unable to save connections");
             }
             Utils.refreshTreeViewAllItems(this.connectionsList);
         });

@@ -27,6 +27,8 @@
 => Global
     => Kill a SQL query execution
 
+Overrides :
+    PrismTextLayout.java to change the tab size from 8 to 4 (configurable in a later version)
 
 ### DEPLOY
 

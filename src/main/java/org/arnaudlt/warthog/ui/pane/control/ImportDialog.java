@@ -19,7 +19,7 @@ import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromDatabaseService;
-import org.arnaudlt.warthog.ui.util.AlertError;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -140,7 +140,7 @@ public class ImportDialog {
 
         NamedDatasetImportFromDatabaseService importService = new NamedDatasetImportFromDatabaseService(namedDatasetManager, connection, tableName);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertError.showFailureAlert(owner, fail, "Not able to add the dataset '"+ tableName +"'"));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to add the dataset '"+ tableName +"'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
