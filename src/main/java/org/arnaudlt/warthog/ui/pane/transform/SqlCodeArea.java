@@ -87,7 +87,7 @@ public class SqlCodeArea {
         this.codeArea = new CodeArea();
 
         this.codeArea.getStyleClass().add("sql-area");
-        this.codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, i -> "%03d"));
+        this.codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, i -> "% 3d"));
 
         // Auto indent
         final Pattern whiteSpace = Pattern.compile("^\\s+");
