@@ -18,8 +18,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.PoolService;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -105,10 +105,9 @@ public class OutputPane {
             if (this.preparedDataset == null) return;
 
             DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(this.preparedDataset.getDataset());
-            datasetCountRowsService.setOnSucceeded(success -> {
-
-                AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue()));
-            });
+            datasetCountRowsService.setOnSucceeded(success ->
+                AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue()))
+            );
             datasetCountRowsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Failed to count rows"));
             datasetCountRowsService.setExecutor(poolService.getExecutor());
             datasetCountRowsService.start();
@@ -187,21 +186,11 @@ public class OutputPane {
     public void fill(PreparedDataset preparedDataset) {
 
         this.preparedDataset = preparedDataset;
-        fillOverview(preparedDataset.getOverview());
-    }
-
-
-    protected void fillOverview(List<Row> rows) {
+        List<Row> rows = preparedDataset.getOverview();
 
         clearTableView();
-        if (rows == null || rows.isEmpty()) {
 
-            // TODO : if rows is null or empty we don't have the columns (model) !
-            log.info("No result to display");
-            return;
-        }
-
-        for (StructField field : rows.get(0).schema().fields()) {
+        for (StructField field : preparedDataset.getDataset().schema().fields()) {
 
             TableColumn<Row, Object> col = new TableColumn<>(field.name());
             col.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getAs(field.name())));
