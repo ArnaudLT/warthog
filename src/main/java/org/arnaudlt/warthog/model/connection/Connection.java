@@ -64,15 +64,15 @@ public class Connection implements Serializable {
 
             case ORACLE_DATABASE:
             case POSTGRESQL:
-                this.configurationFilePath = "";
+                this.configurationFilePath = null;
                 break;
             case AZURE_STORAGE:
-                this.host = "";
-                this.port = "";
-                this.database = "";
-                this.databaseType = "";
-                this.user = "";
-                this.password = "";
+                this.host = null;
+                this.port = null;
+                this.database = null;
+                this.databaseType = null;
+                this.user = null;
+                this.password = null;
                 break;
         }
     }
