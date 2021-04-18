@@ -46,7 +46,21 @@ public class ConnectionsManagerDialog {
 
     private ComboBox<ConnectionType> connectionType;
 
-    private TextField configurationFilePath;
+    // Azure storage
+    private TextField tenantId;
+
+    private TextField clientId;
+
+    private PasswordField clientKey;
+
+    private TextField proxyUrl;
+
+    private TextField proxyPort;
+
+    private TextField storageAccount;
+
+
+    // Databases
 
     private TextField host;
 
@@ -185,20 +199,38 @@ public class ConnectionsManagerDialog {
 
         int i = 0;
 
-        Label outputLabel = new Label("SPN configuration file :");
-        configurationFilePath = new TextField();
-        configurationFilePath.setPrefWidth(250);
-        Button outputButton = new Button("...");
-        outputButton.setOnAction(event -> {
+        Label tenantIdLabel = new Label("Tenant Id :");
+        this.tenantId = new TextField();
+        grid.add(tenantIdLabel, 0, i, 1, 1);
+        grid.add(tenantId, 1, i, 3, 1);
+        i++;
 
-            FileChooser fc = new FileChooser();
-            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Configuration file", "*.conf"));
-            File exportFile = fc.showOpenDialog(connectionManagerStage);
+        Label clientIdLabel = new Label("Client Id :");
+        this.clientId = new TextField();
+        grid.add(clientIdLabel, 0, i, 1, 1);
+        grid.add(clientId, 1, i, 3, 1);
+        i++;
 
-            if (exportFile == null) return;
-            configurationFilePath.setText(exportFile.getAbsolutePath());
-        });
-        grid.addRow(i++, outputLabel, configurationFilePath, outputButton);
+        Label clientKeyLabel = new Label("Client key :");
+        this.clientKey = new PasswordField();
+        grid.add(clientKeyLabel, 0, i, 1, 1);
+        grid.add(clientKey, 1, i, 3, 1);
+        i++;
+
+        Label proxyUrlLabel = new Label("Proxy url :");
+        this.proxyUrl = new TextField();
+        this.proxyUrl.setPrefWidth(210);
+        Label proxyPortLabel = new Label("Proxy port :");
+        this.proxyPort = new TextField();
+        this.proxyPort.setMaxWidth(60);
+
+        grid.addRow(i++, proxyUrlLabel, proxyUrl, proxyPortLabel, proxyPort);
+
+        Label storageAccountLabel = new Label("Storage account :");
+        this.storageAccount = new TextField();
+        grid.add(storageAccountLabel, 0, i, 1, 1);
+        grid.add(storageAccount, 1, i, 3, 1);
+        i++;
 
         grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
 
@@ -211,7 +243,12 @@ public class ConnectionsManagerDialog {
             connection.cleanUselessAttributs(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());
             connection.setConnectionType(connectionType.getValue());
-            connection.setConfigurationFilePath(configurationFilePath.getText());
+            connection.setTenantId(tenantId.getText());
+            connection.setClientId(clientId.getText());
+            connection.setClientKey(clientKey.getText());
+            connection.setProxyUrl(proxyUrl.getText());
+            connection.setProxyPort(proxyPort.getText());
+            connection.setStorageAccount(storageAccount.getText());
             log.info("Saving {}", connection);
 
             try {
@@ -315,7 +352,12 @@ public class ConnectionsManagerDialog {
                 this.password.setText(connection.getPassword());
                 break;
             case AZURE_STORAGE:
-                this.configurationFilePath.setText(connection.getConfigurationFilePath());
+                this.tenantId.setText(connection.getTenantId());
+                this.clientId.setText(connection.getClientId());
+                this.clientKey.setText(connection.getClientKey());
+                this.proxyUrl.setText(connection.getProxyUrl());
+                this.proxyPort.setText(connection.getProxyPort());
+                this.storageAccount.setText(connection.getStorageAccount());
                 break;
             default:
                 throw new IllegalStateException("Unexpected connection type : " + connection.getConnectionType());
@@ -325,7 +367,12 @@ public class ConnectionsManagerDialog {
 
     public void clearConnectionDetailsView() {
 
-        this.configurationFilePath.setText("");
+        this.tenantId.setText("");
+        this.clientId.setText("");
+        this.clientKey.setText("");
+        this.proxyUrl.setText("");
+        this.proxyPort.setText("");
+        this.storageAccount.setText("");
         this.host.setText("");
         this.port.setText("");
         this.database.setText("");

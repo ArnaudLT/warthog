@@ -20,7 +20,17 @@ public class Connection implements Serializable {
     private ConnectionType connectionType;
 
     // AZ Storage
-    private String configurationFilePath;
+    private String tenantId;
+
+    private String clientId;
+
+    private String clientKey;
+
+    private String proxyUrl;
+
+    private String proxyPort;
+
+    private String storageAccount;
 
     // Database
     protected static final List<String> knownDatabaseType = List.of("SID", "Service name");
@@ -48,7 +58,12 @@ public class Connection implements Serializable {
     public Connection(Connection value) {
         this.name = value.name;
         this.connectionType = value.connectionType;
-        this.configurationFilePath = value.configurationFilePath;
+        this.tenantId = value.tenantId;
+        this.clientId = value.clientId;
+        this.clientKey = value.clientKey;
+        this.proxyUrl = value.proxyUrl;
+        this.proxyPort = value.proxyPort;
+        this.storageAccount = value.storageAccount;
         this.host = value.host;
         this.port = value.port;
         this.database = value.database;
@@ -64,7 +79,12 @@ public class Connection implements Serializable {
 
             case ORACLE_DATABASE:
             case POSTGRESQL:
-                this.configurationFilePath = null;
+                this.tenantId = null;
+                this.clientId = null;
+                this.clientKey = null;
+                this.proxyUrl = null;
+                this.proxyPort = null;
+                this.storageAccount = null;
                 break;
             case AZURE_STORAGE:
                 this.host = null;
@@ -81,20 +101,6 @@ public class Connection implements Serializable {
     @Override
     public String toString() {
         return name;
-    }
-
-
-    public String toExtraString() {
-        return "{name='" + name + '\'' +
-                ", connectionType=" + connectionType +
-                ", configurationFilePath='" + configurationFilePath + '\'' +
-                ", host='" + host + '\'' +
-                ", port='" + port + '\'' +
-                ", database='" + database + '\'' +
-                ", databaseType='" + databaseType + '\'' +
-                ", user='" + user + '\'' +
-                ", password='" + password + '\'' +
-                '}';
     }
 
 

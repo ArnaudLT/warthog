@@ -4,7 +4,7 @@ public enum ConnectionType {
 
     ORACLE_DATABASE("Oracle Database"),
     POSTGRESQL("PostgreSQL"),
-    AZURE_STORAGE("Azure Storage");
+    AZURE_STORAGE("Azure DFS Storage");
 
     final String label;
 

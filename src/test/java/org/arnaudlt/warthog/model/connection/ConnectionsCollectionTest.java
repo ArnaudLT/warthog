@@ -16,12 +16,10 @@ class ConnectionsCollectionTest {
     private Gson gson;
 
 
-    @Test
     void persist() throws IOException {
 
 
         Connection fakeAZConnection1 = new Connection("Azure storage sample", ConnectionType.AZURE_STORAGE);
-        fakeAZConnection1.setConfigurationFilePath("C:\\Users\\Arnaud\\Downloads\\samples\\config.snp");
 
         Connection fakeORAConnection2 = new Connection("Oracle database sample", ConnectionType.ORACLE_DATABASE);
 
@@ -33,14 +31,14 @@ class ConnectionsCollectionTest {
         //connectionsCollection.persist();
     }
 
-    @Test
+
     void load() throws IOException {
 
         ConnectionsCollection connectionsCollection = ConnectionsCollection.load(gson, "target");
         log.info("Loading connections...");
         for (Connection connection : connectionsCollection) {
 
-            log.info("Connection : {}", connection.toExtraString());
+            log.info("Connection : {}", connection.getName());
         }
 
         //Assert.assertEquals(3, connectionsCollection.getConnections().size());
