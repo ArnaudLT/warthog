@@ -36,7 +36,7 @@ public class AzureStorageDfsClient {
         DataLakeFileSystemClient dataLakeFileSystemClient = datalakeServiceClient.getFileSystemClient(container);
         DataLakeDirectoryClient directoryClient = dataLakeFileSystemClient.getDirectoryClient(path);
 
-        createDirectory(Paths.get(targetDirectory, container));
+        createDirectory(Paths.get(targetDirectory, container, path));
 
         PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
         log.info("Starting to download {}/{}", container, path);
@@ -44,9 +44,10 @@ public class AzureStorageDfsClient {
 
             if (!pathItem.isDirectory()) {
 
-                downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), directoryClient, pathItem.getName());
+                String fileName = Paths.get(pathItem.getName()).getFileName().toString();
+                downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), directoryClient, fileName);
             } else {
-                // Just to keep empty directory
+                // Allow to keep empty directories
                 createDirectory(Paths.get(targetDirectory, container, pathItem.getName()));
             }
         }
