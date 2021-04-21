@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
@@ -18,6 +20,7 @@ import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
+import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromAzureDfsStorageService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromDatabaseService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
@@ -25,6 +28,9 @@ import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.Random;
 
 
 @Slf4j
@@ -80,14 +86,14 @@ public class ImportDialog {
 
         Label tableNameLabel = new Label("Table name :");
         TextField tableName = new TextField();
-        tableName.setMinWidth(220);
-        tableName.setMaxWidth(220);
+        tableName.setMinWidth(200);
+        tableName.setMaxWidth(200);
         gridDatabase.addRow(j++, tableNameLabel, tableName);
 
-        gridDatabase.add(new Separator(Orientation.HORIZONTAL), 0, j++, 3, 1);
+        gridDatabase.add(new Separator(Orientation.HORIZONTAL), 0, j++, 2, 1);
 
-        Button importButton = new Button("Import");
-        importButton.setOnAction(event -> {
+        Button importTableButton = new Button("Import");
+        importTableButton.setOnAction(event -> {
 
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
             if (selectedConnection != null) {
@@ -96,14 +102,45 @@ public class ImportDialog {
                 dialog.close();
             }
         });
-        gridDatabase.addRow(j, importButton);
+        gridDatabase.addRow(j, importTableButton);
         // ==============================
 
         // =============== Import from Azure storage ===============
         GridPane gridAzureStorage = GridFactory.buildGrid();
         int k = 0;
-        Label featureIncomingLabel = new Label("Feature coming soon ;-)");
-        gridAzureStorage.addRow(k, featureIncomingLabel);
+
+        Label containerLabel = new Label("Container :");
+        TextField container = new TextField();
+
+        gridAzureStorage.addRow(k++, containerLabel, container);
+
+        Label pathLabel = new Label("Path :");
+        TextField azPath = new TextField();
+        azPath.setMinWidth(200);
+        azPath.setMaxWidth(200);
+
+        gridAzureStorage.addRow(k++, pathLabel, azPath);
+
+        gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
+
+        Button importAzureButton = new Button("Import...");
+        importAzureButton.setOnAction(event -> {
+
+            Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
+            if (selectedConnection != null) {
+
+                DirectoryChooser dc = new DirectoryChooser();
+                File targetDirectory = dc.showDialog(owner);
+                if (targetDirectory != null) {
+
+                    log.info("Download from Azure not yet implemented ! (fake inc)");
+                    importFromAzure(selectedConnection, container.getText(), azPath.getText(), targetDirectory.getAbsolutePath());
+                    dialog.close();
+                }
+            }
+        });
+        gridAzureStorage.addRow(k, importAzureButton);
+
         // ===============
 
 
@@ -121,7 +158,7 @@ public class ImportDialog {
         }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
 
-        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)), 350, 190);
+        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)), 350, 220);
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);
@@ -140,7 +177,18 @@ public class ImportDialog {
 
         NamedDatasetImportFromDatabaseService importService = new NamedDatasetImportFromDatabaseService(namedDatasetManager, connection, tableName);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to add the dataset '"+ tableName +"'"));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '"+ tableName +"'"));
+        importService.setExecutor(this.poolService.getExecutor());
+        importService.start();
+    }
+
+
+    public void importFromAzure(Connection connection, String container, String path, String targetDirectory) {
+
+        NamedDatasetImportFromAzureDfsStorageService importService = new NamedDatasetImportFromAzureDfsStorageService(
+                namedDatasetManager, connection, container, path, targetDirectory);
+        importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '"+ path +"'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }

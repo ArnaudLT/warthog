@@ -28,7 +28,7 @@ public class Connection implements Serializable {
 
     private String proxyUrl;
 
-    private String proxyPort;
+    private Integer proxyPort;
 
     private String storageAccount;
 

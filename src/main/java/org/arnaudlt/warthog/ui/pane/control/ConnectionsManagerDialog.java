@@ -247,7 +247,7 @@ public class ConnectionsManagerDialog {
             connection.setClientId(clientId.getText());
             connection.setClientKey(clientKey.getText());
             connection.setProxyUrl(proxyUrl.getText());
-            connection.setProxyPort(proxyPort.getText());
+            connection.setProxyPort(Integer.parseInt(proxyPort.getText()));
             connection.setStorageAccount(storageAccount.getText());
             log.info("Saving {}", connection);
 
@@ -356,7 +356,7 @@ public class ConnectionsManagerDialog {
                 this.clientId.setText(connection.getClientId());
                 this.clientKey.setText(connection.getClientKey());
                 this.proxyUrl.setText(connection.getProxyUrl());
-                this.proxyPort.setText(connection.getProxyPort());
+                this.proxyPort.setText(connection.getProxyPort().toString());
                 this.storageAccount.setText(connection.getStorageAccount());
                 break;
             default:

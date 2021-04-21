@@ -3,6 +3,14 @@
 
 ### FEATURES
 
+=> Export
+    => Choose repartition/coalesce
+
+=> Azure DFS connector
+    => Import + Export
+    => Import a list of files/directory
+    => Option to repatition/coalesce(n) after import
+
 => Query builder :
 
     => Improve the Visual Query Builder :
