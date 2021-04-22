@@ -34,6 +34,8 @@ public class SparkConfiguration {
         spark.sqlContext().udf()
                 .register("mapToString", mapToString, DataTypes.StringType);
 
+        spark.sqlContext().sql("CREATE TEMPORARY FUNCTION sum_arrays AS 'org.arnaudlt.warthog.model.hive.SumArrays';");
+
         return spark;
     }
 
