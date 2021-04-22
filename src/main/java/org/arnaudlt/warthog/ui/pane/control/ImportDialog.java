@@ -118,7 +118,10 @@ public class ImportDialog {
         azPath.setMinWidth(200);
         azPath.setMaxWidth(200);
 
-        gridAzureStorage.addRow(k++, pathLabel, azPath);
+        Button azExplorerButton = new Button("...");
+        azExplorerButton.setOnAction(event -> AlertFactory.showInformationAlert(owner, "Not yet implemented"));
+
+        gridAzureStorage.addRow(k++, pathLabel, azPath, azExplorerButton);
 
         gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
 
@@ -164,8 +167,9 @@ public class ImportDialog {
                     selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
         }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
-
-        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)), 350, 220);
+        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
+                this.dialog.getScene().getWindow().sizeToScene());
+        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);

@@ -133,7 +133,9 @@ public class ExportDialog {
         }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
 
-        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)), 350, 220);
+        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
+                this.dialog.getScene().getWindow().sizeToScene());
+        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);
