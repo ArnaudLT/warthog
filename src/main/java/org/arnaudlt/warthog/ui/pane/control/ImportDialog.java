@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -20,6 +19,7 @@ import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
+import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromAzureDfsStorageService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromDatabaseService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Random;
 
 
 @Slf4j
@@ -114,7 +113,7 @@ public class ImportDialog {
 
         gridAzureStorage.addRow(k++, containerLabel, container);
 
-        Label pathLabel = new Label("Path :");
+        Label pathLabel = new Label("Directory :");
         TextField azPath = new TextField();
         azPath.setMinWidth(200);
         azPath.setMaxWidth(200);
@@ -133,16 +132,24 @@ public class ImportDialog {
                 File targetDirectory = dc.showDialog(owner);
                 if (targetDirectory != null) {
 
-                    log.info("Download from Azure not yet implemented ! (fake inc)");
                     importFromAzure(selectedConnection, container.getText(), azPath.getText(), targetDirectory.getAbsolutePath());
                     dialog.close();
                 }
             }
         });
-        gridAzureStorage.addRow(k, importAzureButton);
+
+        Button checkSize = new Button("Check size");
+        checkSize.setOnAction(event -> {
+
+            Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
+            if (selectedConnection != null) {
+
+                checkDirectorySize(selectedConnection, container.getText(), azPath.getText());
+            }
+        });
+        gridAzureStorage.addRow(k, importAzureButton, checkSize);
 
         // ===============
-
 
         gridDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
                 Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
@@ -191,6 +198,20 @@ public class ImportDialog {
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '"+ path +"'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
+    }
+
+
+    private void checkDirectorySize(Connection connection, String container, String path) {
+
+        DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(connection, container, path);
+        directoryStatisticsService.setOnSucceeded(success -> {
+
+            DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
+            AlertFactory.showInformationAlert(owner, statistics.filesCount + " files" + " for " + statistics.bytes / 1_000_000 + " MB");
+        });
+        directoryStatisticsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '"+ path +"'"));
+        directoryStatisticsService.setExecutor(this.poolService.getExecutor());
+        directoryStatisticsService.start();
     }
 
 }

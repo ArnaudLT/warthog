@@ -51,7 +51,7 @@ public class ConnectionsCollection implements Iterable<Connection> {
     public void persist() throws IOException {
 
         log.info("Try to delete the '{}/connections.json'", userDirectory);
-        new File(userDirectory, "connections.json").delete();
+        Files.deleteIfExists(Paths.get(userDirectory, "connections.json"));
 
         log.info("Start to write connections in '{}/connections.json'", userDirectory);
 

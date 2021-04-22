@@ -55,7 +55,7 @@ public class ExportFileDialog {
     public void buildExportFileDialog(Stage owner) {
 
         this.owner = owner;
-        this.dialog = StageFactory.buildModalStage(owner, "Export to File");
+        this.dialog = StageFactory.buildModalStage(owner, "Export to file");
 
         GridPane grid = GridFactory.buildGrid();
 

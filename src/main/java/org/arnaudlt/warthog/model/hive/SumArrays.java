@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.model.hive;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentTypeException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
@@ -9,6 +10,8 @@ import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.objectinspector.*;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.AbstractPrimitiveJavaObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.JavaIntObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.io.DoubleWritable;
@@ -18,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Description(
+        name = "Sum arrays of numbers",
+        value = "_FUNC_(x) - Returns the vector sum",
+        extended = "The function takes as argument any array of numeric types and returns an array."
+)
 public class SumArrays extends AbstractGenericUDAFResolver {
 
 
@@ -34,9 +42,23 @@ public class SumArrays extends AbstractGenericUDAFResolver {
             throw new UDFArgumentTypeException(0, "Please provide a list of numbers.");
         }
 
-        // TODO check that it is an array of numeric
+        ObjectInspector objectInspector = ((StandardListObjectInspector) argument).getListElementObjectInspector();
 
-        return new GenericUDAFSumDoubleArray();
+        switch (((AbstractPrimitiveJavaObjectInspector) objectInspector).getPrimitiveCategory()) {
+
+            case BYTE:
+            case SHORT:
+            case INT:
+            case LONG:
+                return new GenericUDAFSumLongArray();
+            case FLOAT:
+            case DOUBLE:
+            case DECIMAL:
+                return new GenericUDAFSumDoubleArray();
+            default:
+                throw new UDFArgumentTypeException(0, "Expected arrays of numbers, but arrays of " + objectInspector.getTypeName() + " detected");
+        }
+
     }
 
 

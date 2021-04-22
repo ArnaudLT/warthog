@@ -68,7 +68,7 @@ public class GlobalSettings implements Serializable {
     public void persist() throws IOException {
 
         log.info("Try to delete the '{}/settings.json'", userDirectory);
-        new File(userDirectory, "settings.json").delete();
+        Files.deleteIfExists(Paths.get(userDirectory, "settings.json"));
 
         log.info("Start to write settings in '{}/settings.json'", userDirectory);
         String settingsJson = gson.toJson(this);

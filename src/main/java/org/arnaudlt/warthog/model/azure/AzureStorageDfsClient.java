@@ -14,6 +14,7 @@ import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
+import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
@@ -32,6 +33,28 @@ public class AzureStorageDfsClient {
 
 
     private AzureStorageDfsClient() {}
+
+
+    public static DirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container, String path) {
+
+        DataLakeDirectoryClient directoryClient = getDataLakeDirectoryClient(connection, container, path);
+
+        DirectoryStatisticsService.DirectoryStatistics directoryStatistics = new DirectoryStatisticsService.DirectoryStatistics();
+
+        PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
+        for (PathItem pathItem : pathItems) {
+
+            if (!pathItem.isDirectory()) {
+
+                String fileName = Paths.get(pathItem.getName()).getFileName().toString();
+                DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
+
+                directoryStatistics.filesCount++;
+                directoryStatistics.bytes += fileClient.getProperties().getFileSize();
+            }
+        }
+        return directoryStatistics;
+    }
 
 
     public static File download(Connection connection, String container, String path, String targetDirectory) throws IOException {
@@ -103,6 +126,7 @@ public class AzureStorageDfsClient {
                 .httpClient(azureHttpClient)
                 .buildClient();
     }
+
 
 
     private static class AzureTokenCredential implements TokenCredential {
