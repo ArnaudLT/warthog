@@ -30,11 +30,13 @@ import java.time.OffsetDateTime;
 public class AzureStorageDfsClient {
 
 
+
+    private AzureStorageDfsClient() {}
+
+
     public static File download(Connection connection, String container, String path, String targetDirectory) throws IOException {
 
-        DataLakeServiceClient datalakeServiceClient = getDataLakeServiceClient(connection);
-        DataLakeFileSystemClient dataLakeFileSystemClient = datalakeServiceClient.getFileSystemClient(container);
-        DataLakeDirectoryClient directoryClient = dataLakeFileSystemClient.getDirectoryClient(path);
+        DataLakeDirectoryClient directoryClient = getDataLakeDirectoryClient(connection, container, path);
 
         createDirectory(Paths.get(targetDirectory, container, path));
 
@@ -42,17 +44,31 @@ public class AzureStorageDfsClient {
         log.info("Starting to download {}/{}", container, path);
         for (PathItem pathItem : pathItems) {
 
-            if (!pathItem.isDirectory()) {
-
-                String fileName = Paths.get(pathItem.getName()).getFileName().toString();
-                downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), directoryClient, fileName);
-            } else {
-                // Allow to keep empty directories
-                createDirectory(Paths.get(targetDirectory, container, pathItem.getName()));
-            }
+            downloadPathItem(directoryClient, targetDirectory, container, pathItem);
         }
         log.info("Download of {}/{} completed", container, path);
         return Paths.get(targetDirectory, container).toFile();
+    }
+
+
+    private static DataLakeDirectoryClient getDataLakeDirectoryClient(Connection connection, String container, String path) {
+
+        DataLakeServiceClient datalakeServiceClient = getDataLakeServiceClient(connection);
+        DataLakeFileSystemClient dataLakeFileSystemClient = datalakeServiceClient.getFileSystemClient(container);
+        return dataLakeFileSystemClient.getDirectoryClient(path);
+    }
+
+
+    private static void downloadPathItem(DataLakeDirectoryClient directoryClient, String targetDirectory, String container, PathItem pathItem) throws IOException {
+
+        if (!pathItem.isDirectory()) {
+
+            String fileName = Paths.get(pathItem.getName()).getFileName().toString();
+            downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), directoryClient, fileName);
+        } else {
+            // Allow to keep empty directories
+            createDirectory(Paths.get(targetDirectory, container, pathItem.getName()));
+        }
     }
 
 
