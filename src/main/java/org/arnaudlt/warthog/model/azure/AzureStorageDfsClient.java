@@ -68,21 +68,27 @@ public class AzureStorageDfsClient {
         log.info("Starting to download {}/{}", container, path);
         for (PathItem pathItem : pathItems) {
 
-            Path targetFilePath = Paths.get(targetDirectory, container, pathItem.getName());
-
-            if (!pathItem.isDirectory()) {
-
-                log.info("Downloading file : {}", targetFilePath);
-                createDirectory(targetFilePath.getParent());
-
-                downloadOneFile(fileSystem, pathItem, targetFilePath);
-            } else {
-                // Allow to keep empty directories
-                createDirectory(targetFilePath);
-            }
+            downloadOnePathItem(container, targetDirectory, fileSystem, pathItem);
         }
         log.info("Download of {}/{} completed", container, path);
         return Paths.get(targetDirectory, container, path).toFile();
+    }
+
+
+    private static void downloadOnePathItem(String container, String targetDirectory, DataLakeFileSystemClient fileSystem, PathItem pathItem) throws IOException {
+
+        Path targetFilePath = Paths.get(targetDirectory, container, pathItem.getName());
+
+        if (!pathItem.isDirectory()) {
+
+            log.info("Downloading file : {}", targetFilePath);
+            createDirectory(targetFilePath.getParent());
+
+            downloadOneFile(fileSystem, pathItem, targetFilePath);
+        } else {
+            // Allow to keep empty directories
+            createDirectory(targetFilePath);
+        }
     }
 
 
