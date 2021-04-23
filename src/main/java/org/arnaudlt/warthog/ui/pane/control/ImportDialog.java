@@ -18,6 +18,7 @@ import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromAzureDfsStorageService;
@@ -123,6 +124,11 @@ public class ImportDialog {
 
         gridAzureStorage.addRow(k++, pathLabel, azPath, azExplorerButton);
 
+/*        Label downloadOnlyLabel = new Label("Download only :");
+        CheckBox downloadOnly = new CheckBox();
+
+        gridAzureStorage.addRow(k++, downloadOnlyLabel, downloadOnly);*/
+
         gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
 
         Button importAzureButton = new Button("Import...");
@@ -135,7 +141,9 @@ public class ImportDialog {
                 File targetDirectory = dc.showDialog(owner);
                 if (targetDirectory != null) {
 
-                    importFromAzure(selectedConnection, container.getText(), azPath.getText(), targetDirectory.getAbsolutePath());
+                    ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
+                            new ImportAzureDfsStorageSettings(container.getText(), azPath.getText(), targetDirectory.getAbsolutePath());
+                    importFromAzure(selectedConnection, importAzureDfsStorageSettings);
                     dialog.close();
                 }
             }
@@ -193,12 +201,13 @@ public class ImportDialog {
     }
 
 
-    public void importFromAzure(Connection connection, String container, String path, String targetDirectory) {
+    public void importFromAzure(Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings) {
 
         NamedDatasetImportFromAzureDfsStorageService importService = new NamedDatasetImportFromAzureDfsStorageService(
-                namedDatasetManager, connection, container, path, targetDirectory);
+                namedDatasetManager, connection, importAzureDfsStorageSettings);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '" + path + "'"));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail,
+                "Not able to import the dataset '" + importAzureDfsStorageSettings.getAzDirectoryPath() + "'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
