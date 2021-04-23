@@ -68,10 +68,31 @@ public class AzureStorageDfsClient {
         log.info("Starting to download {}/{}", container, path);
         for (PathItem pathItem : pathItems) {
 
-            downloadPathItem(fileSystem, targetDirectory, container, pathItem);
+            Path targetFilePath = Paths.get(targetDirectory, container, pathItem.getName());
+
+            if (!pathItem.isDirectory()) {
+
+                log.info("Downloading file : {}", targetFilePath);
+                createDirectory(targetFilePath.getParent());
+
+                downloadOneFile(fileSystem, pathItem, targetFilePath);
+            } else {
+                // Allow to keep empty directories
+                createDirectory(targetFilePath);
+            }
         }
         log.info("Download of {}/{} completed", container, path);
         return Paths.get(targetDirectory, container, path).toFile();
+    }
+
+
+    private static void downloadOneFile(DataLakeFileSystemClient fileSystem, PathItem pathItem, Path targetFilePath) {
+
+        DataLakeDirectoryClient dc = fileSystem.getDirectoryClient(Paths.get(pathItem.getName()).getParent().toString());
+        String fileName = Paths.get(pathItem.getName()).getFileName().toString();
+        DataLakeFileClient fileClient = dc.getFileClient(fileName);
+
+        fileClient.readToFile(targetFilePath.toString());
     }
 
 
@@ -79,29 +100,6 @@ public class AzureStorageDfsClient {
 
         DataLakeServiceClient datalakeServiceClient = getDataLakeServiceClient(connection);
         return datalakeServiceClient.getFileSystemClient(container);
-    }
-
-
-    private static void downloadPathItem(DataLakeFileSystemClient fileSystem, String targetDirectory, String container, PathItem pathItem) throws IOException {
-
-        if (!pathItem.isDirectory()) {
-
-            String fileName = Paths.get(pathItem.getName()).getFileName().toString();
-            DataLakeDirectoryClient dc = fileSystem.getDirectoryClient(Paths.get(pathItem.getName()).getParent().toString());
-            downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), dc, fileName);
-        } else {
-            // Allow to keep empty directories
-            createDirectory(Paths.get(targetDirectory, container, pathItem.getName()));
-        }
-    }
-
-
-    private static void downloadOneFile(Path targetFilePath, DataLakeDirectoryClient directoryClient, String remoteFilePath) throws IOException {
-
-        log.info("Downloading file : {}", targetFilePath);
-        createDirectory(targetFilePath.getParent());
-        DataLakeFileClient fileClient = directoryClient.getFileClient(remoteFilePath);
-        fileClient.readToFile(targetFilePath.toString());
     }
 
 
