@@ -71,7 +71,7 @@ public class AzureStorageDfsClient {
             downloadPathItem(fileSystem, targetDirectory, container, pathItem);
         }
         log.info("Download of {}/{} completed", container, path);
-        return Paths.get(targetDirectory, container, targetDirectory).toFile();
+        return Paths.get(targetDirectory, container, path).toFile();
     }
 
 
