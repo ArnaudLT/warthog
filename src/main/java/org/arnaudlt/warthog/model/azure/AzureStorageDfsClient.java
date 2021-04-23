@@ -57,48 +57,48 @@ public class AzureStorageDfsClient {
     }
 
 
-    public static File download(Connection connection, String container, String path, String targetDirectory) throws IOException {
+    public static File download(Connection connection, String container, String azDirectoryPath, String localDirectoryPath) throws IOException {
 
         DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
-        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(path);
+        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(azDirectoryPath);
 
-        createDirectory(Paths.get(targetDirectory, container, path));
+        createDirectory(Paths.get(localDirectoryPath, container, azDirectoryPath));
 
         PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
-        log.info("Starting to download {}/{}", container, path);
+        log.info("Starting to download {}/{}", container, azDirectoryPath);
         for (PathItem pathItem : pathItems) {
 
-            downloadOnePathItem(container, targetDirectory, fileSystem, pathItem);
+            downloadOnePathItem(container, localDirectoryPath, fileSystem, pathItem);
         }
-        log.info("Download of {}/{} completed", container, path);
-        return Paths.get(targetDirectory, container, path).toFile();
+        log.info("Download of {}/{} completed", container, azDirectoryPath);
+        return Paths.get(localDirectoryPath, container, azDirectoryPath).toFile();
     }
 
 
-    private static void downloadOnePathItem(String container, String targetDirectory, DataLakeFileSystemClient fileSystem, PathItem pathItem) throws IOException {
+    private static void downloadOnePathItem(String container, String localDirectoryPath, DataLakeFileSystemClient fileSystem, PathItem pathItem) throws IOException {
 
-        Path targetFilePath = Paths.get(targetDirectory, container, pathItem.getName());
+        Path localFilePath = Paths.get(localDirectoryPath, container, pathItem.getName());
 
         if (!pathItem.isDirectory()) {
 
-            log.info("Downloading file : {}", targetFilePath);
-            createDirectory(targetFilePath.getParent());
+            log.info("Downloading file : {}", localFilePath);
+            createDirectory(localFilePath.getParent());
 
-            downloadOneFile(fileSystem, pathItem, targetFilePath);
+            downloadOneFile(fileSystem, pathItem, localFilePath);
         } else {
             // Allow to keep empty directories
-            createDirectory(targetFilePath);
+            createDirectory(localFilePath);
         }
     }
 
 
-    private static void downloadOneFile(DataLakeFileSystemClient fileSystem, PathItem pathItem, Path targetFilePath) {
+    private static void downloadOneFile(DataLakeFileSystemClient fileSystem, PathItem pathItem, Path localFilePath) {
 
         DataLakeDirectoryClient dc = fileSystem.getDirectoryClient(Paths.get(pathItem.getName()).getParent().toString());
         String fileName = Paths.get(pathItem.getName()).getFileName().toString();
         DataLakeFileClient fileClient = dc.getFileClient(fileName);
 
-        fileClient.readToFile(targetFilePath.toString());
+        fileClient.readToFile(localFilePath.toString());
     }
 
 
