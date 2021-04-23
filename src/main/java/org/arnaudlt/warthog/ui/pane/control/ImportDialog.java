@@ -65,7 +65,7 @@ public class ImportDialog {
         this.owner = owner;
         this.dialog = StageFactory.buildModalStage(owner, "Import");
 
-        GridPane common = GridFactory.buildGrid(new Insets(20,20,0,20));
+        GridPane common = GridFactory.buildGrid(new Insets(20, 20, 0, 20));
 
         int i = 0;
 
@@ -141,25 +141,24 @@ public class ImportDialog {
             }
         });
 
-        Button checkSize = new Button("Check size");
-        checkSize.setOnAction(event -> {
+        Button checkSizeButton = new Button("Check size");
+        checkSizeButton.setOnAction(event -> {
 
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
             if (selectedConnection != null) {
-
-                checkDirectorySize(selectedConnection, container.getText(), azPath.getText());
+                checkDirectorySize(checkSizeButton, selectedConnection, container.getText(), azPath.getText());
             }
         });
-        gridAzureStorage.addRow(k, importAzureButton, checkSize);
+        gridAzureStorage.addRow(k, importAzureButton, checkSizeButton);
 
         // ===============
 
         gridDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
-                Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
-                return selectedConnection != null && (
-                        selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
-                        selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
-            }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+            Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
+            return selectedConnection != null && (
+                    selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
+                            selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
+        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
         gridAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
@@ -188,7 +187,7 @@ public class ImportDialog {
 
         NamedDatasetImportFromDatabaseService importService = new NamedDatasetImportFromDatabaseService(namedDatasetManager, connection, tableName);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '"+ tableName +"'"));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '" + tableName + "'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
@@ -199,21 +198,27 @@ public class ImportDialog {
         NamedDatasetImportFromAzureDfsStorageService importService = new NamedDatasetImportFromAzureDfsStorageService(
                 namedDatasetManager, connection, container, path, targetDirectory);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '"+ path +"'"));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '" + path + "'"));
         importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
 
 
-    private void checkDirectorySize(Connection connection, String container, String path) {
+    private void checkDirectorySize(Button checkSizeButton, Connection connection, String container, String path) {
 
+        checkSizeButton.setDisable(true);
         DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(connection, container, path);
         directoryStatisticsService.setOnSucceeded(success -> {
 
+            checkSizeButton.setDisable(false);
             DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
             AlertFactory.showInformationAlert(owner, statistics.filesCount + " files" + " for " + statistics.bytes / 1_000_000 + " MB");
         });
-        directoryStatisticsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '"+ path +"'"));
+        directoryStatisticsService.setOnFailed(fail -> {
+
+            checkSizeButton.setDisable(false);
+            AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + path + "'");
+        });
         directoryStatisticsService.setExecutor(this.poolService.getExecutor());
         directoryStatisticsService.start();
     }
