@@ -37,7 +37,8 @@ public class AzureStorageDfsClient {
 
     public static DirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container, String path) {
 
-        DataLakeDirectoryClient directoryClient = getDataLakeDirectoryClient(connection, container, path);
+        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
+        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(path);
 
         DirectoryStatisticsService.DirectoryStatistics directoryStatistics = new DirectoryStatisticsService.DirectoryStatistics();
 
@@ -46,8 +47,7 @@ public class AzureStorageDfsClient {
 
             if (!pathItem.isDirectory()) {
 
-                String fileName = Paths.get(pathItem.getName()).getFileName().toString();
-                DataLakeFileClient fileClient = directoryClient.getFileClient(fileName);
+                DataLakeFileClient fileClient = fileSystem.getFileClient(pathItem.getName());
 
                 directoryStatistics.filesCount++;
                 directoryStatistics.bytes += fileClient.getProperties().getFileSize();
@@ -59,7 +59,8 @@ public class AzureStorageDfsClient {
 
     public static File download(Connection connection, String container, String path, String targetDirectory) throws IOException {
 
-        DataLakeDirectoryClient directoryClient = getDataLakeDirectoryClient(connection, container, path);
+        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
+        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(path);
 
         createDirectory(Paths.get(targetDirectory, container, path));
 
@@ -67,27 +68,27 @@ public class AzureStorageDfsClient {
         log.info("Starting to download {}/{}", container, path);
         for (PathItem pathItem : pathItems) {
 
-            downloadPathItem(directoryClient, targetDirectory, container, pathItem);
+            downloadPathItem(fileSystem, targetDirectory, container, pathItem);
         }
         log.info("Download of {}/{} completed", container, path);
         return Paths.get(targetDirectory, container).toFile();
     }
 
 
-    private static DataLakeDirectoryClient getDataLakeDirectoryClient(Connection connection, String container, String path) {
+    private static DataLakeFileSystemClient getDataLakeFileSystemClient(Connection connection, String container) {
 
         DataLakeServiceClient datalakeServiceClient = getDataLakeServiceClient(connection);
-        DataLakeFileSystemClient dataLakeFileSystemClient = datalakeServiceClient.getFileSystemClient(container);
-        return dataLakeFileSystemClient.getDirectoryClient(path);
+        return datalakeServiceClient.getFileSystemClient(container);
     }
 
 
-    private static void downloadPathItem(DataLakeDirectoryClient directoryClient, String targetDirectory, String container, PathItem pathItem) throws IOException {
+    private static void downloadPathItem(DataLakeFileSystemClient fileSystem, String targetDirectory, String container, PathItem pathItem) throws IOException {
 
         if (!pathItem.isDirectory()) {
 
             String fileName = Paths.get(pathItem.getName()).getFileName().toString();
-            downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), directoryClient, fileName);
+            DataLakeDirectoryClient dc = fileSystem.getDirectoryClient(Paths.get(pathItem.getName()).getParent().toString());
+            downloadOneFile(Paths.get(targetDirectory, container, pathItem.getName()), dc, fileName);
         } else {
             // Allow to keep empty directories
             createDirectory(Paths.get(targetDirectory, container, pathItem.getName()));
@@ -98,7 +99,7 @@ public class AzureStorageDfsClient {
     private static void downloadOneFile(Path targetFilePath, DataLakeDirectoryClient directoryClient, String remoteFilePath) throws IOException {
 
         log.info("Downloading file : {}", targetFilePath);
-        createDirectory(targetFilePath);
+        createDirectory(targetFilePath.getParent());
         DataLakeFileClient fileClient = directoryClient.getFileClient(remoteFilePath);
         fileClient.readToFile(targetFilePath.toString());
     }
