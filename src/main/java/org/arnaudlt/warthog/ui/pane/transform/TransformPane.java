@@ -8,7 +8,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

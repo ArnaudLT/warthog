@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;

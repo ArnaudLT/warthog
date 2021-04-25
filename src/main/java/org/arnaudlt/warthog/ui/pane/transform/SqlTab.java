@@ -2,7 +2,7 @@ package org.arnaudlt.warthog.ui.pane.transform;
 
 import javafx.scene.control.Tab;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
 public class SqlTab extends Tab {

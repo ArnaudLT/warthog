@@ -11,7 +11,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
@@ -286,11 +286,9 @@ public class ControlPane {
 
     public void importFile(File file) {
 
-        NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(namedDatasetManager, file);
-        importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '"+ file.getName() +"'"));
-        importService.setExecutor(this.poolService.getExecutor());
-        this.poolService.registerService(importService);
+        NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(poolService, namedDatasetManager, file);
+        importService.whenSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
+        importService.whenFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '"+ file.getName() +"'"));
         importService.start();
     }
 

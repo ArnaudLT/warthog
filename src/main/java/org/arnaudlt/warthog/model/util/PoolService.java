@@ -1,4 +1,4 @@
-package org.arnaudlt.warthog;
+package org.arnaudlt.warthog.model.util;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;

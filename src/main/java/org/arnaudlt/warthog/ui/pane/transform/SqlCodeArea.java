@@ -6,7 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.PoolService;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;

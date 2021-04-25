@@ -16,6 +16,7 @@ import jfxtras.styles.jmetro.Style;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.builder.SpringApplicationBuilder;
