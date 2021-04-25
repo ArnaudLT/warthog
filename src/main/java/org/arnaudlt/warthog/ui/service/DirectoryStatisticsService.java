@@ -5,9 +5,10 @@ import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.azure.AzureStorageDfsClient;
 import org.arnaudlt.warthog.model.connection.Connection;
+import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
-public class DirectoryStatisticsService extends Service<DirectoryStatisticsService.DirectoryStatistics> {
+public class DirectoryStatisticsService extends AbstractMonitoredService<DirectoryStatisticsService.DirectoryStatistics> {
 
     private final Connection connection;
 
@@ -16,8 +17,9 @@ public class DirectoryStatisticsService extends Service<DirectoryStatisticsServi
     private final String path;
 
 
-    public DirectoryStatisticsService(Connection connection, String container, String path) {
+    public DirectoryStatisticsService(PoolService poolService, Connection connection, String container, String path) {
 
+        super(poolService);
         this.connection = connection;
         this.container = container;
         this.path = path;
@@ -31,7 +33,11 @@ public class DirectoryStatisticsService extends Service<DirectoryStatisticsServi
             @Override
             protected DirectoryStatistics call() {
 
-                return AzureStorageDfsClient.getStatistics(connection, container, path);
+                updateMessage("Gather statistics on " + container + "/" + path);
+                updateProgress(-1,1);
+                DirectoryStatistics statistics = AzureStorageDfsClient.getStatistics(connection, container, path);
+                updateProgress(1, 1);
+                return statistics;
             }
         };
     }

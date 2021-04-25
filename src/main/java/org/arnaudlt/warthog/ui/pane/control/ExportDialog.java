@@ -156,19 +156,17 @@ public class ExportDialog {
         if (selectedNamedDataset == null) {
 
             final String sqlQuery = this.transformPane.getSqlQuery();
-            SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(namedDatasetManager,
+            SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(poolService, namedDatasetManager,
                     sqlQuery, selectedConnection, exportDatabaseSettings);
             sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
             sqlExportToDatabaseService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the database export"));
-            sqlExportToDatabaseService.setExecutor(poolService.getExecutor());
             sqlExportToDatabaseService.start();
         } else {
 
             NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
-                    new NamedDatasetExportToDatabaseService(namedDatasetManager, selectedNamedDataset, selectedConnection, exportDatabaseSettings);
+                    new NamedDatasetExportToDatabaseService(poolService, namedDatasetManager, selectedNamedDataset, selectedConnection, exportDatabaseSettings);
             namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
             namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the database export"));
-            namedDatasetExportToDatabaseService.setExecutor(poolService.getExecutor());
             namedDatasetExportToDatabaseService.start();
         }
     }

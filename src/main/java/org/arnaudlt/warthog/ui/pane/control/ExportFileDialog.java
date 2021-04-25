@@ -151,17 +151,15 @@ public class ExportFileDialog {
         if (selectedNamedDataset == null) {
 
             final String sqlQuery = this.transformPane.getSqlQuery();
-            SqlExportToFileService exportService = new SqlExportToFileService(namedDatasetManager, sqlQuery, exportFileSettings);
+            SqlExportToFileService exportService = new SqlExportToFileService(poolService, namedDatasetManager, sqlQuery, exportFileSettings);
             exportService.setOnSucceeded(success -> log.info("Export succeeded"));
             exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the export"));
-            exportService.setExecutor(poolService.getExecutor());
             exportService.start();
         } else {
 
-            NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(namedDatasetManager, selectedNamedDataset, exportFileSettings);
+            NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(poolService, namedDatasetManager, selectedNamedDataset, exportFileSettings);
             exportService.setOnSucceeded(success -> log.info("Export succeeded"));
             exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the export"));
-            exportService.setExecutor(poolService.getExecutor());
             exportService.start();
         }
     }

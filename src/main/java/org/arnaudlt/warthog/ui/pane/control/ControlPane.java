@@ -197,17 +197,15 @@ public class ControlPane {
             if (selectedNamedDataset == null) {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlOverviewService overviewService = new SqlOverviewService(namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
+                SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
-                overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             } else {
 
-                NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(selectedNamedDataset, globalSettings.getOverviewRows());
+                NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(poolService, selectedNamedDataset, globalSettings.getOverviewRows());
                 overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
-                overviewService.setExecutor(poolService.getExecutor());
                 overviewService.start();
             }
             event.consume();
@@ -230,17 +228,15 @@ public class ControlPane {
             if (selectedNamedDataset == null) {
 
                 final String sqlQuery = this.transformPane.getSqlQuery();
-                SqlExportToFileService exportService = new SqlExportToFileService(namedDatasetManager, sqlQuery, exportFileSettings);
+                SqlExportToFileService exportService = new SqlExportToFileService(poolService, namedDatasetManager, sqlQuery, exportFileSettings);
                 exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
                 exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the Csv export"));
-                exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             } else {
 
-                NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(namedDatasetManager, selectedNamedDataset, exportFileSettings);
+                NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(poolService, namedDatasetManager, selectedNamedDataset, exportFileSettings);
                 exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
                 exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the Csv export"));
-                exportService.setExecutor(poolService.getExecutor());
                 exportService.start();
             }
         };
@@ -287,8 +283,8 @@ public class ControlPane {
     public void importFile(File file) {
 
         NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(poolService, namedDatasetManager, file);
-        importService.whenSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
-        importService.whenFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '"+ file.getName() +"'"));
+        importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '"+ file.getName() +"'"));
         importService.start();
     }
 

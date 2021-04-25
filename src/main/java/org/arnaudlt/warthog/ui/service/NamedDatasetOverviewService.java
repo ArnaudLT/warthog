@@ -1,15 +1,15 @@
 package org.arnaudlt.warthog.ui.service;
 
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
+import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
-public class NamedDatasetOverviewService extends Service<PreparedDataset> {
+public class NamedDatasetOverviewService extends AbstractMonitoredService<PreparedDataset> {
 
 
     private final NamedDataset namedDataset;
@@ -17,7 +17,9 @@ public class NamedDatasetOverviewService extends Service<PreparedDataset> {
     private final Integer overviewRows;
 
 
-    public NamedDatasetOverviewService(NamedDataset namedDataset, Integer overviewRows) {
+    public NamedDatasetOverviewService(PoolService poolService, NamedDataset namedDataset, Integer overviewRows) {
+
+        super(poolService);
         this.namedDataset = namedDataset;
         this.overviewRows = overviewRows;
     }
@@ -31,8 +33,12 @@ public class NamedDatasetOverviewService extends Service<PreparedDataset> {
             protected PreparedDataset call() {
 
                 log.info("Start generating an overview for {}", namedDataset.getName());
+                updateMessage("Generating overview");
+                updateProgress(-1,1);
                 Dataset<Row> output = namedDataset.applyTransformation();
-                return new PreparedDataset(output, output.takeAsList(overviewRows));
+                PreparedDataset preparedDataset = new PreparedDataset(output, output.takeAsList(overviewRows));
+                updateProgress(1, 1);
+                return preparedDataset;
             }
         };
     }

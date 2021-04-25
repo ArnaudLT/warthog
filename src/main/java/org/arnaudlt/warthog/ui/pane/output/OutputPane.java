@@ -104,12 +104,10 @@ public class OutputPane {
 
             if (this.preparedDataset == null) return;
 
-            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(this.preparedDataset.getDataset());
+            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(poolService, this.preparedDataset.getDataset());
             datasetCountRowsService.setOnSucceeded(success ->
-                AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue()))
-            );
+                AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue())));
             datasetCountRowsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Failed to count rows"));
-            datasetCountRowsService.setExecutor(poolService.getExecutor());
             datasetCountRowsService.start();
         };
     }

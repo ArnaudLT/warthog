@@ -6,9 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
+import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
-public class SqlExportToDatabaseService extends Service<Void> {
+public class SqlExportToDatabaseService extends AbstractMonitoredService<Void> {
 
     private final NamedDatasetManager namedDatasetManager;
 
@@ -19,9 +20,10 @@ public class SqlExportToDatabaseService extends Service<Void> {
     private final ExportDatabaseSettings exportDatabaseSettings;
 
 
-    public SqlExportToDatabaseService(NamedDatasetManager namedDatasetManager, String sqlQuery,
+    public SqlExportToDatabaseService(PoolService poolService, NamedDatasetManager namedDatasetManager, String sqlQuery,
                                       Connection databaseConnection, ExportDatabaseSettings exportDatabaseSettings) {
 
+        super(poolService);
         this.namedDatasetManager = namedDatasetManager;
         this.sqlQuery = sqlQuery;
         this.databaseConnection = databaseConnection;
@@ -37,7 +39,10 @@ public class SqlExportToDatabaseService extends Service<Void> {
             protected Void call() {
 
                 log.info("Start generating a DB export for {}", sqlQuery);
+                updateMessage("Exporting to " + exportDatabaseSettings.getTableName() + " table");
+                updateProgress(-1,1);
                 namedDatasetManager.exportToDatabase(sqlQuery, databaseConnection, exportDatabaseSettings);
+                updateProgress(1, 1);
                 return null;
             }
         };

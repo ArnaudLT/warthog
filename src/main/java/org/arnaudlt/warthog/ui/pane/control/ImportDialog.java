@@ -193,10 +193,9 @@ public class ImportDialog {
 
     public void importTable(Connection connection, String tableName) {
 
-        NamedDatasetImportFromDatabaseService importService = new NamedDatasetImportFromDatabaseService(namedDatasetManager, connection, tableName);
+        NamedDatasetImportFromDatabaseService importService = new NamedDatasetImportFromDatabaseService(poolService, namedDatasetManager, connection, tableName);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to import the dataset '" + tableName + "'"));
-        importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
 
@@ -204,11 +203,10 @@ public class ImportDialog {
     public void importFromAzure(Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings) {
 
         NamedDatasetImportFromAzureDfsStorageService importService = new NamedDatasetImportFromAzureDfsStorageService(
-                namedDatasetManager, connection, importAzureDfsStorageSettings);
+                poolService, namedDatasetManager, connection, importAzureDfsStorageSettings);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail,
                 "Not able to import the dataset '" + importAzureDfsStorageSettings.getAzDirectoryPath() + "'"));
-        importService.setExecutor(this.poolService.getExecutor());
         importService.start();
     }
 
@@ -216,7 +214,7 @@ public class ImportDialog {
     private void checkDirectorySize(Button checkSizeButton, Connection connection, String container, String path) {
 
         checkSizeButton.setDisable(true);
-        DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(connection, container, path);
+        DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, connection, container, path);
         directoryStatisticsService.setOnSucceeded(success -> {
 
             checkSizeButton.setDisable(false);
@@ -228,7 +226,6 @@ public class ImportDialog {
             checkSizeButton.setDisable(false);
             AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + path + "'");
         });
-        directoryStatisticsService.setExecutor(this.poolService.getExecutor());
         directoryStatisticsService.start();
     }
 

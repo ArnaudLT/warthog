@@ -1,14 +1,14 @@
 package org.arnaudlt.warthog.ui.service;
 
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
+import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
-public class NamedDatasetExportToFileService extends Service<Void> {
+public class NamedDatasetExportToFileService extends AbstractMonitoredService<Void> {
 
 
     private final NamedDatasetManager namedDatasetManager;
@@ -18,8 +18,10 @@ public class NamedDatasetExportToFileService extends Service<Void> {
     private final ExportFileSettings exportFileSettings;
 
 
-    public NamedDatasetExportToFileService(NamedDatasetManager namedDatasetManager, NamedDataset namedDataset,
+    public NamedDatasetExportToFileService(PoolService poolService, NamedDatasetManager namedDatasetManager, NamedDataset namedDataset,
                                            ExportFileSettings exportFileSettings) {
+
+        super(poolService);
         this.namedDatasetManager = namedDatasetManager;
         this.namedDataset = namedDataset;
         this.exportFileSettings = exportFileSettings;
@@ -34,7 +36,10 @@ public class NamedDatasetExportToFileService extends Service<Void> {
             protected Void call() {
 
                 log.info("Start generating an export for {}", namedDataset.getName());
+                updateMessage("Exporting to " + exportFileSettings.getFilePath());
+                updateProgress(-1,1);
                 namedDatasetManager.export(namedDataset, exportFileSettings);
+                updateProgress(1, 1);
                 return null;
             }
         };

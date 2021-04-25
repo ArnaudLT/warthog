@@ -1,20 +1,21 @@
 package org.arnaudlt.warthog.ui.service;
 
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
-public class DatasetCountRowsService extends Service<Long> {
+public class DatasetCountRowsService extends AbstractMonitoredService<Long> {
 
 
     private final Dataset<Row> dataset;
 
 
-    public DatasetCountRowsService(Dataset<Row> dataset) {
+    public DatasetCountRowsService(PoolService poolService, Dataset<Row> dataset) {
 
+        super(poolService);
         this.dataset = dataset;
     }
 
@@ -27,7 +28,11 @@ public class DatasetCountRowsService extends Service<Long> {
             protected Long call() {
 
                 log.info("Start counting rows");
-                return dataset.count();
+                updateMessage("Counting rows");
+                updateProgress(-1,1);
+                Long count = dataset.count();
+                updateProgress(1, 1);
+                return count;
             }
         };
     }
