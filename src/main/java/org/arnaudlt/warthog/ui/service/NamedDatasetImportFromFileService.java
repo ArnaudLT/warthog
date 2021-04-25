@@ -7,6 +7,7 @@ import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class NamedDatasetImportFromFileService extends Service<NamedDataset> {
@@ -29,11 +30,21 @@ public class NamedDatasetImportFromFileService extends Service<NamedDataset> {
 
         return new Task<>() {
             @Override
-            protected NamedDataset call() {
+            protected NamedDataset call() throws InterruptedException {
 
+                updateProgress(0,10);
                 log.info("Start importing a named dataset from {}", file.getAbsolutePath());
+
+                for (int i=0; i<10; i++) {
+
+                    TimeUnit.SECONDS.sleep(5);
+                    updateMessage("Ca avance boby ! (" + i + ")");
+                    updateProgress(i, 10);
+                }
+
                 NamedDataset namedDataset = namedDatasetManager.createNamedDataset(file);
                 namedDatasetManager.registerNamedDataset(namedDataset);
+                updateProgress(10, 10);
                 return namedDataset;
             }
         };

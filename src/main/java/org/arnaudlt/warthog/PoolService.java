@@ -1,10 +1,14 @@
 package org.arnaudlt.warthog;
 
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -18,6 +22,9 @@ public class PoolService {
 
     private final ScheduledExecutorService scheduler;
 
+    private final ObservableList<Service<?>> services;
+
+
     @Autowired
     public PoolService() {
         this.executor = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -27,10 +34,31 @@ public class PoolService {
         this.scheduler = Executors.newScheduledThreadPool(1);
         Runnable goTickTack = () -> this.tickTack.set(this.executor.getActiveCount());
         this.scheduler.scheduleAtFixedRate(goTickTack, 500, 500, TimeUnit.MILLISECONDS);
+
+        this.services = FXCollections.synchronizedObservableList(FXCollections.observableList(new ArrayList<>()));
+    }
+
+
+    public void registerService(Service<?> service) {
+
+        this.services.add(service);
+    }
+
+
+    public void deregisterService(Service<?> service) {
+
+        this.services.remove(service);
+    }
+
+
+    public ObservableList<Service<?>> getServices() {
+
+        return services;
     }
 
 
     public ThreadPoolExecutor getExecutor() {
+
         return executor;
     }
 
