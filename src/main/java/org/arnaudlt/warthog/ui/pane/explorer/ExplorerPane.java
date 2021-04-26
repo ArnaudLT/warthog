@@ -1,23 +1,16 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
-import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.control.ControlPane;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,39 +30,26 @@ public class ExplorerPane {
 
     private ControlPane controlPane;
 
-    private TreeView<NamedDatasetItem> datasetsExplorer;
+    private TreeView<NamedDatasetItem> treeExplorer;
 
     private final Map<NamedDataset, TreeItem<NamedDatasetItem>> namedDatasetToTreeItem;
 
-    private final ListView<Service<?>> tasksExplorer;
-
 
     @Autowired
-    public ExplorerPane(PoolService poolService) {
+    public ExplorerPane() {
 
         this.namedDatasetToTreeItem = new HashMap<>();
-        this.tasksExplorer = new ListView<>(poolService.getServices());
     }
 
 
     public Node buildExplorerPane(Stage stage) {
 
-        TabPane global = new TabPane();
-        global.setSide(Side.LEFT);
-        global.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        this.treeExplorer = buildTreeView();
 
-        this.datasetsExplorer = buildTreeView();
-        VBox vBox = new VBox(datasetsExplorer);
-        this.datasetsExplorer.prefHeightProperty().bind(vBox.heightProperty());
+        VBox vBox = new VBox(treeExplorer);
+        this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
 
-        global.getTabs().add(new Tab("Datasets", this.datasetsExplorer));
-
-        this.tasksExplorer.setCellFactory(x ->new ExplorerPane.ServiceCell());
-        VBox vBox2 = new VBox(tasksExplorer);
-        this.tasksExplorer.prefHeightProperty().bind(vBox2.heightProperty());
-
-        global.getTabs().add(new Tab("Tasks", this.tasksExplorer));
-        return global;
+        return vBox;
     }
 
 
@@ -111,7 +91,7 @@ public class ExplorerPane {
     private void copySelectionToClipboard() {
 
         String content;
-        TreeItem<NamedDatasetItem> selectedItem = this.datasetsExplorer.getSelectionModel().getSelectedItem();
+        TreeItem<NamedDatasetItem> selectedItem = this.treeExplorer.getSelectionModel().getSelectedItem();
         if (selectedItem == null) {
             content = "";
         } else {
@@ -142,8 +122,8 @@ public class ExplorerPane {
 
         }
 
-        this.datasetsExplorer.getRoot().getChildren().add(item);
-        this.datasetsExplorer.getSelectionModel().select(item);
+        this.treeExplorer.getRoot().getChildren().add(item);
+        this.treeExplorer.getSelectionModel().select(item);
         this.namedDatasetToTreeItem.put(namedDataset, item);
     }
 
@@ -186,10 +166,10 @@ public class ExplorerPane {
 
     public Set<NamedDataset> getSelectedItems() {
 
-        return this.datasetsExplorer.getSelectionModel().getSelectedItems().stream()
+        return this.treeExplorer.getSelectionModel().getSelectedItems().stream()
                 .filter(Objects::nonNull)
                 .map(item -> {
-                    if (item.getParent() != null && item.getParent() != this.datasetsExplorer.getRoot()) {
+                    if (item.getParent() != null && item.getParent() != this.treeExplorer.getRoot()) {
                         return item.getParent().getValue().getNamedDataset();
                     } else {
                         return item.getValue().getNamedDataset();
@@ -203,7 +183,7 @@ public class ExplorerPane {
 
         TreeItem<NamedDatasetItem> namedDatasetTreeItem = this.namedDatasetToTreeItem.get(namedDataset);
         this.namedDatasetToTreeItem.remove(namedDataset);
-        this.datasetsExplorer.getRoot().getChildren().remove(namedDatasetTreeItem);
+        this.treeExplorer.getRoot().getChildren().remove(namedDatasetTreeItem);
     }
 
 
@@ -212,7 +192,7 @@ public class ExplorerPane {
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() >= 2 && event.getTarget() != null) {
 
             event.consume(); // Avoid expand/collapse on double click on the namedDataset !
-            ObservableList<TreeItem<NamedDatasetItem>> selectedItems = this.datasetsExplorer.getSelectionModel().getSelectedItems();
+            ObservableList<TreeItem<NamedDatasetItem>> selectedItems = this.treeExplorer.getSelectionModel().getSelectedItems();
             for (TreeItem<NamedDatasetItem> selectedItem : selectedItems) {
 
                 if (selectedItem == null) continue;
@@ -231,66 +211,6 @@ public class ExplorerPane {
 
     public void setControlPane(ControlPane controlPane) {
         this.controlPane = controlPane;
-    }
-
-
-    //https://stackoverflow.com/questions/15661500/javafx-listview-item-with-an-image-button
-    @Slf4j
-    private static class ServiceCell extends ListCell<Service<?>> {
-
-        private final VBox content;
-
-        private final Label label;
-
-        private final ProgressIndicator progressIndicator;
-
-        private final Button cancelButton;
-
-
-        public ServiceCell() {
-
-            super();
-
-            this.label = new Label();
-            Pane pane = new Pane();
-            this.cancelButton = new Button("", new MDL2IconFont("\uE711"));
-
-            HBox hBox = new HBox(this.label, pane, cancelButton);
-            hBox.setAlignment(Pos.CENTER);
-            HBox.setHgrow(pane, Priority.ALWAYS);
-
-            this.progressIndicator = new ProgressBar();
-            this.content = new VBox(0, hBox, this.progressIndicator);
-
-            setStyle("-fx-padding: 0px");
-        }
-
-
-        @Override
-        protected void updateItem(Service<?> item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(null);  // No text in label of super class
-            if (empty) {
-                setGraphic(null);
-            } else {
-
-                // TODO not clean. Why should I rebind that for each update ... Unbind needed ?
-                this.label.textProperty().unbind();
-                this.progressIndicator.progressProperty().unbind();
-
-                this.label.textProperty().bind(item.messageProperty());
-                this.progressIndicator.progressProperty().bind(item.progressProperty());
-                this.cancelButton.setOnAction(event -> {
-                    log.info("Request cancel task : {}", item);
-                    item.cancel();
-                });
-
-                setGraphic(content);
-            }
-        }
-
-
-
     }
 
 

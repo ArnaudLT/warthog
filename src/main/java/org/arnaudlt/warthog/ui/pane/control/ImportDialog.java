@@ -124,6 +124,11 @@ public class ImportDialog {
 
         gridAzureStorage.addRow(k++, pathLabel, azPath, azExplorerButton);
 
+/*        Label downloadOnlyLabel = new Label("Download only :");
+        CheckBox downloadOnly = new CheckBox();
+
+        gridAzureStorage.addRow(k++, downloadOnlyLabel, downloadOnly);*/
+
         gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
 
         Button importAzureButton = new Button("Import...");

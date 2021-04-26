@@ -49,6 +49,8 @@ public class ControlPane {
 
     private final ConnectionsManagerDialog connectionsManagerDialog;
 
+    private final TasksManagerDialog tasksManagerDialog;
+
     private ImportDialog importDialog;
 
     private ExplorerPane explorerPane;
@@ -62,7 +64,8 @@ public class ControlPane {
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
                        ExportDialog exportDialog, GlobalSettings globalSettings,
                        ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
-                       ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog) {
+                       ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog,
+                       TasksManagerDialog tasksManagerDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
@@ -72,6 +75,7 @@ public class ControlPane {
         this.settingsDialog = settingsDialog;
         this.connectionsManagerDialog = connectionsManagerDialog;
         this.importDialog = importDialog;
+        this.tasksManagerDialog = tasksManagerDialog;
     }
 
 
@@ -93,6 +97,7 @@ public class ControlPane {
         this.exportFileDialog.buildExportFileDialog(stage);
         this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
         this.importDialog.buildImportDialog(stage);
+        this.tasksManagerDialog.buildTasksManagerDialog(stage);
 
         return hBox;
     }
@@ -148,9 +153,18 @@ public class ControlPane {
         MenuItem exportItem = new MenuItem("Export...");
         exportItem.setOnAction(getExportActionEventHandler());
 
-        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem);
+        MenuItem tasksManagerItem = new MenuItem("Tasks manager...");
+        tasksManagerItem.setOnAction(getTasksManagerActionEventHandler());
+
+        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem, new SeparatorMenuItem(), tasksManagerItem);
 
         return new MenuBar(fileMenu, editMenu, runMenu);
+    }
+
+
+    private EventHandler<ActionEvent> getTasksManagerActionEventHandler() {
+
+            return actionEvent -> this.tasksManagerDialog.showTasksManagerDialog();
     }
 
 
