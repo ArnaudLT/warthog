@@ -1,7 +1,9 @@
 package org.arnaudlt.warthog.ui.util;
 
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class StageFactory {
 
@@ -10,11 +12,19 @@ public class StageFactory {
 
     public static Stage buildModalStage(Stage owner, String title) {
 
+        return buildModalStage(owner, title, Modality.APPLICATION_MODAL, StageStyle.DECORATED, false);
+    }
+
+
+    public static Stage buildModalStage(Stage owner, String title, Modality modality, StageStyle stageStyle, boolean isResizable) {
+
         Stage stage = new Stage();
         stage.setTitle(title);
-        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.getIcons().add(new Image("/warthog_icon.png"));
+        stage.initModality(modality);
+        stage.initStyle(stageStyle);
         stage.initOwner(owner);
-        stage.setResizable(false);
+        stage.setResizable(isResizable);
 
         stage.setOnShowing(ev -> stage.hide());
         stage.setOnShown(ev -> {

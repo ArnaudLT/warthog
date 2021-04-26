@@ -10,17 +10,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class TasksManagerDialog {
+public class BackgroundTasksDialog {
 
 
     private Stage stage;
@@ -29,20 +31,16 @@ public class TasksManagerDialog {
 
 
     @Autowired
-    public TasksManagerDialog(PoolService poolService) {
+    public BackgroundTasksDialog(PoolService poolService) {
 
         this.serviceListView = new ListView<>(poolService.getServices());
         this.serviceListView.setCellFactory(x ->new ServiceCell());
     }
 
 
-    public void buildTasksManagerDialog(Stage owner) {
+    public void buildBackgroundTasksDialog(Stage owner) {
 
-        this.stage = new Stage();
-        stage.setTitle("Tasks manager");
-        stage.initModality(Modality.NONE);
-        stage.initOwner(owner);
-        stage.setResizable(true);
+        this.stage = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.UNIFIED, true);
         stage.setWidth(320);
         stage.setOnShowing(ev -> stage.hide());
         stage.setOnShown(ev -> {

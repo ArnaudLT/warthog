@@ -7,7 +7,7 @@
     => Choose repartition/coalesce
 
 => Azure DFS connector
-    => Import + Export
+    => Export
     => Import a list of files/directory
     => Option to repatition/coalesce(n) after import
 
@@ -26,6 +26,11 @@
 
 => UI :
     => Capability to change the size of the font
+    => Warthog icon on all stage
+
+=> Tasks management :
+    => Rename to 'Background tasks' ?
+    => More precise follow-up of the tasks
 
 => Dataset modifications :
     => Capability to add column ? (primitive types)

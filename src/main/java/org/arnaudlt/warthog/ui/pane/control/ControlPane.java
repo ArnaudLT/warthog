@@ -49,7 +49,7 @@ public class ControlPane {
 
     private final ConnectionsManagerDialog connectionsManagerDialog;
 
-    private final TasksManagerDialog tasksManagerDialog;
+    private final BackgroundTasksDialog backgroundTasksDialog;
 
     private ImportDialog importDialog;
 
@@ -65,7 +65,7 @@ public class ControlPane {
                        ExportDialog exportDialog, GlobalSettings globalSettings,
                        ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
                        ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog,
-                       TasksManagerDialog tasksManagerDialog) {
+                       BackgroundTasksDialog backgroundTasksDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
@@ -75,7 +75,7 @@ public class ControlPane {
         this.settingsDialog = settingsDialog;
         this.connectionsManagerDialog = connectionsManagerDialog;
         this.importDialog = importDialog;
-        this.tasksManagerDialog = tasksManagerDialog;
+        this.backgroundTasksDialog = backgroundTasksDialog;
     }
 
 
@@ -97,7 +97,7 @@ public class ControlPane {
         this.exportFileDialog.buildExportFileDialog(stage);
         this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
         this.importDialog.buildImportDialog(stage);
-        this.tasksManagerDialog.buildTasksManagerDialog(stage);
+        this.backgroundTasksDialog.buildBackgroundTasksDialog(stage);
 
         return hBox;
     }
@@ -153,18 +153,18 @@ public class ControlPane {
         MenuItem exportItem = new MenuItem("Export...");
         exportItem.setOnAction(getExportActionEventHandler());
 
-        MenuItem tasksManagerItem = new MenuItem("Tasks manager ...");
-        tasksManagerItem.setOnAction(getTasksManagerActionEventHandler());
+        MenuItem backgroundTasksItem = new MenuItem("Background tasks...");
+        backgroundTasksItem.setOnAction(getBackgroundTasksActionEventHandler());
 
-        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem, new SeparatorMenuItem(), tasksManagerItem);
+        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem, new SeparatorMenuItem(), backgroundTasksItem);
 
         return new MenuBar(fileMenu, editMenu, runMenu);
     }
 
 
-    private EventHandler<ActionEvent> getTasksManagerActionEventHandler() {
+    private EventHandler<ActionEvent> getBackgroundTasksActionEventHandler() {
 
-            return actionEvent -> this.tasksManagerDialog.showTasksManagerDialog();
+            return actionEvent -> this.backgroundTasksDialog.showTasksManagerDialog();
     }
 
 
