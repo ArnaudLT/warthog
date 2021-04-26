@@ -88,7 +88,7 @@ public class BackgroundTasksDialog {
 
             this.label = new Label();
             Pane pane = new Pane();
-            this.cancelButton = new Button("", new MDL2IconFont("\uE711"));
+            this.cancelButton = new Button("", new MDL2IconFont("\uF78A"));
 
             HBox hBox = new HBox(this.label, pane, cancelButton);
             hBox.setAlignment(Pos.CENTER);
