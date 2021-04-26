@@ -153,7 +153,7 @@ public class ControlPane {
         MenuItem exportItem = new MenuItem("Export...");
         exportItem.setOnAction(getExportActionEventHandler());
 
-        MenuItem tasksManagerItem = new MenuItem("Tasks manager...");
+        MenuItem tasksManagerItem = new MenuItem("Tasks manager ...");
         tasksManagerItem.setOnAction(getTasksManagerActionEventHandler());
 
         runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem, new SeparatorMenuItem(), tasksManagerItem);

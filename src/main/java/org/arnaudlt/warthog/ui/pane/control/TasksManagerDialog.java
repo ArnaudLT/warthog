@@ -8,13 +8,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.MDL2IconFont;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
-import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class TasksManagerDialog {
 
 
-    private  Stage dialog;
+    private Stage stage;
 
     private final ListView<Service<?>> serviceListView;
 
@@ -38,19 +38,36 @@ public class TasksManagerDialog {
 
     public void buildTasksManagerDialog(Stage owner) {
 
-        dialog = StageFactory.buildModalStage(owner, "Tasks manager");
+        this.stage = new Stage();
+        stage.setTitle("Tasks manager");
+        stage.initModality(Modality.NONE);
+        stage.initOwner(owner);
+        stage.setResizable(true);
+        stage.setWidth(320);
+        stage.setOnShowing(ev -> stage.hide());
+        stage.setOnShown(ev -> {
+
+            double centerX = owner.getX() + owner.getWidth() / 1.3d;
+            double centerY = owner.getY() + owner.getHeight() / 2d;
+            stage.setX(centerX - stage.getWidth() / 2d);
+            stage.setY(centerY - stage.getHeight() / 2d);
+
+            stage.show();
+        });
+
+        this.serviceListView.setPlaceholder(new Label("No background tasks are running"));
 
         Scene dialogScene = new Scene(this.serviceListView);
         JMetro metro = new JMetro(Style.LIGHT);
         metro.setAutomaticallyColorPanes(true);
         metro.setScene(dialogScene);
-        dialog.setScene(dialogScene);
+        stage.setScene(dialogScene);
     }
 
 
     public void showTasksManagerDialog() {
 
-        this.dialog.show();
+        this.stage.show();
     }
 
 

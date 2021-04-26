@@ -55,6 +55,7 @@ public class OutputPane {
         this.owner = owner;
 
         this.tableView = new TableView<>();
+        this.tableView.setPlaceholder(new Label("No data to display"));
         this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.tableView.getSelectionModel().setCellSelectionEnabled(true);
 
