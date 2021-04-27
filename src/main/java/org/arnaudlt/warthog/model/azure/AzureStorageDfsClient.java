@@ -17,7 +17,6 @@ import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -57,59 +56,46 @@ public class AzureStorageDfsClient {
     }
 
 
-    public static File download(Connection connection, String container, String azDirectoryPath, String localDirectoryPath) throws IOException {
-
-        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
-        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(azDirectoryPath);
-
-        createDirectory(Paths.get(localDirectoryPath, container, azDirectoryPath));
-
-        PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
-        log.info("Starting to download {}/{}", container, azDirectoryPath);
-        for (PathItem pathItem : pathItems) {
-
-            downloadOnePathItem(container, localDirectoryPath, fileSystem, pathItem);
-        }
-        log.info("Download of {}/{} completed", container, azDirectoryPath);
-        return Paths.get(localDirectoryPath, container, azDirectoryPath).toFile();
-    }
-
-
-    private static void downloadOnePathItem(String container, String localDirectoryPath, DataLakeFileSystemClient fileSystem, PathItem pathItem) throws IOException {
+    public static long downloadOnePathItem(String container, String localDirectoryPath, DataLakeFileSystemClient fileSystem, PathItem pathItem) throws IOException {
 
         Path localFilePath = Paths.get(localDirectoryPath, container, pathItem.getName());
 
+        final long fileSize;
         if (!pathItem.isDirectory()) {
 
             log.info("Downloading file : {}", localFilePath);
             createDirectory(localFilePath.getParent());
 
-            downloadOneFile(fileSystem, pathItem, localFilePath);
+            fileSize = downloadOneFile(fileSystem, pathItem, localFilePath);
         } else {
             // Allow to keep empty directories
             createDirectory(localFilePath);
+            fileSize = 0;
         }
+        return fileSize;
     }
 
 
-    private static void downloadOneFile(DataLakeFileSystemClient fileSystem, PathItem pathItem, Path localFilePath) {
+    private static long downloadOneFile(DataLakeFileSystemClient fileSystem, PathItem pathItem, Path localFilePath) {
 
         DataLakeDirectoryClient dc = fileSystem.getDirectoryClient(Paths.get(pathItem.getName()).getParent().toString());
         String fileName = Paths.get(pathItem.getName()).getFileName().toString();
         DataLakeFileClient fileClient = dc.getFileClient(fileName);
 
         fileClient.readToFile(localFilePath.toString());
+
+        return fileClient.getProperties().getFileSize();
     }
 
 
-    private static DataLakeFileSystemClient getDataLakeFileSystemClient(Connection connection, String container) {
+    public static DataLakeFileSystemClient getDataLakeFileSystemClient(Connection connection, String container) {
 
         DataLakeServiceClient datalakeServiceClient = getDataLakeServiceClient(connection);
         return datalakeServiceClient.getFileSystemClient(container);
     }
 
 
-    private static void createDirectory(Path targetDirectoryPath) throws IOException {
+    public static void createDirectory(Path targetDirectoryPath) throws IOException {
 
         if (!Files.exists(targetDirectoryPath)) {
             log.info("Creating directory : {}", targetDirectoryPath);

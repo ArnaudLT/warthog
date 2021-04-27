@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Optional;
 
 
 @Slf4j
@@ -115,19 +116,14 @@ public class ImportDialog {
         gridAzureStorage.addRow(k++, containerLabel, container);
 
         Label pathLabel = new Label("Directory :");
-        TextField azPath = new TextField();
-        azPath.setMinWidth(200);
-        azPath.setMaxWidth(200);
+        TextField azPathField = new TextField();
+        azPathField.setMinWidth(200);
+        azPathField.setMaxWidth(200);
 
         Button azExplorerButton = new Button("...");
         azExplorerButton.setOnAction(event -> AlertFactory.showInformationAlert(owner, "Not yet implemented"));
 
-        gridAzureStorage.addRow(k++, pathLabel, azPath, azExplorerButton);
-
-/*        Label downloadOnlyLabel = new Label("Download only :");
-        CheckBox downloadOnly = new CheckBox();
-
-        gridAzureStorage.addRow(k++, downloadOnlyLabel, downloadOnly);*/
+        gridAzureStorage.addRow(k++, pathLabel, azPathField, azExplorerButton);
 
         gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
 
@@ -137,27 +133,39 @@ public class ImportDialog {
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
             if (selectedConnection != null) {
 
-                DirectoryChooser dc = new DirectoryChooser();
-                File targetDirectory = dc.showDialog(owner);
-                if (targetDirectory != null) {
+                final String azContainer = container.getText();
+                final String azPath = azPathField.getText();
 
-                    ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
-                            new ImportAzureDfsStorageSettings(container.getText(), azPath.getText(), targetDirectory.getAbsolutePath());
-                    importFromAzure(selectedConnection, importAzureDfsStorageSettings);
-                    dialog.close();
-                }
+                importAzureButton.setDisable(true);
+                DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, azContainer, azPath);
+                directoryStatisticsService.setOnSucceeded(success -> {
+
+                    DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
+                    AlertFactory.showConfirmationAlert(owner, "Do you really want to download " + statistics.filesCount + " files for " + statistics.bytes / 1_000_000 + " MB ?")
+                            .filter(button -> button == ButtonType.OK)
+                            .ifPresent(b -> {
+
+                                DirectoryChooser dc = new DirectoryChooser();
+                                File localDirectory = dc.showDialog(owner);
+                                if (localDirectory != null) {
+
+                                    ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
+                                            new ImportAzureDfsStorageSettings(azContainer, azPath, localDirectory.getAbsolutePath());
+                                    importFromAzure(selectedConnection, importAzureDfsStorageSettings, statistics);
+                                    dialog.close();
+                                }
+                            });
+                    importAzureButton.setDisable(false);
+                });
+                directoryStatisticsService.setOnFailed(fail -> {
+                    importAzureButton.setDisable(false);
+                    AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azPath + "'");
+                });
+                directoryStatisticsService.start();
             }
         });
 
-        Button checkSizeButton = new Button("Check size");
-        checkSizeButton.setOnAction(event -> {
-
-            Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
-            if (selectedConnection != null) {
-                checkDirectorySize(checkSizeButton, selectedConnection, container.getText(), azPath.getText());
-            }
-        });
-        gridAzureStorage.addRow(k, importAzureButton, checkSizeButton);
+        gridAzureStorage.addRow(k, importAzureButton);
 
         // ===============
 
@@ -200,33 +208,16 @@ public class ImportDialog {
     }
 
 
-    public void importFromAzure(Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings) {
+    public void importFromAzure(Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings,
+                                DirectoryStatisticsService.DirectoryStatistics statistics) {
 
         NamedDatasetImportFromAzureDfsStorageService importService = new NamedDatasetImportFromAzureDfsStorageService(
-                poolService, namedDatasetManager, connection, importAzureDfsStorageSettings);
+                poolService, namedDatasetManager, connection, importAzureDfsStorageSettings, statistics);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail,
                 "Not able to import the dataset '" + importAzureDfsStorageSettings.getAzDirectoryPath() + "'"));
         importService.start();
     }
 
-
-    private void checkDirectorySize(Button checkSizeButton, Connection connection, String container, String path) {
-
-        checkSizeButton.setDisable(true);
-        DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, connection, container, path);
-        directoryStatisticsService.setOnSucceeded(success -> {
-
-            checkSizeButton.setDisable(false);
-            DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
-            AlertFactory.showInformationAlert(owner, statistics.filesCount + " files" + " for " + statistics.bytes / 1_000_000 + " MB");
-        });
-        directoryStatisticsService.setOnFailed(fail -> {
-
-            checkSizeButton.setDisable(false);
-            AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + path + "'");
-        });
-        directoryStatisticsService.start();
-    }
 
 }

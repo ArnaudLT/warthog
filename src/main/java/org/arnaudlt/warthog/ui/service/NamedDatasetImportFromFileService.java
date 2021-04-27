@@ -30,7 +30,7 @@ public class NamedDatasetImportFromFileService extends AbstractMonitoredService<
 
         return new Task<>() {
             @Override
-            protected NamedDataset call() throws InterruptedException {
+            protected NamedDataset call() {
 
                 log.info("Start importing a named dataset from {}", file.getAbsolutePath());
                 updateMessage("Importing " + file.getName());
