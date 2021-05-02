@@ -34,13 +34,12 @@ public class BackgroundTasksDialog {
     public BackgroundTasksDialog(PoolService poolService) {
 
         this.serviceListView = new ListView<>(poolService.getServices());
-        this.serviceListView.setCellFactory(x ->new ServiceCell());
     }
 
 
     public void buildBackgroundTasksDialog(Stage owner) {
 
-        this.stage = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.UNIFIED, true);
+        this.stage = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.DECORATED, true);
         stage.setWidth(320);
         stage.setOnShowing(ev -> stage.hide());
         stage.setOnShown(ev -> {
@@ -53,6 +52,7 @@ public class BackgroundTasksDialog {
             stage.show();
         });
 
+        this.serviceListView.setCellFactory(x ->new ServiceCell());
         this.serviceListView.setPlaceholder(new Label("No background tasks are running"));
 
         Scene dialogScene = new Scene(this.serviceListView);

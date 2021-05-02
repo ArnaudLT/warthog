@@ -9,7 +9,6 @@
 => Azure DFS connector
     => Export
     => Import a list of files/directory
-    => Import button automatically check the size (can be used for progress % :-) )
     => Option to repatition/coalesce(n) after import
 
 => Query builder :
@@ -38,8 +37,6 @@
     => Capability to empty a dataset
     => Capability to add / remove lines
 
-=> Global
-    => Kill a SQL query execution
 
 ### DEPLOY
 

@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -13,12 +14,12 @@ import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromAzureDfsStorageService;
@@ -31,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.Optional;
 
 
 @Slf4j
@@ -81,6 +81,40 @@ public class ImportDialog {
         common.add(new Separator(Orientation.HORIZONTAL), 0, i, 3, 1);
 
         // =============== Import from database ===============
+        Node gridDatabase = getDatabaseImportNode();
+
+        // ==============================
+
+        // =============== Import from Azure storage ===============
+        Node gridAzureStorage = getAzureStorageImportNode();
+
+        // ===============
+
+        gridDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
+            Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
+            return selectedConnection != null && (
+                    selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
+                            selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
+        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+
+        gridAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
+            Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
+            return selectedConnection != null &&
+                    selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
+        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+
+        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
+                this.dialog.getScene().getWindow().sizeToScene());
+        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
+        JMetro metro = new JMetro(Style.LIGHT);
+        metro.setAutomaticallyColorPanes(true);
+        metro.setScene(dialogScene);
+        dialog.setScene(dialogScene);
+    }
+
+
+    public Node getDatabaseImportNode() {
+
         GridPane gridDatabase = GridFactory.buildGrid();
 
         int j = 0;
@@ -104,9 +138,13 @@ public class ImportDialog {
             }
         });
         gridDatabase.addRow(j, importTableButton);
-        // ==============================
 
-        // =============== Import from Azure storage ===============
+        return gridDatabase;
+    }
+
+
+    public Node getAzureStorageImportNode() {
+
         GridPane gridAzureStorage = GridFactory.buildGrid();
         int k = 0;
 
@@ -120,10 +158,7 @@ public class ImportDialog {
         azPathField.setMinWidth(200);
         azPathField.setMaxWidth(200);
 
-        Button azExplorerButton = new Button("...");
-        azExplorerButton.setOnAction(event -> AlertFactory.showInformationAlert(owner, "Not yet implemented"));
-
-        gridAzureStorage.addRow(k++, pathLabel, azPathField, azExplorerButton);
+        gridAzureStorage.addRow(k++, pathLabel, azPathField);
 
         gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
 
@@ -167,28 +202,7 @@ public class ImportDialog {
 
         gridAzureStorage.addRow(k, importAzureButton);
 
-        // ===============
-
-        gridDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
-            Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
-            return selectedConnection != null && (
-                    selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
-                            selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
-        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
-
-        gridAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
-            Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
-            return selectedConnection != null &&
-                    selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
-        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
-
-        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
-                this.dialog.getScene().getWindow().sizeToScene());
-        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(dialogScene);
-        dialog.setScene(dialogScene);
+        return gridAzureStorage;
     }
 
 
