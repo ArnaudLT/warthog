@@ -27,13 +27,13 @@ public class BackgroundTasksDialog {
 
     private Stage stage;
 
-    private final ListView<Service<?>> serviceListView;
+    private final PoolService poolService;
 
 
     @Autowired
     public BackgroundTasksDialog(PoolService poolService) {
 
-        this.serviceListView = new ListView<>(poolService.getServices());
+        this.poolService = poolService;
     }
 
 
@@ -52,13 +52,11 @@ public class BackgroundTasksDialog {
             stage.show();
         });
 
-        this.serviceListView.setCellFactory(x ->new ServiceCell());
-        this.serviceListView.setPlaceholder(new Label("No background tasks are running"));
+        ListView<Service<?>> serviceListView = new ListView<>(poolService.getServices());
+        serviceListView.setCellFactory(x ->new ServiceCell());
+        serviceListView.setPlaceholder(new Label("No background tasks are running"));
 
-        Scene dialogScene = new Scene(this.serviceListView);
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(dialogScene);
+        Scene dialogScene = StageFactory.buildScene(serviceListView);
         stage.setScene(dialogScene);
     }
 

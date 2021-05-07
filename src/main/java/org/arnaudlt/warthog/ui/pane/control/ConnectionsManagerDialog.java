@@ -183,10 +183,7 @@ public class ConnectionsManagerDialog {
 
         hBox.getChildren().add(new VBox(controlButtons, connectionsList));
         hBox.getChildren().add(connectionDetails);
-        Scene dialogScene = new Scene(hBox, 750, 400);
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(dialogScene);
+        Scene dialogScene = StageFactory.buildScene(hBox, 750, 400);
         connectionManagerStage.setScene(dialogScene);
     }
 
@@ -245,7 +242,7 @@ public class ConnectionsManagerDialog {
             connection.setClientId(clientId.getText());
             connection.setClientKey(clientKey.getText());
             connection.setProxyUrl(proxyUrl.getText());
-            connection.setProxyPort(Integer.parseInt(proxyPort.getText()));
+            connection.setProxyPort(Integer.parseInt(proxyPort.getText())); // TODO handle the NumberFormatException exception please :-)
             connection.setStorageAccount(storageAccount.getText());
             log.info("Saving {}", connection);
 

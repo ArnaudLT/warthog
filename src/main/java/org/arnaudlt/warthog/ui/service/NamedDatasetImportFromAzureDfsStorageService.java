@@ -73,13 +73,13 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
         @Override
         protected NamedDataset call() throws Exception {
 
-            updateMessage("Importing " + importAzureDfsStorageSettings.getContainer() + "/" +
+            updateMessage("Importing " + importAzureDfsStorageSettings.getAzContainer() + "/" +
                     importAzureDfsStorageSettings.getAzDirectoryPath());
             long totalWork = statistics.bytes + 5_000_000; // 5_000_000 is an arbitrary amount for the creation and the registration of the dataset
             long workDone = 0;
             updateProgress(workDone, totalWork);
 
-            final String container = importAzureDfsStorageSettings.getContainer();
+            final String container = importAzureDfsStorageSettings.getAzContainer();
             final String azDirectoryPath = importAzureDfsStorageSettings.getAzDirectoryPath();
             final String localDirectoryPath = importAzureDfsStorageSettings.getLocalDirectoryPath();
 

@@ -132,13 +132,10 @@ public class ExportDialog {
                     selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
         }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
-
         connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
                 this.dialog.getScene().getWindow().sizeToScene());
-        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(dialogScene);
+
+        Scene dialogScene = StageFactory.buildScene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
         dialog.setScene(dialogScene);
     }
 

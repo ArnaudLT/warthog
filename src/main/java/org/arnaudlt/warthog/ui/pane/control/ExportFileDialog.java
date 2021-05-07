@@ -131,10 +131,7 @@ public class ExportFileDialog {
         });
         grid.addRow(i, exportButton);
 
-        Scene dialogScene = new Scene(grid);
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(dialogScene);
+        Scene dialogScene = StageFactory.buildScene(grid);
         dialog.setScene(dialogScene);
     }
 

@@ -1,9 +1,13 @@
 package org.arnaudlt.warthog.ui.util;
 
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.Style;
 
 public class StageFactory {
 
@@ -38,6 +42,33 @@ public class StageFactory {
         });
 
         return stage;
+    }
+
+
+    public static Scene buildScene(Parent root, double width, double height) {
+
+        Scene dialogScene = new Scene(root, width, height);
+        return enrichScene(dialogScene);
+    }
+
+
+    public static Scene buildScene(Parent root) {
+
+        Scene dialogScene = new Scene(root);
+        return enrichScene(dialogScene);
+    }
+
+
+    private static Scene enrichScene(Scene scene) {
+
+        JMetro metro = new JMetro(Style.LIGHT);
+        metro.setAutomaticallyColorPanes(true);
+        metro.setScene(scene);
+        String styleSheet = StageFactory.class.getResource("/style.css").toExternalForm();
+        String sqlStyleSheet = StageFactory.class.getResource("/sql-keywords.css").toExternalForm();
+        scene.getStylesheets().add(styleSheet);
+        scene.getStylesheets().add(sqlStyleSheet);
+        return scene;
     }
 
 }

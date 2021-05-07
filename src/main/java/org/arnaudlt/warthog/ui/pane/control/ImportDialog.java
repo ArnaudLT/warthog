@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -11,8 +10,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
@@ -32,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -67,37 +66,36 @@ public class ImportDialog {
         this.owner = owner;
         this.dialog = StageFactory.buildModalStage(owner, "Import");
 
-        GridPane common = GridFactory.buildGrid(new Insets(20, 20, 0, 20));
+        GridPane common = GridFactory.buildGrid();
 
         int i = 0;
 
         Label connectionLabel = new Label("Connection :");
         connectionsListBox = new ComboBox<>(connectionsCollection.getConnections());
+        connectionsListBox.setMinWidth(300);
+        connectionsListBox.setMaxWidth(300);
         connectionsListBox.getSelectionModel().selectFirst();
-        connectionsListBox.setMinWidth(220);
-        connectionsListBox.setMaxWidth(220);
+
         common.addRow(i++, connectionLabel, connectionsListBox);
 
-        common.add(new Separator(Orientation.HORIZONTAL), 0, i, 3, 1);
-
         // =============== Import from database ===============
-        Node gridDatabase = getDatabaseImportNode();
+        Node nodeDatabase = getDatabaseImportNode();
 
         // ==============================
 
         // =============== Import from Azure storage ===============
-        Node gridAzureStorage = getAzureStorageImportNode();
+        Node nodeAzureStorage = getAzureStorageImportNode();
 
         // ===============
 
-        gridDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
+        nodeDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
             return selectedConnection != null && (
                     selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
                             selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
         }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
-        gridAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
+        nodeAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
             return selectedConnection != null &&
                     selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
@@ -105,28 +103,27 @@ public class ImportDialog {
 
         connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
                 this.dialog.getScene().getWindow().sizeToScene());
-        Scene dialogScene = new Scene(new VBox(common, new Group(gridDatabase, gridAzureStorage)));
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(dialogScene);
+
+        Scene dialogScene = StageFactory.buildScene(new VBox(common, new Group(nodeDatabase, nodeAzureStorage)));
         dialog.setScene(dialogScene);
     }
 
 
     public Node getDatabaseImportNode() {
 
-        GridPane gridDatabase = GridFactory.buildGrid();
-
-        int j = 0;
+        GridPane basicSettingsNode = GridFactory.buildGrid();
 
         Label tableNameLabel = new Label("Table name :");
         TextField tableName = new TextField();
-        tableName.setMinWidth(200);
-        tableName.setMaxWidth(200);
-        gridDatabase.addRow(j++, tableNameLabel, tableName);
+        tableName.setMinWidth(300);
+        tableName.setMaxWidth(300);
+        basicSettingsNode.addRow(0, tableNameLabel, tableName);
 
-        gridDatabase.add(new Separator(Orientation.HORIZONTAL), 0, j++, 2, 1);
+        Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
+        TabPane tabPane = new TabPane(basicSettingsTab);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
+        GridPane bottomGrid = GridFactory.buildGrid();
         Button importTableButton = new Button("Import");
         importTableButton.setOnAction(event -> {
 
@@ -137,72 +134,111 @@ public class ImportDialog {
                 dialog.close();
             }
         });
-        gridDatabase.addRow(j, importTableButton);
+        bottomGrid.addRow(0, importTableButton);
 
-        return gridDatabase;
+        return new VBox(tabPane, bottomGrid);
     }
 
 
     public Node getAzureStorageImportNode() {
 
-        GridPane gridAzureStorage = GridFactory.buildGrid();
-        int k = 0;
+        // Basic settings
+        GridPane basicSettingsNode = GridFactory.buildGrid();
+        int rowIndex = 0;
 
-        Label containerLabel = new Label("Container :");
-        TextField container = new TextField();
+        Label azContainerLabel = new Label("Azure container :");
+        TextField azContainerField = new TextField();
+        azContainerField.setMinWidth(300);
+        azContainerField.setMaxWidth(300);
+        basicSettingsNode.addRow(rowIndex++, azContainerLabel, azContainerField);
 
-        gridAzureStorage.addRow(k++, containerLabel, container);
+        Label azDirectoryLabel = new Label("Azure directory :");
+        TextField azDirectoryField = new TextField();
+        basicSettingsNode.addRow(rowIndex++, azDirectoryLabel, azDirectoryField);
 
-        Label pathLabel = new Label("Directory :");
-        TextField azPathField = new TextField();
-        azPathField.setMinWidth(200);
-        azPathField.setMaxWidth(200);
+        basicSettingsNode.add(new Separator(Orientation.HORIZONTAL), 0, rowIndex++, 3, 1);
 
-        gridAzureStorage.addRow(k++, pathLabel, azPathField);
+        Label localDirectoryLabel = new Label("Local directory :");
+        TextField localDirectoryField = new TextField();
+        Button directoryChooserButton = new Button("...");
+        directoryChooserButton.setOnAction(event -> {
 
-        gridAzureStorage.add(new Separator(Orientation.HORIZONTAL), 0, k++, 2, 1);
+            DirectoryChooser fc = new DirectoryChooser();
+            File exportFile = fc.showDialog(this.dialog);
+            if (localDirectoryField.getText() != null) {
+                fc.setInitialDirectory(new File(localDirectoryField.getText()));
+            }
+            if (exportFile == null) return;
+            localDirectoryField.setText(exportFile.getAbsolutePath());
+        });
+        basicSettingsNode.addRow(rowIndex++, localDirectoryLabel, localDirectoryField, directoryChooserButton);
 
-        Button importAzureButton = new Button("Import...");
+        Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
+
+        // Advanced settings
+        GridPane advancedSettingsNode = GridFactory.buildGrid();
+        rowIndex = 0;
+
+        Label listOfFilesLabel = new Label("List of files \n(1 file per line or\nleave empty for all):");
+        TextArea listOfFilesArea = new TextArea();
+        listOfFilesArea.setPrefRowCount(5);
+        listOfFilesArea.setMinWidth(300);
+        listOfFilesArea.setMaxWidth(300);
+        advancedSettingsNode.addRow(rowIndex++, listOfFilesLabel, listOfFilesArea);
+
+        advancedSettingsNode.add(new Separator(Orientation.HORIZONTAL), 0, rowIndex++, 2, 1);
+
+        Label basePathLabel = new Label("Import base path :");
+        TextField basePathField = new TextField();
+        advancedSettingsNode.addRow(rowIndex++, basePathLabel, basePathField);
+
+        Tab advancedSettingsTab = new Tab("Advanced", advancedSettingsNode);
+        TabPane tabPane = new TabPane(basicSettingsTab, advancedSettingsTab);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        GridPane bottomGrid = GridFactory.buildGrid();
+        Button importAzureButton = new Button("Import");
         importAzureButton.setOnAction(event -> {
 
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
-            if (selectedConnection != null) {
+            if (selectedConnection == null) return;
 
-                final String azContainer = container.getText();
-                final String azPath = azPathField.getText();
+            final String azContainer = azContainerField.getText();
+            final String azPath = azDirectoryField.getText();
+            final String localDirectory = localDirectoryField.getText();
+            final String basePath = basePathField.getText();
+            final List<String> listOfFiles = listOfFilesArea.getParagraphs()
+                    .stream()
+                    .map(CharSequence::toString)
+                    .collect(Collectors.toList());
 
-                importAzureButton.setDisable(true);
-                DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, azContainer, azPath);
-                directoryStatisticsService.setOnSucceeded(success -> {
+            ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
+                    new ImportAzureDfsStorageSettings(azContainer, azPath, localDirectory, basePath, listOfFiles);
 
-                    DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
-                    AlertFactory.showConfirmationAlert(owner, "Do you really want to download " + statistics.filesCount + " files for " + statistics.bytes / 1_000_000 + " MB ?")
-                            .filter(button -> button == ButtonType.OK)
-                            .ifPresent(b -> {
+            DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
+            directoryStatisticsService.setOnSucceeded(success -> {
 
-                                DirectoryChooser dc = new DirectoryChooser();
-                                File localDirectory = dc.showDialog(owner);
-                                if (localDirectory != null) {
+                DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
+                AlertFactory.showConfirmationAlert(owner, "Do you want to download " + statistics.filesCount + " files for " + statistics.bytes / 1_000_000 + " MB ?")
+                        .filter(button -> button == ButtonType.OK)
+                        .ifPresent(b -> {
 
-                                    ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
-                                            new ImportAzureDfsStorageSettings(azContainer, azPath, localDirectory.getAbsolutePath());
-                                    importFromAzure(selectedConnection, importAzureDfsStorageSettings, statistics);
-                                    dialog.close();
-                                }
-                            });
-                    importAzureButton.setDisable(false);
-                });
-                directoryStatisticsService.setOnFailed(fail -> {
-                    importAzureButton.setDisable(false);
-                    AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azPath + "'");
-                });
-                directoryStatisticsService.start();
-            }
+                            importFromAzure(selectedConnection, importAzureDfsStorageSettings, statistics);
+                            dialog.close();
+                        });
+                importAzureButton.setDisable(false);
+            });
+            directoryStatisticsService.setOnFailed(fail -> {
+                importAzureButton.setDisable(false);
+                AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azPath + "'");
+            });
+            directoryStatisticsService.start();
+            importAzureButton.setDisable(true);
         });
 
-        gridAzureStorage.addRow(k, importAzureButton);
+        bottomGrid.addRow(0, importAzureButton);
 
-        return gridAzureStorage;
+        return new VBox(tabPane, bottomGrid);
     }
 
 

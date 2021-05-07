@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.*;
@@ -97,17 +98,8 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         mainPane.setStage(stage);
         Parent root = mainPane.build();
 
-        Scene scene = new Scene(root, 1280, 720);
-        String styleSheet = getClass().getResource("/style.css").toExternalForm();
-        String sqlStyleSheet = getClass().getResource("/sql-keywords.css").toExternalForm();
-
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(false);
-        metro.setScene(scene);
-
+        Scene scene = StageFactory.buildScene(root, 1280, 720);
         stage.setScene(scene);
-        scene.getStylesheets().add(styleSheet);
-        scene.getStylesheets().add(sqlStyleSheet);
         stage.show();
     }
 

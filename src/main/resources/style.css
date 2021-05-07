@@ -20,6 +20,10 @@
     -fx-padding: 0.5em 2em 0.5em 0; /* 8 24 8 0 */
 }
 
+.text-field {
+    -right-button-visible: false
+}
+
 
 .progress-bar:indeterminate .dot_1 {
     -fx-background-color: ACCENT_COLOR;
