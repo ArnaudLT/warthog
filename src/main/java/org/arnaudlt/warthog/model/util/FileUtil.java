@@ -1,18 +1,11 @@
 package org.arnaudlt.warthog.model.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 public class FileUtil {
@@ -21,43 +14,26 @@ public class FileUtil {
     private FileUtil() {}
 
 
-    public static Format getFileType(File file) throws IOException {
+    public static Format getFileType(List<Path> filePaths) {
 
-        if (file.isDirectory()) {
-
-            try (Stream<Path> walk = Files.walk(file.toPath(), FileVisitOption.FOLLOW_LINKS)) {
-
-                String fileType = walk
-                        .map(Path::toFile)
-                        .dropWhile(File::isDirectory)
-                        .map(FileUtil::getLowerCaseExtension)
-                        .dropWhile(ext -> Format.valueFromLabel(ext) == null)
-                        .findAny()
-                        .orElseThrow(() -> new ProcessingException(String.format("Not able to determine the file type of %s", file)));
-                log.info("A directory with {} files inside", fileType);
-                return Format.valueFromLabel(fileType);
-            }
-
-        } else if (file.getName().contains(".")) {
-
-            String fileType = getLowerCaseExtension(file);
-            log.info("A {} file", fileType);
-            return Format.valueFromLabel(fileType);
-        }
-
-        throw new ProcessingException(String.format("Not able to determine the file type of %s", file));
+        String fileType = filePaths.stream()
+                .map(f -> getLowerCaseExtension(f.getFileName().toString()))
+                .dropWhile(ext -> Format.valueFromLabel(ext) == null)
+                .findAny()
+                .orElseThrow(() -> new ProcessingException("Not able to determine the file type"));
+        return Format.valueFromLabel(fileType);
     }
 
 
-    public static String getLowerCaseExtension(File file) {
+    public static String getLowerCaseExtension(String fileName) {
 
-        return file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
+        return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     }
 
 
-    public static String inferSeparator(File file) throws IOException {
+    public static String inferSeparator(List<Path> filePaths) {
 
-        File fileToRead = findAnyCsvFile(file);
+        File fileToRead = findAnyCsvFile(filePaths);
 
         List<String> testedSeparator = List.of(",", ";", "\\t", "\\|", "\\$");
         for (String separator : testedSeparator) {
@@ -79,27 +55,17 @@ public class FileUtil {
     }
 
 
-    private static File findAnyCsvFile(File file) throws IOException {
+    private static File findAnyCsvFile(List<Path> filePaths) {
 
-        if (file.isDirectory()) {
-
-            try (Stream<Path> walk = Files.walk(file.toPath(), FileVisitOption.FOLLOW_LINKS)) {
-
-                File anyCsv = walk
-                        .map(Path::toFile)
-                        .dropWhile(File::isDirectory)
-                        .dropWhile(f -> !"csv".equals(getLowerCaseExtension(f)))
-                        .findAny()
-                        .orElseThrow(() -> new ProcessingException(String.format("Not able to find any csv file in directory %s ", file)));
-                log.info("{} has been found in {}", anyCsv, file);
-                return anyCsv;
-            }
-        }
-        return file;
+        return filePaths.stream()
+                .dropWhile(path -> !"csv".equals(getLowerCaseExtension(path.getFileName().toString())))
+                .findAny()
+                .orElseThrow(() -> new ProcessingException("Not able to find any csv file in the list"))
+                .toFile();
     }
 
 
-    private static boolean isAValidSeparator(File file, String separator) throws IOException {
+    private static boolean isAValidSeparator(File file, String separator) {
 
         String line;
         int lineIndex = 0;
@@ -121,18 +87,17 @@ public class FileUtil {
                 }
                 lineIndex++;
             }
+        } catch (IOException e) {
+            throw new ProcessingException(String.format("Error while reading file %s", file.getName()), e);
         }
         return true;
     }
 
 
-    public static double getSizeInMegaBytes(File file) {
+    public static double getSizeInMegaBytes(List<Path> filePaths) {
 
-        if (file.isDirectory()) {
-
-            return FileUtils.sizeOfDirectory(file) / 1024d / 1024d;
-        } else {
-            return file.length() / 1024d / 1024d;
-        }
+        return filePaths.stream()
+                .mapToDouble(path -> path.toFile().length() / 1024d / 1024d)
+                .sum();
     }
 }

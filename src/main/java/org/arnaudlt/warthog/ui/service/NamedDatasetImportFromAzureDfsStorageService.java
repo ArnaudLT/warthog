@@ -13,7 +13,10 @@ import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.arnaudlt.warthog.model.azure.AzureStorageDfsClient.*;
 
@@ -86,20 +89,24 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
             DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
             DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(azDirectoryPath);
 
-            createDirectory(Paths.get(localDirectoryPath, container, azDirectoryPath));
+            Path basePath = Paths.get(localDirectoryPath, container, azDirectoryPath);
+            createDirectory(basePath);
 
+            List<Path> listOfPaths = new ArrayList<>();
             PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
             log.info("Starting to download {}/{}", container, azDirectoryPath);
             for (PathItem pathItem : pathItems) {
 
-                workDone += downloadOnePathItem(container, localDirectoryPath, fileSystem, pathItem);
+                Path localFilePath = Paths.get(localDirectoryPath, container, pathItem.getName());
+                workDone += downloadOnePathItem(fileSystem, pathItem, localFilePath);
+                listOfPaths.add(localFilePath);
                 updateProgress(workDone, totalWork);
             }
             log.info("Download of {}/{} completed", container, azDirectoryPath);
-            File dl = Paths.get(localDirectoryPath, container, azDirectoryPath).toFile();
-
             updateProgress(statistics.bytes, totalWork);
-            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(dl);
+
+            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(basePath, listOfPaths);
+
             namedDatasetManager.registerNamedDataset(namedDataset);
             updateProgress(totalWork, totalWork);
             return namedDataset;

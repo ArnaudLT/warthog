@@ -11,7 +11,6 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.objectinspector.*;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.AbstractPrimitiveJavaObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.JavaIntObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorUtils;
 import org.apache.hadoop.io.DoubleWritable;
@@ -107,7 +106,7 @@ public class SumArrays extends AbstractGenericUDAFResolver {
         }
 
         @Override
-        public void iterate(AggregationBuffer agg, Object[] parameters) throws HiveException {
+        public void iterate(AggregationBuffer agg, Object[] parameters) {
 
             merge(agg, parameters[0]);
         }

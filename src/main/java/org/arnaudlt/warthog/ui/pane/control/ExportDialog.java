@@ -10,8 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.connection.Connection;

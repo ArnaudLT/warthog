@@ -1,6 +1,5 @@
 package org.arnaudlt.warthog.ui.service;
 
-import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;

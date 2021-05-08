@@ -18,10 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -39,56 +44,94 @@ public class NamedDatasetManager {
 
         this.spark = spark;
         this.uniqueIdGenerator = uniqueIdGenerator;
-        this.observableNamedDatasets = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
+        this.observableNamedDatasets = FXCollections.synchronizedObservableList(
+                FXCollections.observableArrayList(new ArrayList<>()));
     }
 
 
     public NamedDataset createNamedDataset(File file) {
 
-        try {
+        Path basePath;
+        List<Path> filePaths;
+        if (file.isDirectory()) {
 
-            Format fileType = FileUtil.getFileType(file);
-            String separator = ";";
-            double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(file);
+            basePath = file.toPath();
+            try (Stream<Path> walk = Files.walk(file.toPath(), FileVisitOption.FOLLOW_LINKS)) {
 
-            Dataset<Row> dataset;
-            switch (fileType) {
-                case CSV:
-                    separator = FileUtil.inferSeparator(file);
-                    dataset = this.spark
-                            .read()
-                            .option("header", true)
-                            .option("inferSchema", "true")
-                            .option("sep", separator)
-                            .csv(file.getAbsolutePath());
-                    break;
-                case JSON:
-                    dataset = this.spark
-                            .read()
-                            .json(file.getAbsolutePath());
-                    break;
-                case PARQUET:
-                    dataset = this.spark
-                            .read()
-                            .parquet(file.getAbsolutePath());
-                    break;
-                case ORC:
-                    dataset = this.spark
-                            .read()
-                            .orc(file.getAbsolutePath());
-                    break;
-                default:
-                    throw new ProcessingException(String.format("Not able to read %s file type", fileType));
+                filePaths = walk
+                        .filter(path -> !path.toFile().isDirectory())
+                        .filter(path -> !path.toFile().isHidden())
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
+
+                throw new ProcessingException(String.format("Not able to scan directory %s", file.getName()),e);
             }
-            Catalog catalog = buildCatalog(dataset);
-            Transformation transformation = buildTransformation(catalog);
+        } else {
 
-            return new NamedDataset(this.uniqueIdGenerator.getUniqueId(),
-                    file.getName(), dataset, catalog, transformation, new Decoration(file.toPath().toString(), sizeInMegaBytes, separator));
+            basePath = file.toPath().getParent();
+            filePaths = List.of(file.toPath());
+        }
+        return createNamedDataset(basePath, filePaths);
+    }
 
-        } catch (Exception e) {
 
-            throw new ProcessingException(String.format("Not able to create the named dataset from %s", file),e);
+    public NamedDataset createNamedDataset(Path basePath, List<Path> filePaths) {
+
+        Format fileType = FileUtil.getFileType(filePaths);
+        double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(filePaths);
+
+        Dataset<Row> dataset;
+        String[] filesToLoad = filePaths.stream().map(Path::toString).toArray(String[]::new);
+        switch (fileType) {
+
+            case CSV:
+                String separator = FileUtil.inferSeparator(filePaths);
+                dataset = spark.read()
+                        .option("header", true)
+                        .option("inferSchema", "true")
+                        .option("sep", separator)
+                        .option("basePath", basePath.toString())
+                        .csv(filesToLoad);
+                break;
+            case JSON:
+                dataset = spark.read()
+                        .option("basePath", basePath.toString())
+                        .json(filesToLoad);
+                break;
+            case PARQUET:
+                dataset = spark.read()
+                        .option("basePath", basePath.toString())
+                        .parquet(filesToLoad);
+                break;
+            case ORC:
+                dataset = spark.read()
+                        .option("basePath", basePath.toString())
+                        .orc(filesToLoad);
+                break;
+            default:
+                throw new ProcessingException(String.format("Not able to read %s type", fileType));
+        }
+
+        Catalog catalog = buildCatalog(dataset);
+        Transformation transformation = buildTransformation(catalog);
+        String name = determineName(basePath, filePaths);
+
+        return new NamedDataset(
+                this.uniqueIdGenerator.getUniqueId(),
+                name,
+                dataset,
+                catalog,
+                transformation,
+                new Decoration(basePath.toString(), sizeInMegaBytes));
+    }
+
+
+    private String determineName(Path basePath, List<Path> filePaths) {
+
+        if (filePaths.size() == 1) {
+            return filePaths.get(0).getFileName().toString();
+        } else {
+            return basePath.getFileName().toString();
         }
     }
 
@@ -103,7 +146,7 @@ public class NamedDatasetManager {
         Transformation transformation = buildTransformation(catalog);
 
         return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog, transformation,
-                new Decoration(databaseConnection.getName() + " - " + tableName, 0, ""));
+                new Decoration(databaseConnection.getName() + " - " + tableName, 0));
     }
 
 

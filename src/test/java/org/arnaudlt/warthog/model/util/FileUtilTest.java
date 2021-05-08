@@ -3,38 +3,36 @@ package org.arnaudlt.warthog.model.util;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.nio.file.Paths;
+import java.util.List;
 
 class FileUtilTest {
 
     @Test
-    void getFileTypeParquetFile() throws IOException {
+    void getFileTypeParquetFile() {
 
-        Format fileType = FileUtil.getFileType(new File("src/test/plop.parquet"));
+        Format fileType = FileUtil.getFileType(List.of(Paths.get("src/test/plop.parquet")));
         Assert.assertEquals(Format.PARQUET, fileType);
     }
 
     @Test
-    void getFileTypeCsvFile() throws IOException {
+    void getFileTypeCsvFile() {
 
-        Format fileType = FileUtil.getFileType(new File("src/test/resources/code-insee-sample.csv"));
+        Format fileType = FileUtil.getFileType(List.of(Paths.get("src/test/resources/code-insee-sample.csv")));
         Assert.assertEquals(Format.CSV, fileType);
     }
 
     @Test
-    void getFileTypeOrcDirectory() throws IOException {
+    void getFileTypeOrcDirectory() {
 
-        Format fileType = FileUtil.getFileType(new File("src/test/resources/covid19-orc"));
+        Format fileType = FileUtil.getFileType(List.of(Paths.get("src/test/resources/covid19-orc")));
         Assert.assertEquals(Format.ORC, fileType);
     }
 
     @Test
-    void getFileTypeCsvDirectory() throws IOException {
+    void getFileTypeCsvDirectory() {
 
-        Format fileType = FileUtil.getFileType(new File("src/test/resources/first_join.csv"));
+        Format fileType = FileUtil.getFileType(List.of(Paths.get("src/test/resources/first_join.csv")));
         Assert.assertEquals(Format.CSV, fileType);
     }
 }

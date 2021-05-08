@@ -6,13 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.*;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import scala.collection.Iterator;
 
 import java.io.File;
 import java.io.Serializable;
@@ -45,6 +43,21 @@ class NamedDatasetManagerTest {
 
         Catalog catalog = namedDataset.getCatalog();
         assertEquals(7, catalog.getColumns().size());
+    }
+
+
+    @Test
+    void testIt() {
+
+        String[] fl = new String[]{
+                "C:\\Users\\Arnaud\\Downloads\\samples\\archive\\covid19-sample\\couleur=vert\\.part-00000-76c173ea-d61b-4431-ab04-1993c5724bed.c000.snappy.parquet.crc"
+                ,"C:\\Users\\Arnaud\\Downloads\\samples\\archive\\covid19-sample\\couleur=vert\\part-00000-76c173ea-d61b-4431-ab04-1993c5724bed.c000.snappy.parquet"
+        };
+        Dataset<Row> parquet = this.sparkSession
+                .read()
+                .parquet(fl);
+
+        parquet.show(100, false);
     }
 
 

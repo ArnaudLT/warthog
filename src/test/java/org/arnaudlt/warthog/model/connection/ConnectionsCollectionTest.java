@@ -2,7 +2,6 @@ package org.arnaudlt.warthog.model.connection;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ class ConnectionsCollectionTest {
     private Gson gson;
 
 
-    void persist() throws IOException {
+    void persist() {
 
 
         Connection fakeAZConnection1 = new Connection("Azure storage sample", ConnectionType.AZURE_STORAGE);

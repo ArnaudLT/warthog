@@ -56,16 +56,13 @@ public class AzureStorageDfsClient {
     }
 
 
-    public static long downloadOnePathItem(String container, String localDirectoryPath, DataLakeFileSystemClient fileSystem, PathItem pathItem) throws IOException {
-
-        Path localFilePath = Paths.get(localDirectoryPath, container, pathItem.getName());
+    public static long downloadOnePathItem(DataLakeFileSystemClient fileSystem, PathItem pathItem, Path localFilePath) throws IOException {
 
         final long fileSize;
         if (!pathItem.isDirectory()) {
 
             log.info("Downloading file : {}", localFilePath);
             createDirectory(localFilePath.getParent());
-
             fileSize = downloadOneFile(fileSystem, pathItem, localFilePath);
         } else {
             // Allow to keep empty directories

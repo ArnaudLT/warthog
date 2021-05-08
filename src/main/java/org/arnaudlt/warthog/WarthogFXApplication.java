@@ -11,8 +11,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
@@ -72,7 +70,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
 
     private PoolService poolService;
 
-    private MainPane mainPane;
+    private final MainPane mainPane;
 
 
     @Autowired

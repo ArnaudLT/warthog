@@ -6,14 +6,11 @@ public class Decoration {
 
     private final double sizeInMegaBytes;
 
-    private final String separator;
 
-
-    public Decoration(String filePath, double sizeInMegaBytes, String separator) {
+    public Decoration(String filePath, double sizeInMegaBytes) {
 
         this.filePath = filePath;
         this.sizeInMegaBytes = sizeInMegaBytes;
-        this.separator = separator;
     }
 
 
@@ -27,7 +24,4 @@ public class Decoration {
     }
 
 
-    public String getSeparator() {
-        return separator;
-    }
 }
