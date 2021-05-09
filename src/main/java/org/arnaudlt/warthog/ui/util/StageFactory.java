@@ -11,7 +11,8 @@ import jfxtras.styles.jmetro.Style;
 
 public class StageFactory {
 
-    private StageFactory() {}
+    private StageFactory() {
+    }
 
 
     public static Stage buildModalStage(Stage owner, String title) {
