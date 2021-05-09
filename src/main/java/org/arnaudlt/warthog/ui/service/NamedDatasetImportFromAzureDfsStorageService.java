@@ -12,7 +12,6 @@ import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
