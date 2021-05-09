@@ -9,27 +9,21 @@
 => Azure DFS connector
     => Export
     => Import a list of files/directory
-    => Option to repatition/coalesce(n) after import
+    => Option to repartition/coalesce(n) after import
 
 => Query builder :
-
     => Improve the Visual Query Builder :
         => Something to (un)select all the columns in one click
-
     => Validate transformation before execution (and provide feedback to user).
         => Visual warning when using map/array column in where, group by, ...
-
 
 => SQL :
     => Auto-completion
 
-
 => UI :
     => Capability to change the size of the font
-    => Warthog icon on all stage
 
 => Tasks management :
-    => Rename to 'Background tasks' ?
     => More precise follow-up of the tasks
 
 => Dataset modifications :
@@ -47,5 +41,6 @@
 => enableHiveSupport on SparkSession  :
     => String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
     => .config("spark.sql.warehouse.dir", warehouseLocation) /
+    => hive.exec.scratchdir custom
     => How to handle command : \bin\winutils.exe chmod 777 \tmp\hive
 

@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -179,17 +177,10 @@ public class ImportDialog {
         GridPane advancedSettingsNode = GridFactory.buildGrid();
         rowIndex = 0;
 
-        Label listOfFilesLabel = new Label("List of files \n(1 file per line or\nleave empty for all):");
-        TextArea listOfFilesArea = new TextArea();
-        listOfFilesArea.setPrefRowCount(5);
-        listOfFilesArea.setMinWidth(300);
-        listOfFilesArea.setMaxWidth(300);
-        advancedSettingsNode.addRow(rowIndex++, listOfFilesLabel, listOfFilesArea);
-
-        advancedSettingsNode.add(new Separator(Orientation.HORIZONTAL), 0, rowIndex++, 2, 1);
-
         Label basePathLabel = new Label("Import base path :");
         TextField basePathField = new TextField();
+        basePathField.setMinWidth(300);
+        basePathField.setMaxWidth(300);
         advancedSettingsNode.addRow(rowIndex++, basePathLabel, basePathField);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedSettingsNode);
@@ -207,13 +198,9 @@ public class ImportDialog {
             final String azPath = azDirectoryField.getText();
             final String localDirectory = localDirectoryField.getText();
             final String basePath = basePathField.getText();
-            final List<String> listOfFiles = listOfFilesArea.getParagraphs()
-                    .stream()
-                    .map(CharSequence::toString)
-                    .collect(Collectors.toList());
 
             ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
-                    new ImportAzureDfsStorageSettings(azContainer, azPath, localDirectory, basePath, listOfFiles);
+                    new ImportAzureDfsStorageSettings(azContainer, azPath, localDirectory, basePath);
 
             DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
             directoryStatisticsService.setOnSucceeded(success -> {
