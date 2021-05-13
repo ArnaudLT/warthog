@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,14 +52,16 @@ class NamedDatasetManagerTest {
     void testIt() {
 
         String[] fl = new String[]{
-                "C:\\Users\\Arnaud\\Downloads\\samples\\archive\\covid19-sample\\couleur=vert\\.part-00000-76c173ea-d61b-4431-ab04-1993c5724bed.c000.snappy.parquet.crc"
-                ,"C:\\Users\\Arnaud\\Downloads\\samples\\archive\\covid19-sample\\couleur=vert\\part-00000-76c173ea-d61b-4431-ab04-1993c5724bed.c000.snappy.parquet"
+                "src/test/resources/map_test.parquet/part-00002-0c02924e-645c-4efc-a600-249510188a39-c000.gz.parquet"
+                ,"src/test/resources/map_test.parquet/part-00003-0c02924e-645c-4efc-a600-249510188a39-c000.gz.parquet"
         };
         Dataset<Row> parquet = this.sparkSession
                 .read()
+                .option("basePath", Paths.get("src/test/resources/map_test.parquet/").toString())
                 .parquet(fl);
 
         parquet.show(100, false);
+        Assert.assertEquals(3, parquet.count());
     }
 
 

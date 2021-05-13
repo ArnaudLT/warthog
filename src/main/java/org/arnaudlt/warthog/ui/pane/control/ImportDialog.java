@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 
 @Slf4j
@@ -179,9 +181,27 @@ public class ImportDialog {
 
         Label basePathLabel = new Label("Import base path :");
         TextField basePathField = new TextField();
-        basePathField.setMinWidth(300);
-        basePathField.setMaxWidth(300);
-        advancedSettingsNode.addRow(rowIndex++, basePathLabel, basePathField);
+        basePathField.setMinWidth(250);
+        basePathField.setMaxWidth(250);
+
+        CheckBox automaticBasePathCheckBox = new CheckBox("Auto");
+        automaticBasePathCheckBox.setSelected(true);
+        basePathField.disableProperty().bind(automaticBasePathCheckBox.selectedProperty());
+
+        StringBinding basePathFieldBind = Bindings.createStringBinding(() ->
+                        Paths.get(localDirectoryField.getText(), azContainerField.getText(), azDirectoryField.getText()).toString(),
+                localDirectoryField.textProperty(), azContainerField.textProperty(), azDirectoryField.textProperty());
+
+        basePathField.textProperty().bind(basePathFieldBind);
+        automaticBasePathCheckBox.selectedProperty().addListener((selectedProperty, oldValue, newValue) -> {
+            if (newValue) {
+                basePathField.textProperty().bind(basePathFieldBind);
+            } else {
+                basePathField.textProperty().unbind();
+            }
+        });
+
+        advancedSettingsNode.addRow(rowIndex++, basePathLabel, basePathField, automaticBasePathCheckBox);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedSettingsNode);
         TabPane tabPane = new TabPane(basicSettingsTab, advancedSettingsTab);
