@@ -25,7 +25,9 @@ class FileUtilTest {
     @Test
     void getFileTypeOrcDirectory() {
 
-        Format fileType = FileUtil.getFileType(List.of(Paths.get("src/test/resources/covid19-orc")));
+        Format fileType = FileUtil.getFileType(List.of(
+                Paths.get(".part-00000-64218e1e-0aae-4d0d-b9af-17fbe6fee7c1-c000.snappy.orc.crc"),
+                Paths.get("src/test/resources/covid19-orc/part-00000-64218e1e-0aae-4d0d-b9af-17fbe6fee7c1-c000.snappy.orc")));
         Assert.assertEquals(Format.ORC, fileType);
     }
 
