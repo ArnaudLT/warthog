@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 public class BackgroundTasksDialog {
 
 
-    private Stage stage;
+    private Stage dialog;
 
     private final PoolService poolService;
 
@@ -37,17 +37,17 @@ public class BackgroundTasksDialog {
 
     public void buildBackgroundTasksDialog(Stage owner) {
 
-        this.stage = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.DECORATED, true);
-        stage.setWidth(320);
-        stage.setOnShowing(ev -> stage.hide());
-        stage.setOnShown(ev -> {
+        this.dialog = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.DECORATED, true);
+        dialog.setWidth(320);
+        dialog.setOnShowing(ev -> dialog.hide());
+        dialog.setOnShown(ev -> {
 
             double centerX = owner.getX() + owner.getWidth() / 1.3d;
             double centerY = owner.getY() + owner.getHeight() / 2d;
-            stage.setX(centerX - stage.getWidth() / 2d);
-            stage.setY(centerY - stage.getHeight() / 2d);
+            dialog.setX(centerX - dialog.getWidth() / 2d);
+            dialog.setY(centerY - dialog.getHeight() / 2d);
 
-            stage.show();
+            dialog.show();
         });
 
         ListView<Service<?>> serviceListView = new ListView<>(poolService.getServices());
@@ -55,13 +55,13 @@ public class BackgroundTasksDialog {
         serviceListView.setPlaceholder(new Label("No background tasks are running"));
 
         Scene dialogScene = StageFactory.buildScene(serviceListView);
-        stage.setScene(dialogScene);
+        dialog.setScene(dialogScene);
     }
 
 
     public void showTasksManagerDialog() {
 
-        this.stage.show();
+        this.dialog.show();
     }
 
 

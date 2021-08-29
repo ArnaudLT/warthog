@@ -34,7 +34,7 @@ public class ConnectionsManagerDialog {
 
     private Stage owner;
 
-    private Stage connectionManagerStage;
+    private Stage dialog;
 
     private TreeView<Connection> connectionsList;
 
@@ -80,7 +80,7 @@ public class ConnectionsManagerDialog {
     public void buildConnectionsManagerDialog(Stage owner) {
 
         this.owner = owner;
-        connectionManagerStage = StageFactory.buildModalStage(owner, "Connections Manager");
+        dialog = StageFactory.buildModalStage(owner, "Connections Manager");
 
         HBox hBox = new HBox();
 
@@ -160,7 +160,7 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> connectionToDeleteItem = connectionsList.getSelectionModel().getSelectedItem();
             if (connectionToDeleteItem != null && connectionToDeleteItem.getValue() != null) {
 
-                AlertFactory.showConfirmationAlert(connectionManagerStage, "Do you want to delete connection : " + connectionToDeleteItem.getValue() + " ?")
+                AlertFactory.showConfirmationAlert(dialog, "Do you want to delete connection : " + connectionToDeleteItem.getValue() + " ?")
                         .filter(button -> button == ButtonType.OK)
                         .ifPresent(b -> {
                             this.connectionsCollection.getConnections().remove(connectionToDeleteItem.getValue());
@@ -182,7 +182,7 @@ public class ConnectionsManagerDialog {
         hBox.getChildren().add(new VBox(controlButtons, connectionsList));
         hBox.getChildren().add(connectionDetails);
         Scene dialogScene = StageFactory.buildScene(hBox, 750, 400);
-        connectionManagerStage.setScene(dialogScene);
+        dialog.setScene(dialogScene);
     }
 
 
@@ -377,6 +377,6 @@ public class ConnectionsManagerDialog {
 
     public void showConnectionsManagerDialog() {
 
-        this.connectionManagerStage.show();
+        this.dialog.show();
     }
 }
