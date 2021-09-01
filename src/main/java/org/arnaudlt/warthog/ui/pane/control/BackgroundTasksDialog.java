@@ -39,16 +39,6 @@ public class BackgroundTasksDialog {
 
         this.dialog = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.DECORATED, true);
         dialog.setWidth(320);
-        dialog.setOnShowing(ev -> dialog.hide());
-        dialog.setOnShown(ev -> {
-
-            double centerX = owner.getX() + owner.getWidth() / 1.3d;
-            double centerY = owner.getY() + owner.getHeight() / 2d;
-            dialog.setX(centerX - dialog.getWidth() / 2d);
-            dialog.setY(centerY - dialog.getHeight() / 2d);
-
-            dialog.show();
-        });
 
         ListView<Service<?>> serviceListView = new ListView<>(poolService.getServices());
         serviceListView.setCellFactory(x ->new ServiceCell());
@@ -83,6 +73,7 @@ public class BackgroundTasksDialog {
             super();
 
             this.label = new Label();
+            this.label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
             Pane pane = new Pane();
             this.cancelButton = new Button("", new MDL2IconFont("\uF78A"));
 
@@ -92,6 +83,7 @@ public class BackgroundTasksDialog {
 
             this.progressIndicator = new ProgressBar();
             this.content = new VBox(0, hBox, this.progressIndicator);
+            this.content.setPrefWidth(300);
 
             setStyle("-fx-padding: 0px");
         }
@@ -105,7 +97,6 @@ public class BackgroundTasksDialog {
                 setGraphic(null);
             } else {
 
-                // TODO not clean. Why should I rebind that for each update ... Unbind needed ?
                 this.label.textProperty().unbind();
                 this.progressIndicator.progressProperty().unbind();
 
