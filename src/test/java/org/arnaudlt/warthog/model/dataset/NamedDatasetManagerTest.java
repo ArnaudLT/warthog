@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +60,20 @@ class NamedDatasetManagerTest {
                 .parquet(fl);
 
         parquet.show(100, false);
-        Assert.assertEquals(3, parquet.count());
+        assertEquals(3, parquet.count());
+    }
+
+
+    @Test
+    void avroTest() {
+
+        Dataset<Row> avroDs = this.sparkSession
+                .read()
+                .format("avro")
+                .load("src/test/resources/userdata2.avro");
+
+        avroDs.show(10);
+        avroDs.printSchema();
     }
 
 

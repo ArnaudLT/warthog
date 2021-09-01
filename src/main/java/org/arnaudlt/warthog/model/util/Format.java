@@ -5,7 +5,8 @@ public enum Format {
     CSV("csv"),
     JSON("json"),
     PARQUET("parquet"),
-    ORC("orc");
+    ORC("orc"),
+    AVRO("avro");
 
     final String label;
 
@@ -17,7 +18,8 @@ public enum Format {
 
     static Format valueFromLabel(String label) {
 
-        for (Format f : values()) {
+        Format[] values = values();
+        for (Format f : values) {
             if (f.label.equals(label)) {
                 return f;
             }

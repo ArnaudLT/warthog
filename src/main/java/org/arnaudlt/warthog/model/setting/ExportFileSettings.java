@@ -58,6 +58,4 @@ public class ExportFileSettings {
         return header;
     }
 
-
-
 }

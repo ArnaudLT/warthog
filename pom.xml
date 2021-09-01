@@ -90,6 +90,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-avro_2.12</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-file-datalake</artifactId>
             <version>12.4.1</version>

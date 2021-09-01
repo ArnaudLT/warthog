@@ -106,7 +106,8 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
             updateProgress(statistics.bytes, totalWork);
 
             Path basePath = customBasePath.isBlank() ? baseDirectory : Paths.get(customBasePath);
-            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(basePath, listOfPaths);
+            String preferredName = basePath.getFileName().toString();
+            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(basePath, listOfPaths, preferredName);
 
             namedDatasetManager.registerNamedDataset(namedDataset);
             updateProgress(totalWork, totalWork);

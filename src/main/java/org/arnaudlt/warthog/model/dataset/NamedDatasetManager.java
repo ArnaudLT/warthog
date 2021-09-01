@@ -52,10 +52,12 @@ public class NamedDatasetManager {
     public NamedDataset createNamedDataset(File file) {
 
         Path basePath;
+        String preferredName;
         List<Path> filePaths;
         if (file.isDirectory()) {
 
             basePath = file.toPath();
+            preferredName = file.getName();
             try (Stream<Path> walk = Files.walk(file.toPath(), FileVisitOption.FOLLOW_LINKS)) {
 
                 filePaths = walk
@@ -69,13 +71,14 @@ public class NamedDatasetManager {
         } else {
 
             basePath = file.toPath().getParent();
+            preferredName = file.getName();
             filePaths = List.of(file.toPath());
         }
-        return createNamedDataset(basePath, filePaths);
+        return createNamedDataset(basePath, filePaths, preferredName);
     }
 
 
-    public NamedDataset createNamedDataset(Path basePath, List<Path> filePaths) {
+    public NamedDataset createNamedDataset(Path basePath, List<Path> filePaths, String preferredName) {
 
         Format fileType = FileUtil.getFileType(filePaths);
         double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(filePaths);
@@ -108,13 +111,19 @@ public class NamedDatasetManager {
                         .option("basePath", basePath.toString())
                         .orc(filesToLoad);
                 break;
+            case AVRO:
+                dataset = spark.read()
+                        .option("basePath", basePath.toString())
+                        .format("avro")
+                        .load(filesToLoad);
+                break;
             default:
                 throw new ProcessingException(String.format("Not able to read %s type", fileType));
         }
 
         Catalog catalog = buildCatalog(dataset);
         Transformation transformation = buildTransformation(catalog);
-        String name = determineName(basePath, filePaths);
+        String name = determineName(basePath, preferredName);
 
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
@@ -126,10 +135,10 @@ public class NamedDatasetManager {
     }
 
 
-    private String determineName(Path basePath, List<Path> filePaths) {
+    private String determineName(Path basePath, String preferredName) {
 
-        if (filePaths.size() == 1) {
-            return filePaths.get(0).getFileName().toString();
+        if (preferredName != null && !preferredName.isBlank()) {
+            return preferredName;
         } else {
             return basePath.getFileName().toString();
         }
@@ -283,21 +292,26 @@ public class NamedDatasetManager {
         switch (format) {
             case CSV:
                 dfw
-                    .option("sep", exportFileSettings.getSeparator())
-                    .option("header", exportFileSettings.getHeader())
-                    .csv(exportFileSettings.getFilePath());
+                        .option("sep", exportFileSettings.getSeparator())
+                        .option("header", exportFileSettings.getHeader())
+                        .csv(exportFileSettings.getFilePath());
                 break;
             case JSON:
                 dfw
-                    .json(exportFileSettings.getFilePath());
+                        .json(exportFileSettings.getFilePath());
                 break;
             case PARQUET:
                 dfw
-                    .parquet(exportFileSettings.getFilePath());
+                        .parquet(exportFileSettings.getFilePath());
                 break;
             case ORC:
                 dfw
-                    .orc(exportFileSettings.getFilePath());
+                        .orc(exportFileSettings.getFilePath());
+                break;
+            case AVRO:
+                dfw
+                        .format("avro")
+                        .save(exportFileSettings.getFilePath());
                 break;
         }
 
