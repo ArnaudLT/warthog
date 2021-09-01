@@ -214,13 +214,13 @@ public class ImportDialog {
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
             if (selectedConnection == null) return;
 
-            final String azContainer = azContainerField.getText();
-            final String azPath = azDirectoryField.getText();
-            final String localDirectory = localDirectoryField.getText();
-            final String basePath = basePathField.getText();
+            final String azContainer = azContainerField.getText().strip();
+            final String azDirectoryPath = azDirectoryField.getText().strip();
+            final String localDirectory = localDirectoryField.getText().strip();
+            final String basePath = basePathField.getText().strip();
 
             ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
-                    new ImportAzureDfsStorageSettings(azContainer, azPath, localDirectory, basePath);
+                    new ImportAzureDfsStorageSettings(azContainer, azDirectoryPath, localDirectory, basePath);
 
             DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
             directoryStatisticsService.setOnSucceeded(success -> {
@@ -237,7 +237,7 @@ public class ImportDialog {
             });
             directoryStatisticsService.setOnFailed(fail -> {
                 importAzureButton.setDisable(false);
-                AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azPath + "'");
+                AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azDirectoryPath + "'");
             });
             directoryStatisticsService.start();
             importAzureButton.setDisable(true);
