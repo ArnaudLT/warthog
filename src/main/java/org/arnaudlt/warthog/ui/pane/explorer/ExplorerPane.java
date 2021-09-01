@@ -11,8 +11,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
-import org.arnaudlt.warthog.ui.pane.control.ControlPane;
-import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
+import org.arnaudlt.warthog.ui.MainPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import scala.collection.Iterator;
@@ -25,10 +24,7 @@ import java.util.stream.Collectors;
 @Component
 public class ExplorerPane {
 
-
-    private TransformPane transformPane;
-
-    private ControlPane controlPane;
+    private MainPane mainPane;
 
     private TreeView<NamedDatasetItem> treeExplorer;
 
@@ -73,7 +69,7 @@ public class ExplorerPane {
             List<File> files = dragEvent.getDragboard().getFiles();
             for (File file : files) {
 
-                this.controlPane.importFile(file);
+                this.mainPane.getControlPane().importFile(file);
             }
         });
 
@@ -198,20 +194,14 @@ public class ExplorerPane {
                 if (selectedItem == null) continue;
                 NamedDataset selectedNamedDataset = selectedItem.getValue().getNamedDataset();
                 log.info("Request to open named dataset {}", selectedNamedDataset.getName());
-                this.transformPane.openNamedDataset(selectedNamedDataset);
+                this.mainPane.getTransformPane().openNamedDataset(selectedNamedDataset);
             }
         }
     };
 
 
-    public void setTransformPane(TransformPane transformPane) {
-        this.transformPane = transformPane;
+    public void setMainPane(MainPane mainPane) {
+
+        this.mainPane = mainPane;
     }
-
-
-    public void setControlPane(ControlPane controlPane) {
-        this.controlPane = controlPane;
-    }
-
-
 }

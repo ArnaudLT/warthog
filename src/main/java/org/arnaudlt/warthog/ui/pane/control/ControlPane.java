@@ -17,9 +17,7 @@ import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
-import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
-import org.arnaudlt.warthog.ui.pane.output.OutputPane;
-import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
+import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.*;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,8 @@ import java.util.Set;
 @Slf4j
 @Component
 public class ControlPane {
+
+    private MainPane mainPane;
 
     private Stage stage;
 
@@ -52,12 +52,6 @@ public class ControlPane {
     private final BackgroundTasksDialog backgroundTasksDialog;
 
     private ImportDialog importDialog;
-
-    private ExplorerPane explorerPane;
-
-    private TransformPane transformPane;
-
-    private OutputPane outputPane;
 
 
     @Autowired
@@ -193,18 +187,18 @@ public class ControlPane {
 
         return event -> {
 
-            NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
+            NamedDataset selectedNamedDataset = this.mainPane.getTransformPane().getSelectedNamedDataset();
             if (selectedNamedDataset == null) {
 
-                final String sqlQuery = this.transformPane.getSqlQuery();
+                final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
                 SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
-                overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
+                overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
                 overviewService.start();
             } else {
 
                 NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(poolService, selectedNamedDataset, globalSettings.getOverviewRows());
-                overviewService.setOnSucceeded(success -> this.outputPane.fill(overviewService.getValue()));
+                overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
                 overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
                 overviewService.start();
             }
@@ -224,10 +218,10 @@ public class ControlPane {
             String filePath = exportFile.getAbsolutePath();
             ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, Format.CSV, "Overwrite", "", ";", true);
 
-            NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
+            NamedDataset selectedNamedDataset = this.mainPane.getTransformPane().getSelectedNamedDataset();
             if (selectedNamedDataset == null) {
 
-                final String sqlQuery = this.transformPane.getSqlQuery();
+                final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
                 SqlExportToFileService exportService = new SqlExportToFileService(poolService, namedDatasetManager, sqlQuery, exportFileSettings);
                 exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
                 exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the Csv export"));
@@ -283,7 +277,7 @@ public class ControlPane {
     public void importFile(File file) {
 
         NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(poolService, namedDatasetManager, file);
-        importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
+        importService.setOnSucceeded(success -> mainPane.getExplorerPane().addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '"+ file.getName() +"'"));
         importService.start();
     }
@@ -291,29 +285,20 @@ public class ControlPane {
 
     private final EventHandler<ActionEvent> requestDelete = actionEvent -> {
 
-        Set<NamedDataset> selectedItems = this.explorerPane.getSelectedItems();
+        Set<NamedDataset> selectedItems = this.mainPane.getExplorerPane().getSelectedItems();
         for (NamedDataset selectedNamedDataset : selectedItems) {
 
             log.info("Request to close named dataset {}", selectedNamedDataset.getName());
-            this.transformPane.closeNamedDataset(selectedNamedDataset);
-            this.explorerPane.removeNamedDataset(selectedNamedDataset);
+            this.mainPane.getTransformPane().closeNamedDataset(selectedNamedDataset);
+            this.mainPane.getExplorerPane().removeNamedDataset(selectedNamedDataset);
             this.namedDatasetManager.deregisterNamedDataset(selectedNamedDataset);
         }
     };
 
 
-    public void setExplorerPane(ExplorerPane explorerPane) {
-        this.explorerPane = explorerPane;
-    }
+    public void setMainPane(MainPane mainPane) {
 
-
-    public void setTransformPane(TransformPane transformPane) {
-        this.transformPane = transformPane;
-    }
-
-
-    public void setOutputPane(OutputPane outputPane) {
-        this.outputPane = outputPane;
+        this.mainPane = mainPane;
     }
 
 

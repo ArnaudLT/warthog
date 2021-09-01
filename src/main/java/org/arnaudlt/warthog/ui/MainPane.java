@@ -23,8 +23,6 @@ public class MainPane {
 
     private final OutputPane outputPane;
 
-    private Stage stage;
-
 
     @Autowired
     public MainPane(ControlPane controlPane, ExplorerPane explorerPane, TransformPane transformPane,
@@ -35,15 +33,12 @@ public class MainPane {
         this.transformPane = transformPane;
         this.outputPane = outputPane;
 
-        this.controlPane.setExplorerPane(this.explorerPane);
-        this.controlPane.setTransformPane(this.transformPane);
-        this.controlPane.setOutputPane(this.outputPane);
-        this.explorerPane.setTransformPane(this.transformPane);
-        this.explorerPane.setControlPane(this.controlPane);
+        this.controlPane.setMainPane(this);
+        this.explorerPane.setMainPane(this);
     }
 
 
-    public Parent build() {
+    public Parent build(Stage stage) {
 
         Node controlNode = this.controlPane.buildControlPane(stage);
         Node explorerNode = this.explorerPane.buildExplorerPane(stage);
@@ -63,8 +58,20 @@ public class MainPane {
         return splitPane;
     }
 
-    public void setStage(Stage stage) {
 
-        this.stage = stage;
+    public TransformPane getTransformPane() {
+        return this.transformPane;
+    }
+
+    public ControlPane getControlPane() {
+        return this.controlPane;
+    }
+
+    public OutputPane getOutputPane() {
+        return this.outputPane;
+    }
+
+    public ExplorerPane getExplorerPane() {
+        return this.explorerPane;
     }
 }

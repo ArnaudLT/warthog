@@ -93,8 +93,7 @@ class StageInitializer implements ApplicationListener<StageReadyEvent> {
         stage.getIcons().add(new Image("/warthog_icon.png"));
         stage.setOnCloseRequest(closeApplication);
 
-        mainPane.setStage(stage);
-        Parent root = mainPane.build();
+        Parent root = mainPane.build(stage);
 
         Scene scene = StageFactory.buildScene(root, 1280, 720);
         stage.setScene(scene);
