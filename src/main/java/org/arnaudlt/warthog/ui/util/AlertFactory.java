@@ -29,10 +29,10 @@ public class AlertFactory {
         alert.setHeaderText("");
         alert.setContentText(text);
         TextArea stack = new TextArea(exception.toString());
+        stack.setEditable(false);
         alert.getDialogPane().setExpandableContent(stack);
         alert.getDialogPane().setExpanded(true);
         alert.initOwner(owner);
-
         alert.show();
     }
 
@@ -42,6 +42,20 @@ public class AlertFactory {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
         alert.setHeaderText("");
         alert.setContentText(text);
+        alert.initOwner(owner);
+        alert.show();
+    }
+
+
+    public static void showInformationAlert(Stage owner, String text, String longMessage) {
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.CLOSE);
+        alert.setHeaderText("");
+        alert.setContentText(text);
+        TextArea stack = new TextArea(longMessage);
+        stack.setEditable(false);
+        alert.getDialogPane().setExpandableContent(stack);
+        alert.getDialogPane().setExpanded(true);
         alert.initOwner(owner);
         alert.show();
     }

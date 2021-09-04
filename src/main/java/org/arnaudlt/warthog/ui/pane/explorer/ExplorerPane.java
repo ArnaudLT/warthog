@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.ui.MainPane;
+import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import scala.collection.Iterator;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class ExplorerPane {
+
+    private Stage stage;
 
     private MainPane mainPane;
 
@@ -40,6 +43,7 @@ public class ExplorerPane {
 
     public Node buildExplorerPane(Stage stage) {
 
+        this.stage = stage;
         this.treeExplorer = buildTreeView();
 
         VBox vBox = new VBox(treeExplorer);
@@ -54,6 +58,7 @@ public class ExplorerPane {
         TreeItem<NamedDatasetItem> root = new TreeItem<>();
 
         TreeView<NamedDatasetItem> tree = new TreeView<>(root);
+        tree.setCellFactory(x -> new NamedDatasetItemTreeCell(stage));
         tree.setShowRoot(false);
         tree.addEventFilter(MouseEvent.MOUSE_PRESSED, requestOpenSelectedNamedDatasets);
 
@@ -93,24 +98,26 @@ public class ExplorerPane {
         } else {
             content = selectedItem.getValue().getSqlName();
         }
-        final ClipboardContent clipboardContent = new ClipboardContent();
-        clipboardContent.putString(content);
-        Clipboard.getSystemClipboard().setContent(clipboardContent);
+        Utils.copyStringToClipboard(content);
     }
 
 
     public void addNamedDatasetItem(NamedDataset namedDataset) {
 
-        TreeItem<NamedDatasetItem> item = new TreeItem<>(new NamedDatasetItem(
+        NamedDatasetItem rootNamedDatasetItem = new NamedDatasetItem(
                 namedDataset,
                 namedDataset.getLocalTemporaryViewName(),
-                namedDataset.getLocalTemporaryViewName()));
+                namedDataset.getLocalTemporaryViewName(),
+                null);
+        TreeItem<NamedDatasetItem> item = new TreeItem<>(rootNamedDatasetItem);
 
         StructType schema = namedDataset.getDataset().schema();
         for (StructField field : schema.fields()) {
 
             NamedDatasetItem child = new NamedDatasetItem(namedDataset,
-                    field.name() + " - " + field.dataType().typeName(), field.name());
+                    field.name() + " - " + field.dataType().typeName(), field.name(), field.dataType());
+
+            rootNamedDatasetItem.getChild().add(child);
 
             TreeItem<NamedDatasetItem> childItem = new TreeItem<>(child);
             item.getChildren().add(childItem);
@@ -133,10 +140,14 @@ public class ExplorerPane {
                 while (iterator.hasNext()) {
 
                     StructField field = iterator.next();
-                    TreeItem<NamedDatasetItem> child = new TreeItem<>(new NamedDatasetItem(
+
+                    NamedDatasetItem childNamedItem = new NamedDatasetItem(
                             parent.getValue().getNamedDataset(),
                             field.name() + " - " + field.dataType().typeName(),
-                            field.name()));
+                            field.name(), field.dataType());
+
+                    TreeItem<NamedDatasetItem> child = new TreeItem<>(childNamedItem);
+                    parent.getValue().getChild().add(childNamedItem);
                     parent.getChildren().add(child);
                     addSubItems(child, field.dataType());
                 }

@@ -3,6 +3,8 @@ package org.arnaudlt.warthog.ui.util;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 public class Utils {
 
@@ -31,6 +33,14 @@ public class Utils {
             treeView.getSelectionModel().select(i);
         }
         treeView.getSelectionModel().select(selectedItem);
+    }
+
+
+    public static void copyStringToClipboard(String content) {
+
+        final ClipboardContent clipboardContent = new ClipboardContent();
+        clipboardContent.putString(content);
+        Clipboard.getSystemClipboard().setContent(clipboardContent);
     }
 
 }

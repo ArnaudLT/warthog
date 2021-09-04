@@ -5,8 +5,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
@@ -16,10 +14,11 @@ import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
-import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
+import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -90,7 +89,11 @@ public class OutputPane {
         countRowsButton.setTooltip(new Tooltip("Count rows"));
         countRowsButton.setOnAction(getDatasetCountRowsEventHandler());
 
-        VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton);
+        Button showSchemaButton = new Button("", new MDL2IconFont("\ue822"));
+        showSchemaButton.setTooltip(new Tooltip("Show schema"));
+        showSchemaButton.setOnAction(getDatasetShowSchemaEventHandler());
+
+        VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showSchemaButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
         this.tableView.prefWidthProperty().bind(hBox.widthProperty());
@@ -110,6 +113,16 @@ public class OutputPane {
                 AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue())));
             datasetCountRowsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Failed to count rows"));
             datasetCountRowsService.start();
+        };
+    }
+
+
+    private EventHandler<ActionEvent> getDatasetShowSchemaEventHandler() {
+
+        return event -> {
+
+            if (this.preparedDataset == null) return;
+            AlertFactory.showInformationAlert(owner, "Schema : ", this.preparedDataset.getDataset().schema().prettyJson());
         };
     }
 
@@ -162,9 +175,7 @@ public class OutputPane {
                 )
                 .collect(Collectors.joining("\n"));
 
-        final ClipboardContent clipboardContent = new ClipboardContent();
-        clipboardContent.putString(content);
-        Clipboard.getSystemClipboard().setContent(clipboardContent);
+        Utils.copyStringToClipboard(content);
     }
 
 

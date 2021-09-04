@@ -1,6 +1,10 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
+import org.apache.spark.sql.types.DataType;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NamedDatasetItem {
 
@@ -10,11 +14,19 @@ public class NamedDatasetItem {
 
     private final String sqlName;
 
+    private final DataType dataType;
 
-    public NamedDatasetItem(NamedDataset namedDataset, String label, String sqlName) {
+    private final List<NamedDatasetItem> child;
+
+
+    public NamedDatasetItem(NamedDataset namedDataset,
+                            String label, String sqlName, DataType dataType) {
+
         this.namedDataset = namedDataset;
         this.label = label;
         this.sqlName = sqlName;
+        this.dataType = dataType;
+        this.child = new ArrayList<>();
     }
 
 
@@ -45,6 +57,16 @@ public class NamedDatasetItem {
     }
 
 
+    public DataType getDataType() {
+        return dataType;
+    }
+
+
+    public List<NamedDatasetItem> getChild() {
+        return child;
+    }
+
+
     private boolean containsSpecialCharacter(String value) {
 
         return value
@@ -53,7 +75,6 @@ public class NamedDatasetItem {
                         (i > 64 && i < 91) ||
                         (i > 96 && i < 123) ||
                         (i > 47 && i < 58) ||
-                        (i == 45) ||
                         (i == 95)
                 ));
     }

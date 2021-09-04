@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -66,8 +67,8 @@ public class ExportFileDialog {
         Button outputButton = new Button("...");
         outputButton.setOnAction(event -> {
 
-            FileChooser fc = new FileChooser();
-            File exportFile = fc.showSaveDialog(this.dialog);
+            DirectoryChooser dc = new DirectoryChooser();
+            File exportFile = dc.showDialog(this.dialog);
 
             if (exportFile == null) return;
             output.setText(exportFile.getAbsolutePath());
@@ -119,7 +120,7 @@ public class ExportFileDialog {
         TextField partitionBy = new TextField();
         partitionBy.setMinWidth(300);
         partitionBy.setMaxWidth(300);
-        partitionBy.setTooltip(new Tooltip("Comma separated list of attributs"));
+        partitionBy.setTooltip(new Tooltip("Comma separated list of attributes"));
 
         advancedGrid.addRow(rowIndex++, partitionByLabel, partitionBy);
 

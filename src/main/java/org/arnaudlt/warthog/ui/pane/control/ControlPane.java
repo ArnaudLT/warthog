@@ -137,10 +137,6 @@ public class ControlPane {
         overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ENTER"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
-        MenuItem exportCsvItem = new MenuItem("Export as Csv...");
-        exportCsvItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+E"));
-        exportCsvItem.setOnAction(getExportToCsvActionEventHandler());
-
         MenuItem exportToFileItem = new MenuItem("Export locally...");
         exportToFileItem.setOnAction(getExportToFileActionEventHandler());
 
@@ -207,36 +203,6 @@ public class ControlPane {
     }
 
 
-    private EventHandler<ActionEvent> getExportToCsvActionEventHandler() {
-
-        return event -> {
-
-            FileChooser fc = new FileChooser();
-            File exportFile = fc.showSaveDialog(this.stage);
-
-            if (exportFile == null) return;
-            String filePath = exportFile.getAbsolutePath();
-            ExportFileSettings exportFileSettings = new ExportFileSettings(filePath, Format.CSV, "Overwrite", "", ";", true);
-
-            NamedDataset selectedNamedDataset = this.mainPane.getTransformPane().getSelectedNamedDataset();
-            if (selectedNamedDataset == null) {
-
-                final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
-                SqlExportToFileService exportService = new SqlExportToFileService(poolService, namedDatasetManager, sqlQuery, exportFileSettings);
-                exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
-                exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the Csv export"));
-                exportService.start();
-            } else {
-
-                NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(poolService, namedDatasetManager, selectedNamedDataset, exportFileSettings);
-                exportService.setOnSucceeded(success -> log.info("Csv Export succeeded"));
-                exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the Csv export"));
-                exportService.start();
-            }
-        };
-    }
-
-
     private EventHandler<ActionEvent> getExportToFileActionEventHandler() {
 
         return event -> this.exportFileDialog.showExportFileDialog();
@@ -268,10 +234,8 @@ public class ControlPane {
     };
 
 
-    private final EventHandler<ActionEvent> requestImportFrom = actionEvent -> {
-
+    private final EventHandler<ActionEvent> requestImportFrom = actionEvent ->
         this.importDialog.showImportDatabaseDialog();
-    };
 
 
     public void importFile(File file) {

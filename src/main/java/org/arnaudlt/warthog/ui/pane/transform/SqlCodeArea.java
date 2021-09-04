@@ -3,10 +3,12 @@ package org.arnaudlt.warthog.ui.pane.transform;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.*;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
+import org.arnaudlt.warthog.ui.util.Utils;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
@@ -102,6 +104,15 @@ public class SqlCodeArea {
                 }
             }
         });
+
+        MenuItem copyMenu = new MenuItem("Copy");
+        copyMenu.setOnAction(evt -> Utils.copyStringToClipboard(codeArea.getSelectedText()));
+
+        MenuItem pasteMenu = new MenuItem("Paste");
+        pasteMenu.setOnAction(evt -> codeArea.insertText(codeArea.getCaretPosition(),
+                Clipboard.getSystemClipboard().getContent(DataFormat.PLAIN_TEXT).toString()));
+
+        codeArea.setContextMenu(new ContextMenu(copyMenu, pasteMenu));
 
         this.codeArea.multiPlainChanges()
                 .successionEnds(Duration.ofMillis(500))
