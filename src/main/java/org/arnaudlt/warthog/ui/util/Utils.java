@@ -29,6 +29,7 @@ public class Utils {
     public static <T> void refreshTreeViewAllItems(TreeView<T> treeView) {
 
         TreeItem<T> selectedItem = treeView.getSelectionModel().getSelectedItem();
+        treeView.getSelectionModel().clearSelection();
         for (int i = 0; i < treeView.getRoot().getChildren().size(); i++) {
             treeView.getSelectionModel().select(i);
         }

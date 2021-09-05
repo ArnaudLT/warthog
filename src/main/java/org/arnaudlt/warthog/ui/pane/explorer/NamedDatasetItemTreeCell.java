@@ -40,17 +40,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
 
             if (namedDatasetItem.getDataType() == null) {
 
-                MenuItem helpMenuItem = new MenuItem("Help...");
-                helpMenuItem.setOnAction(evt -> {
-
-                    String selectAll = namedDatasetItem.getChild().stream()
-                            .map(ndi -> "\t" + ndi.getSqlName())
-                            .collect(Collectors.joining(",\n"));
-
-                    AlertFactory.showInformationAlert(stage, "Select explicitly all fields",
-                                "SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getSqlName() + ";\n");
-                });
-
+                MenuItem helpMenuItem = buildTableHelpMenuItem(namedDatasetItem);
                 contextMenu.getItems().add(helpMenuItem);
             }
 
@@ -58,6 +48,21 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             setText(namedDatasetItem.getLabel());
             setGraphic(null);
         }
+    }
+
+
+    private MenuItem buildTableHelpMenuItem(NamedDatasetItem namedDatasetItem) {
+        MenuItem helpMenuItem = new MenuItem("Help...");
+        helpMenuItem.setOnAction(evt -> {
+
+            String selectAll = namedDatasetItem.getChild().stream()
+                    .map(ndi -> "\t" + ndi.getSqlName())
+                    .collect(Collectors.joining(",\n"));
+
+            AlertFactory.showInformationAlert(stage, "Select explicitly all fields",
+                        "SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getSqlName() + ";\n");
+        });
+        return helpMenuItem;
     }
 
 }
