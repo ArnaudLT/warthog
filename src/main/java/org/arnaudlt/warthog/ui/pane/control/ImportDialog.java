@@ -239,6 +239,7 @@ public class ImportDialog {
                 importAzureButton.setDisable(false);
                 AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azDirectoryPath + "'");
             });
+            directoryStatisticsService.setOnCancelled(cancel -> importAzureButton.setDisable(false));
             directoryStatisticsService.start();
             importAzureButton.setDisable(true);
         });

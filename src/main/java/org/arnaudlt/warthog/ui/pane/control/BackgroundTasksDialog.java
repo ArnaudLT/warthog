@@ -55,7 +55,6 @@ public class BackgroundTasksDialog {
     }
 
 
-    //https://stackoverflow.com/questions/15661500/javafx-listview-item-with-an-image-button
     @Slf4j
     private static class ServiceCell extends ListCell<Service<?>> {
 
