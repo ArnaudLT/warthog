@@ -29,16 +29,18 @@ public class UserConfiguration {
                                             @Value("${warthog.user.directory}") String userDirectory,
                                             @Value("${warthog.spark.threads}") Integer sparkThreads,
                                             @Value("${warthog.spark.ui}") Boolean sparkUI,
-                                            @Value("${warthog.overview.rows}") Integer overviewRows) {
+                                            @Value("${warthog.overview.rows}") Integer overviewRows,
+                                            @Value("${warthog.overview.truncate-after}") Integer overviewTruncateAfter) {
 
         GlobalSettings settings;
         try {
 
             settings = GlobalSettings.load(gson, userDirectory);
+            // TODO if new properties have been added, we should default them.
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
-            settings = new GlobalSettings(gson, userDirectory, sparkThreads, sparkUI, overviewRows);
+            settings = new GlobalSettings(gson, userDirectory, sparkThreads, sparkUI, overviewRows, overviewTruncateAfter);
             try {
 
                 settings.persist();

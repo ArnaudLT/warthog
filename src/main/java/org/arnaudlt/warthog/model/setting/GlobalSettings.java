@@ -24,14 +24,19 @@ public class GlobalSettings implements Serializable {
     // ########## OVERVIEW ##########
     private Integer overviewRows;
 
+    private Integer overviewTruncateAfter;
 
-    public GlobalSettings(Gson gson, String userDirectory, Integer sparkThreads, Boolean sparkUI, Integer overviewRows) {
+
+    public GlobalSettings(Gson gson, String userDirectory,
+                          Integer sparkThreads, Boolean sparkUI,
+                          Integer overviewRows, Integer overviewTruncateAfter) {
 
         this.gson = gson;
         this.userDirectory = userDirectory;
         this.sparkThreads = sparkThreads;
         this.sparkUI = sparkUI;
         this.overviewRows = overviewRows;
+        this.overviewTruncateAfter = overviewTruncateAfter;
     }
 
 
@@ -64,6 +69,15 @@ public class GlobalSettings implements Serializable {
         this.sparkUI = sparkUI;
     }
 
+
+    public Integer getOverviewTruncateAfter() {
+        return overviewTruncateAfter;
+    }
+
+
+    public void setOverviewTruncateAfter(Integer overviewTruncateAfter) {
+        this.overviewTruncateAfter = overviewTruncateAfter;
+    }
 
     public void persist() throws IOException {
 
@@ -102,9 +116,11 @@ public class GlobalSettings implements Serializable {
 
     @Override
     public String toString() {
-        return "{overviewRows=" + overviewRows +
-                ", sparkThreads=" + sparkThreads +
+        return "GlobalSettings{" +
+                "sparkThreads=" + sparkThreads +
                 ", sparkUI=" + sparkUI +
+                ", overviewRows=" + overviewRows +
+                ", overviewTruncateAfter=" + overviewTruncateAfter +
                 '}';
     }
 }

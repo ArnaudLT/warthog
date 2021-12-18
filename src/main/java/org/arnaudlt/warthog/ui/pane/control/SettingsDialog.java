@@ -34,7 +34,6 @@ public class SettingsDialog {
 
         this.dialog = StageFactory.buildModalStage(owner, "Settings");
 
-
         GridPane generalGrid = GridFactory.buildGrid();
         int rowIndex = 0;
 
@@ -42,6 +41,12 @@ public class SettingsDialog {
         Spinner<Integer> rowsNumber = new Spinner<>(1, 1000, globalSettings.getOverviewRows(), 1);
         rowsNumber.setEditable(true);
         generalGrid.addRow(rowIndex++, rowsNumberLabel, rowsNumber);
+
+        Label truncateAfterLabel = new Label("Truncate after (chars) :");
+        Spinner<Integer> truncateAfter = new Spinner<>(0, 1000, globalSettings.getOverviewTruncateAfter(), 1);
+        truncateAfter.setEditable(true);
+        truncateAfter.setTooltip(new Tooltip("Set to 0 if you don't want to truncate value"));
+        generalGrid.addRow(rowIndex++, truncateAfterLabel, truncateAfter);
 
         Tab generalsTab = new Tab("Generals", generalGrid);
 
@@ -73,6 +78,7 @@ public class SettingsDialog {
             try {
 
                 globalSettings.setOverviewRows(rowsNumber.getValue());
+                globalSettings.setOverviewTruncateAfter(truncateAfter.getValue());
                 globalSettings.setSparkThreads(sparkThreads.getValue());
                 globalSettings.setSparkUI(sparkUI.isSelected());
                 globalSettings.persist();

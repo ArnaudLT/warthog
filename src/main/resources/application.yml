@@ -10,6 +10,7 @@ warthog:
     directory: user
   overview:
     rows: 50
+    truncate-after: 0
   spark:
     threads: 4
     ui: false

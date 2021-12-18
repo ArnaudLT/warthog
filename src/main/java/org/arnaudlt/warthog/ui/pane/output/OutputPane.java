@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
+import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
@@ -37,15 +38,18 @@ public class OutputPane {
 
     private final PoolService poolService;
 
+    private final GlobalSettings globalSettings;
+
     private TableView<Row> tableView;
 
     private PreparedDataset preparedDataset;
 
 
     @Autowired
-    public OutputPane(PoolService poolService) {
+    public OutputPane(PoolService poolService, GlobalSettings globalSettings) {
 
         this.poolService = poolService;
+        this.globalSettings = globalSettings;
     }
 
 
@@ -200,10 +204,21 @@ public class OutputPane {
 
         clearTableView();
 
+        boolean truncateAfterEnabled = globalSettings.getOverviewTruncateAfter() != 0;
+
         for (StructField field : preparedDataset.getDataset().schema().fields()) {
 
             TableColumn<Row, Object> col = new TableColumn<>(field.name());
-            col.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getAs(field.name())));
+            col.setCellValueFactory(param -> {
+
+                String fieldValue = param.getValue()
+                        .getAs(field.name())
+                        .toString();
+                if (truncateAfterEnabled && fieldValue.length() > globalSettings.getOverviewTruncateAfter()) {
+                    fieldValue = fieldValue.substring(0,globalSettings.getOverviewTruncateAfter()).concat("...");
+                }
+                return new SimpleObjectProperty<>(fieldValue);
+            });
             this.tableView.getColumns().add(col);
         }
         this.tableView.getItems().addAll(rows);
