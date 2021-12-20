@@ -1,12 +1,16 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeCell;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
+import org.arnaudlt.warthog.model.dataset.Decoration;
+import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 
+import java.text.DecimalFormat;
 import java.util.stream.Collectors;
 
 public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
@@ -40,7 +44,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
 
             if (namedDatasetItem.getDataType() == null) {
 
-                MenuItem helpMenuItem = buildTableHelpMenuItem(namedDatasetItem);
+                MenuItem helpMenuItem = buildInfoMenuItem(namedDatasetItem);
                 contextMenu.getItems().add(helpMenuItem);
             }
 
@@ -51,18 +55,48 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
     }
 
 
-    private MenuItem buildTableHelpMenuItem(NamedDatasetItem namedDatasetItem) {
-        MenuItem helpMenuItem = new MenuItem("Help...");
-        helpMenuItem.setOnAction(evt -> {
+    private MenuItem buildInfoMenuItem(NamedDatasetItem namedDatasetItem) {
+
+        MenuItem infoMenuItem = new MenuItem("Info...");
+        infoMenuItem.setOnAction(evt -> {
+
+            GridPane grid = GridFactory.buildGrid();
+            int rowIdx = 0;
+
+            Decoration decoration = namedDatasetItem.getNamedDataset().getDecoration();
+
+            String origin = decoration.getBasePath();
+            grid.addRow(rowIdx++, new Label("Source :"), new Label(origin));
+
+            String firstPart = decoration.getParts().get(0);
+            if (decoration.getParts().size() > 1) {
+                firstPart = firstPart + ",...";
+            }
+            grid.addRow(rowIdx++, new Label("Part(s) :"), new Label(firstPart));
+
+            int partsCount = decoration.getParts().size();
+            grid.addRow(rowIdx++, new Label("Parts count :"), new Label(String.valueOf(partsCount)));
+
+            String format = decoration.getFormatAsString();
+            grid.addRow(rowIdx++, new Label("Format :"), new Label(format));
+
+            DecimalFormat formatter = new DecimalFormat("#.##");
+            String formattedSizeInMB = decoration.getSizeInMegaBytes() != null ? formatter.format(decoration.getSizeInMegaBytes()) : "?";
+            grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
 
             String selectAll = namedDatasetItem.getChild().stream()
                     .map(ndi -> "\t" + ndi.getSqlName())
                     .collect(Collectors.joining(",\n"));
+            TextArea stack = new TextArea("SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getSqlName() + ";\n");
+            stack.maxHeight(80);
+            stack.setEditable(false);
 
-            AlertFactory.showInformationAlert(stage, "Select explicitly all fields",
-                        "SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getSqlName() + ";\n");
+            Scene dialogScene = StageFactory.buildScene(new VBox(grid, stack), -1d, -1d);
+            Stage datasetInformation = StageFactory.buildModalStage(stage, "Dataset information");
+            datasetInformation.setScene(dialogScene);
+            datasetInformation.show();
         });
-        return helpMenuItem;
+        return infoMenuItem;
     }
 
 }

@@ -37,7 +37,7 @@ public class BackgroundTasksDialog {
 
     public void buildBackgroundTasksDialog(Stage owner) {
 
-        this.dialog = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, StageStyle.DECORATED, true);
+        this.dialog = StageFactory.buildModalStage(owner, "Background tasks", Modality.NONE, true);
         dialog.setWidth(320);
 
         ListView<Service<?>> serviceListView = new ListView<>(poolService.getServices());

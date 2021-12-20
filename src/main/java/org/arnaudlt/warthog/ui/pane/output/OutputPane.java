@@ -211,10 +211,14 @@ public class OutputPane {
             TableColumn<Row, Object> col = new TableColumn<>(field.name());
             col.setCellValueFactory(param -> {
 
-                String fieldValue = param.getValue()
-                        .getAs(field.name())
-                        .toString();
+                String fieldValue = "";
+
+                Object rawValue = param.getValue().getAs(field.name());
+                if (rawValue != null) {
+                    fieldValue = rawValue.toString();
+                }
                 if (truncateAfterEnabled && fieldValue.length() > globalSettings.getOverviewTruncateAfter()) {
+
                     fieldValue = fieldValue.substring(0,globalSettings.getOverviewTruncateAfter()).concat("...");
                 }
                 return new SimpleObjectProperty<>(fieldValue);

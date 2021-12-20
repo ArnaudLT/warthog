@@ -81,8 +81,6 @@ public class NamedDatasetManager {
     public NamedDataset createNamedDataset(Path basePath, List<Path> filePaths, String preferredName) {
 
         Format fileType = FileUtil.getFileType(filePaths);
-        double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(filePaths);
-
         Dataset<Row> dataset;
         String[] filesToLoad = filePaths.stream().map(Path::toString).toArray(String[]::new);
         switch (fileType) {
@@ -124,6 +122,7 @@ public class NamedDatasetManager {
         Catalog catalog = buildCatalog(dataset);
         Transformation transformation = buildTransformation(catalog);
         String name = determineName(basePath, preferredName);
+        Decoration decoration = buildDecoration(fileType, basePath.toString(), filesToLoad, filePaths);
 
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
@@ -131,7 +130,19 @@ public class NamedDatasetManager {
                 dataset,
                 catalog,
                 transformation,
-                new Decoration(basePath.toString(), sizeInMegaBytes));
+                decoration);
+    }
+
+
+    private Decoration buildDecoration(Format fileType, String basePath, String[] filesToLoad, List<Path> filePaths) {
+
+        List<String> parts = Arrays.stream(filesToLoad)
+                .map(file -> file.startsWith(basePath) ? file.replace(basePath, "") : file)
+                .collect(Collectors.toList());
+
+        Double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(filePaths);
+
+        return new Decoration(fileType, basePath, parts, sizeInMegaBytes);
     }
 
 
@@ -155,7 +166,7 @@ public class NamedDatasetManager {
         Transformation transformation = buildTransformation(catalog);
 
         return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog, transformation,
-                new Decoration(databaseConnection.getName() + " - " + tableName, 0));
+                new Decoration(null, databaseConnection.getName(), List.of(tableName), null));
     }
 
 

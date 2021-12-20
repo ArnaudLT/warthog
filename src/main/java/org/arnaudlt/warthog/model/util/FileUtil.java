@@ -97,7 +97,7 @@ public class FileUtil {
     public static double getSizeInMegaBytes(List<Path> filePaths) {
 
         return filePaths.stream()
-                .mapToDouble(path -> path.toFile().length() / 1024d / 1024d)
-                .sum();
+                .mapToDouble(path -> path.toFile().length())
+                .sum() / 1024d / 1024d;
     }
 }

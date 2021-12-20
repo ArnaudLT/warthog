@@ -1,27 +1,53 @@
 package org.arnaudlt.warthog.model.dataset;
 
+import org.arnaudlt.warthog.model.util.Format;
+
+import java.util.List;
+
 public class Decoration {
 
-    private final String filePath;
+    private final Format format;
 
-    private final double sizeInMegaBytes;
+    private final String basePath;
+
+    private final List<String> parts;
+
+    private final Double sizeInMegaBytes;
 
 
-    public Decoration(String filePath, double sizeInMegaBytes) {
+    public Decoration(Format format, String basePath, List<String> parts, Double sizeInMegaBytes) {
 
-        this.filePath = filePath;
+        this.format = format;
+        this.basePath = basePath;
+        this.parts = parts;
         this.sizeInMegaBytes = sizeInMegaBytes;
     }
 
 
-    public String getFilePath() {
-        return filePath;
+    public Format getFormat() {
+        return format;
     }
 
 
-    public double getSizeInMegaBytes() {
+    public String getBasePath() {
+        return basePath;
+    }
+
+
+    public List<String> getParts() {
+        return parts;
+    }
+
+
+    public Double getSizeInMegaBytes() {
         return sizeInMegaBytes;
     }
 
 
+    public String getFormatAsString() {
+        if (format == null) {
+            return "N/A";
+        }
+        return format.name();
+    }
 }

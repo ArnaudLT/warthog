@@ -17,20 +17,19 @@ public class StageFactory {
 
     public static Stage buildModalStage(Stage owner, String title) {
 
-        return buildModalStage(owner, title, Modality.APPLICATION_MODAL, StageStyle.DECORATED, false);
+        return buildModalStage(owner, title, Modality.APPLICATION_MODAL, false);
     }
 
 
-    public static Stage buildModalStage(Stage owner, String title, Modality modality, StageStyle stageStyle, boolean isResizable) {
+    public static Stage buildModalStage(Stage owner, String title, Modality modality, boolean isResizable) {
 
         Stage stage = new Stage();
         stage.setTitle(title);
         stage.getIcons().add(new Image("/warthog_icon.png"));
         stage.initModality(modality);
-        stage.initStyle(stageStyle);
+        stage.initStyle(StageStyle.DECORATED);
         stage.initOwner(owner);
         stage.setResizable(isResizable);
-
         stage.setOnShowing(ev -> stage.hide());
         stage.setOnShown(ev -> {
 
