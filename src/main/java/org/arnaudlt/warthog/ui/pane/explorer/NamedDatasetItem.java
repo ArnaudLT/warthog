@@ -12,7 +12,7 @@ public class NamedDatasetItem {
 
     private String label;
 
-    private final String sqlName;
+    private String sqlName;
 
     private final DataType dataType;
 
@@ -45,7 +45,17 @@ public class NamedDatasetItem {
     }
 
 
+    public void setSqlName(String sqlName) {
+        this.sqlName = sqlName;
+    }
+
+
     public String getSqlName() {
+        return sqlName;
+    }
+
+
+    public String getCleanedSqlName() {
 
         if (containsSpecialCharacter(sqlName)) {
 
@@ -84,4 +94,5 @@ public class NamedDatasetItem {
     public String toString() {
         return label;
     }
+
 }

@@ -11,7 +11,11 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
+import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
+import org.arnaudlt.warthog.ui.service.NamedDatasetRenameViewService;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,14 +33,20 @@ public class ExplorerPane {
 
     private MainPane mainPane;
 
+    private final PoolService poolService;
+
+    private final NamedDatasetManager namedDatasetManager;
+
     private TreeView<NamedDatasetItem> treeExplorer;
 
     private final Map<NamedDataset, TreeItem<NamedDatasetItem>> namedDatasetToTreeItem;
 
 
     @Autowired
-    public ExplorerPane() {
+    public ExplorerPane(PoolService poolService, NamedDatasetManager namedDatasetManager) {
 
+        this.poolService = poolService;
+        this.namedDatasetManager = namedDatasetManager;
         this.namedDatasetToTreeItem = new HashMap<>();
     }
 
@@ -58,7 +68,7 @@ public class ExplorerPane {
         TreeItem<NamedDatasetItem> root = new TreeItem<>();
 
         TreeView<NamedDatasetItem> tree = new TreeView<>(root);
-        tree.setCellFactory(x -> new NamedDatasetItemTreeCell(stage));
+        tree.setCellFactory(x -> new NamedDatasetItemTreeCell(stage, this));
         tree.setShowRoot(false);
         tree.addEventFilter(MouseEvent.MOUSE_PRESSED, requestOpenSelectedNamedDatasets);
 
@@ -96,7 +106,7 @@ public class ExplorerPane {
         if (selectedItem == null) {
             content = "";
         } else {
-            content = selectedItem.getValue().getSqlName();
+            content = selectedItem.getValue().getCleanedSqlName();
         }
         Utils.copyStringToClipboard(content);
     }
@@ -191,6 +201,24 @@ public class ExplorerPane {
         TreeItem<NamedDatasetItem> namedDatasetTreeItem = this.namedDatasetToTreeItem.get(namedDataset);
         this.namedDatasetToTreeItem.remove(namedDataset);
         this.treeExplorer.getRoot().getChildren().remove(namedDatasetTreeItem);
+    }
+
+
+    protected void renameSqlView(NamedDatasetItem namedDatasetItem, String renameProposal) {
+
+        NamedDatasetRenameViewService namedDatasetRenameViewService = new NamedDatasetRenameViewService(
+            poolService, namedDatasetManager, namedDatasetItem.getNamedDataset(), renameProposal);
+
+        namedDatasetRenameViewService.setOnSucceeded(success -> {
+            namedDatasetItem.setLabel(renameProposal);
+            namedDatasetItem.setSqlName(renameProposal);
+            this.treeExplorer.refresh();
+        });
+        namedDatasetRenameViewService.setOnFailed(fail -> {
+            AlertFactory.showFailureAlert(stage, fail, "Not able to rename the dataset to " + renameProposal);
+        });
+        namedDatasetRenameViewService.setOnCancelled(cancel -> log.warn("Renaming dataset to "+ renameProposal + " cancelled"));
+        namedDatasetRenameViewService.start();
     }
 
 

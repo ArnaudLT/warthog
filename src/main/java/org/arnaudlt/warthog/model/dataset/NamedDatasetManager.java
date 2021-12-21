@@ -66,7 +66,7 @@ public class NamedDatasetManager {
                         .collect(Collectors.toList());
             } catch (IOException e) {
 
-                throw new ProcessingException(String.format("Not able to scan directory %s", file.getName()),e);
+                throw new ProcessingException(String.format("Not able to scan directory %s", file.getName()), e);
             }
         } else {
 
@@ -122,7 +122,7 @@ public class NamedDatasetManager {
         Catalog catalog = buildCatalog(dataset);
         Transformation transformation = buildTransformation(catalog);
         String name = determineName(basePath, preferredName);
-        Decoration decoration = buildDecoration(fileType, basePath.toString(), filesToLoad, filePaths);
+        Decoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
 
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
@@ -134,9 +134,11 @@ public class NamedDatasetManager {
     }
 
 
-    private Decoration buildDecoration(Format fileType, String basePath, String[] filesToLoad, List<Path> filePaths) {
+    private Decoration buildDecoration(Format fileType, String basePath, List<Path> filePaths) {
 
-        List<String> parts = Arrays.stream(filesToLoad)
+        List<String> parts = filePaths.stream()
+                .map(Path::toString)
+                .filter(file -> file.toLowerCase().endsWith(fileType.name().toLowerCase()))
                 .map(file -> file.startsWith(basePath) ? file.replace(basePath, "") : file)
                 .collect(Collectors.toList());
 
@@ -203,6 +205,14 @@ public class NamedDatasetManager {
             namedDataset.setLocalTemporaryViewName(localTempViewName);
             log.info("Named dataset {} registered (view : `{}`)", namedDataset.getName(), namedDataset.getLocalTemporaryViewName());
         }
+    }
+
+
+    public void tryRenameTempView(NamedDataset namedDataset, String name) throws AnalysisException {
+
+        namedDataset.getDataset().createTempView(name);
+        this.spark.catalog().dropTempView(namedDataset.getLocalTemporaryViewName());
+        namedDataset.setLocalTemporaryViewName(name);
     }
 
 
@@ -294,8 +304,8 @@ public class NamedDatasetManager {
 
             dfw = dfw.partitionBy(
                     Arrays.stream(exportFileSettings.getPartitionBy().split(",", -1))
-                        .map(String::trim)
-                        .toArray(String[]::new));
+                            .map(String::trim)
+                            .toArray(String[]::new));
         }
 
         final Format format = exportFileSettings.getFormat();

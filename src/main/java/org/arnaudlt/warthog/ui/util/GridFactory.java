@@ -13,13 +13,7 @@ public class GridFactory {
 
     public static GridPane buildGrid() {
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.TOP_LEFT);
-        grid.setPadding(new Insets(20,20,20,20));
-        grid.setHgap(10);
-        grid.setVgap(10);
-
-        return grid;
+        return buildGrid(new Insets(20,20,20,20));
     }
 
 

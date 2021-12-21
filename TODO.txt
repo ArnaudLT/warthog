@@ -44,3 +44,7 @@
     => hive.exec.scratchdir custom
     => How to handle command : \bin\winutils.exe chmod 777 \tmp\hive
 
+###################
+
+NamedDataset does not correspond to it 'name' attribute. (more like it's original preferred name)
+

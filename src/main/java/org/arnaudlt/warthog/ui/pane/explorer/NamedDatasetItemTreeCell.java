@@ -18,11 +18,14 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
 
     private final Stage stage;
 
+    private final ExplorerPane explorerPane;
 
-    public NamedDatasetItemTreeCell(Stage stage) {
+
+    public NamedDatasetItemTreeCell(Stage stage, ExplorerPane explorerPane) {
 
         super();
         this.stage = stage;
+        this.explorerPane = explorerPane;
     }
 
 
@@ -38,7 +41,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
         } else {
 
             MenuItem copyMenuItem = new MenuItem("Copy");
-            copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getSqlName()));
+            copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getCleanedSqlName()));
 
             ContextMenu contextMenu = new ContextMenu(copyMenuItem);
 
@@ -84,15 +87,24 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             String formattedSizeInMB = decoration.getSizeInMegaBytes() != null ? formatter.format(decoration.getSizeInMegaBytes()) : "?";
             grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
 
+            TextField renameProposalField = new TextField(namedDatasetItem.getSqlName());
+            Button renameProposalButton = new Button("Rename");
+            grid.addRow(rowIdx, renameProposalField, renameProposalButton);
+
+            renameProposalButton.setOnAction(rne -> {
+
+                this.explorerPane.renameSqlView(namedDatasetItem, renameProposalField.getText());
+            });
+
             String selectAll = namedDatasetItem.getChild().stream()
-                    .map(ndi -> "\t" + ndi.getSqlName())
+                    .map(ndi -> "\t" + ndi.getCleanedSqlName())
                     .collect(Collectors.joining(",\n"));
-            TextArea stack = new TextArea("SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getSqlName() + ";\n");
+            TextArea stack = new TextArea("SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getCleanedSqlName() + ";\n");
             stack.maxHeight(80);
             stack.setEditable(false);
 
             Scene dialogScene = StageFactory.buildScene(new VBox(grid, stack), -1d, -1d);
-            Stage datasetInformation = StageFactory.buildModalStage(stage, "Dataset information");
+            Stage datasetInformation = StageFactory.buildModalStage(stage, namedDatasetItem.getCleanedSqlName() + " information");
             datasetInformation.setScene(dialogScene);
             datasetInformation.show();
         });
