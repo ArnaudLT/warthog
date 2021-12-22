@@ -1,5 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -40,12 +42,13 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             setGraphic(null);
         } else {
 
-            MenuItem copyMenuItem = new MenuItem("Copy");
-            copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getCleanedSqlName()));
-
+            MenuItem copyMenuItem = buildCopyMenuItem(namedDatasetItem);
             ContextMenu contextMenu = new ContextMenu(copyMenuItem);
 
             if (namedDatasetItem.getDataType() == null) {
+
+                MenuItem renameMenuItem = buildRenameMenuItem(namedDatasetItem);
+                contextMenu.getItems().add(renameMenuItem);
 
                 MenuItem helpMenuItem = buildInfoMenuItem(namedDatasetItem);
                 contextMenu.getItems().add(helpMenuItem);
@@ -57,6 +60,12 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
         }
     }
 
+    private MenuItem buildCopyMenuItem(NamedDatasetItem namedDatasetItem) {
+
+        MenuItem copyMenuItem = new MenuItem("Copy");
+        copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getCleanedSqlName()));
+        return copyMenuItem;
+    }
 
     private MenuItem buildInfoMenuItem(NamedDatasetItem namedDatasetItem) {
 
@@ -87,15 +96,6 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             String formattedSizeInMB = decoration.getSizeInMegaBytes() != null ? formatter.format(decoration.getSizeInMegaBytes()) : "?";
             grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
 
-            TextField renameProposalField = new TextField(namedDatasetItem.getSqlName());
-            Button renameProposalButton = new Button("Rename");
-            grid.addRow(rowIdx, renameProposalField, renameProposalButton);
-
-            renameProposalButton.setOnAction(rne -> {
-
-                this.explorerPane.renameSqlView(namedDatasetItem, renameProposalField.getText());
-            });
-
             String selectAll = namedDatasetItem.getChild().stream()
                     .map(ndi -> "\t" + ndi.getCleanedSqlName())
                     .collect(Collectors.joining(",\n"));
@@ -109,6 +109,43 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             datasetInformation.show();
         });
         return infoMenuItem;
+    }
+
+
+    private MenuItem buildRenameMenuItem(NamedDatasetItem namedDatasetItem) {
+
+        MenuItem renameMenuItem = new MenuItem("Rename...");
+        renameMenuItem.setOnAction(evt -> {
+
+            Stage renameViewStage = StageFactory.buildModalStage(stage, "Rename dataset ");
+
+            GridPane grid = GridFactory.buildGrid();
+            int rowIdx = 0;
+
+            grid.add(new Label("Only alphanumerical and underscore characters are allowed"), 0, rowIdx++, 2, 1);
+
+            TextField newNameText = new TextField(namedDatasetItem.getSqlName());
+            newNameText.textProperty().addListener((observable, oldValue, newValue) -> {
+
+                boolean isValid = newValue.matches("^[a-zA-Z0-9_]*$");
+                if (!isValid) {
+
+                    ((StringProperty)observable).setValue(oldValue);
+                }
+            });
+            Button newNameButton = new Button("Rename");
+            newNameButton.setOnAction(rneEvt -> {
+
+                this.explorerPane.renameSqlView(namedDatasetItem, newNameText.getText(), renameViewStage::close);
+            });
+            grid.addRow(rowIdx++, newNameText, newNameButton);
+
+            Scene dialogScene = StageFactory.buildScene(new VBox(grid), -1d, -1d);
+            renameViewStage.setScene(dialogScene);
+            renameViewStage.show();
+        });
+
+        return renameMenuItem;
     }
 
 }

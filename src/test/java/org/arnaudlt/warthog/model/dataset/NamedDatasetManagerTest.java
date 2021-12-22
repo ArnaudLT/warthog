@@ -42,8 +42,7 @@ class NamedDatasetManagerTest {
 
         assertEquals("covid19-sample.csv", namedDataset.getName());
 
-        Catalog catalog = namedDataset.getCatalog();
-        assertEquals(7, catalog.getColumns().size());
+        assertEquals(7, namedDataset.getDataset().columns().length);
     }
 
 

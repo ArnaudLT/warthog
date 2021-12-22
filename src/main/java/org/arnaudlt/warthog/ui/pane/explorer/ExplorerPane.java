@@ -1,5 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -8,6 +10,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -23,6 +26,8 @@ import scala.collection.Iterator;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -203,7 +208,7 @@ public class ExplorerPane {
     }
 
 
-    protected void renameSqlView(NamedDatasetItem namedDatasetItem, String renameProposal) {
+    protected void renameSqlView(NamedDatasetItem namedDatasetItem, String renameProposal, Runnable onSuccess) {
 
         NamedDatasetRenameViewService namedDatasetRenameViewService = new NamedDatasetRenameViewService(
             poolService, namedDatasetManager, namedDatasetItem.getNamedDataset(), renameProposal);
@@ -212,11 +217,14 @@ public class ExplorerPane {
             namedDatasetItem.setLabel(renameProposal);
             namedDatasetItem.setSqlName(renameProposal);
             this.treeExplorer.refresh();
+            onSuccess.run();
         });
         namedDatasetRenameViewService.setOnFailed(fail -> {
             AlertFactory.showFailureAlert(stage, fail, "Not able to rename the dataset to " + renameProposal);
         });
-        namedDatasetRenameViewService.setOnCancelled(cancel -> log.warn("Renaming dataset to "+ renameProposal + " cancelled"));
+        namedDatasetRenameViewService.setOnCancelled(cancel -> {
+            log.warn("Renaming dataset to "+ renameProposal + " cancelled");
+        });
         namedDatasetRenameViewService.start();
     }
 

@@ -15,7 +15,7 @@ public class UniqueIdGenerator {
     @Autowired
     private UniqueIdGenerator() {
 
-        this.atomicInteger = new AtomicInteger(0);
+        this.atomicInteger = new AtomicInteger(1);
     }
 
 

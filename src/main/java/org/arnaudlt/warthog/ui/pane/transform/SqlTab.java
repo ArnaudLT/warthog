@@ -22,7 +22,8 @@ public class SqlTab extends Tab {
 
     public void build() {
 
-        //https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
+        // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
+        // https://spark.apache.org/docs/latest/api/sql/index.html
         this.sqlArea = new SqlCodeArea(poolService);
         this.setContent(this.sqlArea.getWrappedSqlArea());
         this.setClosable(false);

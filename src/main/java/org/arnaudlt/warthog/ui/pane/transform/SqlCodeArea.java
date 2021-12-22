@@ -126,6 +126,7 @@ public class SqlCodeArea {
                 "   Press 'CTRL+ENTER' to run your query\n" +
                 "   https://cwiki.apache.org/confluence/display/Hive/LanguageManual\n" +
                 "   https://spark.apache.org/docs/latest/sql-ref.html\n" +
+                "   https://spark.apache.org/docs/latest/api/sql/index.html\n" +
                 "*/\n"
         );
     }

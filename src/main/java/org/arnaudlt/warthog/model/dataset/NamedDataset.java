@@ -17,8 +17,6 @@ public class NamedDataset {
 
     private final Dataset<Row> dataset;
 
-    private final Catalog catalog;
-
     private final Decoration decoration;
 
     private String localTemporaryViewName;
@@ -29,7 +27,6 @@ public class NamedDataset {
         this.id = id;
         this.name = name;
         this.dataset = dataset;
-        this.catalog = catalog;
         this.decoration = decoration;
     }
 
@@ -46,11 +43,6 @@ public class NamedDataset {
 
     public Dataset<Row> getDataset() {
         return dataset;
-    }
-
-
-    public Catalog getCatalog() {
-        return catalog;
     }
 
 
