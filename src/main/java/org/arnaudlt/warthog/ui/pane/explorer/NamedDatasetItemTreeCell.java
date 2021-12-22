@@ -3,6 +3,7 @@ package org.arnaudlt.warthog.ui.pane.explorer;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -64,12 +65,15 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
         }
     }
 
+
     private MenuItem buildCopyMenuItem(NamedDatasetItem namedDatasetItem) {
 
         MenuItem copyMenuItem = new MenuItem("Copy");
+        copyMenuItem.setAccelerator(KeyCombination.valueOf("CTRL+C"));
         copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getCleanedSqlName()));
         return copyMenuItem;
     }
+
 
     private MenuItem buildInfoMenuItem(NamedDatasetItem namedDatasetItem) {
 
@@ -139,6 +143,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
     private MenuItem buildRenameMenuItem(NamedDatasetItem namedDatasetItem) {
 
         MenuItem renameMenuItem = new MenuItem("Rename...");
+        renameMenuItem.setAccelerator(KeyCombination.valueOf("SHIFT+F6"));
         renameMenuItem.setOnAction(evt -> {
 
             Stage renameViewStage = StageFactory.buildModalStage(stage, "Rename dataset ");

@@ -1,16 +1,11 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -19,15 +14,12 @@ import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetRenameViewService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import scala.collection.Iterator;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -92,27 +84,7 @@ public class ExplorerPane {
             }
         });
 
-        final KeyCombination keyCodeCopy = KeyCodeCombination.valueOf("CTRL+C");
-        tree.setOnKeyPressed(event -> {
-            if (keyCodeCopy.match(event)) {
-                copySelectionToClipboard();
-            }
-        });
-
         return tree;
-    }
-
-
-    private void copySelectionToClipboard() {
-
-        String content;
-        TreeItem<NamedDatasetItem> selectedItem = this.treeExplorer.getSelectionModel().getSelectedItem();
-        if (selectedItem == null) {
-            content = "";
-        } else {
-            content = selectedItem.getValue().getCleanedSqlName();
-        }
-        Utils.copyStringToClipboard(content);
     }
 
 

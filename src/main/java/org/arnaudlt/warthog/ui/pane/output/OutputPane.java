@@ -5,7 +5,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -62,9 +61,9 @@ public class OutputPane {
         this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         this.tableView.getSelectionModel().setCellSelectionEnabled(true);
 
-        final KeyCombination keyCodeCopy = KeyCodeCombination.valueOf("CTRL+C");
-        final KeyCombination keyCodeCopyLineWithHeader = KeyCodeCombination.valueOf("CTRL+SHIFT+C");
-        final KeyCombination keyCodeCopyWithHeader = KeyCodeCombination.valueOf("CTRL+ALT+C");
+        final KeyCombination keyCodeCopy = KeyCombination.valueOf("CTRL+C");
+        final KeyCombination keyCodeCopyLineWithHeader = KeyCombination.valueOf("CTRL+SHIFT+C");
+        final KeyCombination keyCodeCopyWithHeader = KeyCombination.valueOf("CTRL+ALT+C");
         this.tableView.setOnKeyPressed(event -> {
             if (keyCodeCopy.match(event)) {
 
@@ -93,11 +92,15 @@ public class OutputPane {
         countRowsButton.setTooltip(new Tooltip("Count rows"));
         countRowsButton.setOnAction(getDatasetCountRowsEventHandler());
 
+        Button showQueryButton = new Button("", new MDL2IconFont("\uEC42"));
+        showQueryButton.setTooltip(new Tooltip("Show query"));
+        showQueryButton.setOnAction(getShowQueryEventHandler());
+
         Button showSchemaButton = new Button("", new MDL2IconFont("\ue822"));
         showSchemaButton.setTooltip(new Tooltip("Show schema"));
         showSchemaButton.setOnAction(getDatasetShowSchemaEventHandler());
 
-        VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showSchemaButton);
+        VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showQueryButton, showSchemaButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
         this.tableView.prefWidthProperty().bind(hBox.widthProperty());
@@ -127,6 +130,16 @@ public class OutputPane {
 
             if (this.preparedDataset == null) return;
             AlertFactory.showInformationAlert(owner, "Schema : ", this.preparedDataset.getDataset().schema().prettyJson());
+        };
+    }
+
+
+    private EventHandler<ActionEvent> getShowQueryEventHandler() {
+
+        return event -> {
+
+            if (this.preparedDataset == null) return;
+            AlertFactory.showInformationAlert(owner, "SQL query : ", this.preparedDataset.getSqlQuery());
         };
     }
 

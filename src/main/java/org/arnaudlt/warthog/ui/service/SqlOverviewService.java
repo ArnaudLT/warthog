@@ -39,7 +39,7 @@ public class SqlOverviewService extends AbstractMonitoredService<PreparedDataset
                 updateMessage("Generating overview");
                 updateProgress(-1,1);
                 Dataset<Row> row = namedDatasetManager.prepareDataset(sqlQuery);
-                PreparedDataset preparedDataset = new PreparedDataset(row, row.takeAsList(overviewRows));
+                PreparedDataset preparedDataset = new PreparedDataset(sqlQuery, row, row.takeAsList(overviewRows));
                 updateProgress(1, 1);
                 return preparedDataset;
             }

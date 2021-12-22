@@ -5,7 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -101,18 +101,18 @@ public class ControlPane {
         Menu fileMenu = new Menu("File");
 
         MenuItem openFileItem = new MenuItem("Import local file...");
-        openFileItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+O"));
+        openFileItem.setAccelerator(KeyCombination.valueOf("CTRL+O"));
         openFileItem.setOnAction(requestImportFile);
 
         MenuItem openFolderItem = new MenuItem("Import local directory...");
-        openFolderItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+SHIFT+O"));
+        openFolderItem.setAccelerator(KeyCombination.valueOf("CTRL+SHIFT+O"));
         openFolderItem.setOnAction(requestImportFolder);
 
         MenuItem importFromItem = new MenuItem("Import...");
         importFromItem.setOnAction(requestImportFrom);
 
         MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setAccelerator(KeyCodeCombination.valueOf("DELETE"));
+        deleteItem.setAccelerator(KeyCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
         fileMenu.getItems().addAll(openFileItem, openFolderItem, new SeparatorMenuItem(),
@@ -125,7 +125,7 @@ public class ControlPane {
         connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
 
         MenuItem settingsItem = new MenuItem("Settings...");
-        settingsItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ALT+S"));
+        settingsItem.setAccelerator(KeyCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
         editMenu.getItems().addAll(connectionManagerItem, settingsItem);
@@ -133,7 +133,7 @@ public class ControlPane {
         Menu runMenu = new Menu("Run");
 
         MenuItem overviewItem = new MenuItem("Overview");
-        overviewItem.setAccelerator(KeyCodeCombination.valueOf("CTRL+ENTER"));
+        overviewItem.setAccelerator(KeyCombination.valueOf("CTRL+ENTER"));
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
         MenuItem exportToFileItem = new MenuItem("Export locally...");
