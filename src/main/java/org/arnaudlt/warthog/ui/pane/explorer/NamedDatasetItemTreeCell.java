@@ -4,7 +4,9 @@ import javafx.beans.property.StringProperty;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.arnaudlt.warthog.model.dataset.Decoration;
@@ -122,13 +124,15 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             GridPane grid = GridFactory.buildGrid();
             int rowIdx = 0;
 
-            grid.add(new Label("Only alphanumerical and underscore characters are allowed"), 0, rowIdx++, 2, 1);
+            grid.add(new Label("Only alphanumerical and underscore characters are allowed."), 0, rowIdx++, 2, 1);
 
             TextField newNameText = new TextField(namedDatasetItem.getSqlName());
+            ColumnConstraints constraints = new ColumnConstraints();
+            constraints.setHgrow(Priority.ALWAYS);
+            grid.getColumnConstraints().add(constraints);
             newNameText.textProperty().addListener((observable, oldValue, newValue) -> {
 
-                boolean isValid = newValue.matches("^[a-zA-Z0-9_]*$");
-                if (!isValid) {
+                if (!newValue.matches("^[a-zA-Z0-9_]*$")) {
 
                     ((StringProperty)observable).setValue(oldValue);
                 }
