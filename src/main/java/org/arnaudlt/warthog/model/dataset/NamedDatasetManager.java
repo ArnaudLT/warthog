@@ -5,6 +5,8 @@ import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.arnaudlt.warthog.model.connection.Connection;
+import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
+import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
@@ -117,7 +119,7 @@ public class NamedDatasetManager {
         }
 
         String name = determineName(basePath, preferredName);
-        Decoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
+        LocalDecoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
 
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
@@ -127,7 +129,7 @@ public class NamedDatasetManager {
     }
 
 
-    private Decoration buildDecoration(Format fileType, String basePath, List<Path> filePaths) {
+    private LocalDecoration buildDecoration(Format fileType, String basePath, List<Path> filePaths) {
 
         List<String> parts = filePaths.stream()
                 .map(Path::toString)
@@ -137,7 +139,7 @@ public class NamedDatasetManager {
 
         Double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(filePaths);
 
-        return new Decoration(fileType, basePath, parts, sizeInMegaBytes);
+        return new LocalDecoration(basePath, parts, fileType.name(), sizeInMegaBytes);
     }
 
 
@@ -158,7 +160,7 @@ public class NamedDatasetManager {
                 .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
 
         return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset,
-                new Decoration(null, databaseConnection.getName(), List.of(tableName), null));
+                new DatabaseDecoration(databaseConnection.getName(), tableName));
     }
 
 

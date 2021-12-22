@@ -3,6 +3,7 @@ package org.arnaudlt.warthog.model.dataset;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.arnaudlt.warthog.model.dataset.decoration.Decoration;
 
 import java.util.Objects;
 

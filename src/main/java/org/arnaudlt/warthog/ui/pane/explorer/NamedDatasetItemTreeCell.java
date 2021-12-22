@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
 import javafx.beans.property.StringProperty;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
@@ -9,7 +8,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.arnaudlt.warthog.model.dataset.Decoration;
+import org.arnaudlt.warthog.model.dataset.decoration.AzureDecoration;
+import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
+import org.arnaudlt.warthog.model.dataset.decoration.Decoration;
+import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -78,31 +80,51 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             int rowIdx = 0;
 
             Decoration decoration = namedDatasetItem.getNamedDataset().getDecoration();
+            if (decoration instanceof LocalDecoration) {
 
-            String origin = decoration.getBasePath();
-            grid.addRow(rowIdx++, new Label("Source :"), new Label(origin));
+                if (decoration instanceof AzureDecoration) {
 
-            String firstPart = decoration.getParts().get(0);
-            if (decoration.getParts().size() > 1) {
-                firstPart = firstPart + ",...";
+                    AzureDecoration azureDecoration = (AzureDecoration) decoration;
+                    grid.addRow(rowIdx++, new Label("Downloaded from :"), new Label(azureDecoration.getSource()));
+                }
+
+                LocalDecoration localDecoration = (LocalDecoration) decoration;
+
+                String basePath = localDecoration.getBasePath();
+                grid.addRow(rowIdx++, new Label("Base path :"), new Label(basePath));
+
+                String firstPart = localDecoration.getParts().get(0);
+
+                boolean isMultiParts = localDecoration.getParts().size() > 1;
+                if (isMultiParts) {
+                    grid.addRow(rowIdx++, new Label("Parts :"), new Label(firstPart + ",..."));
+                } else {
+                    grid.addRow(rowIdx++, new Label("Part :"), new Label(firstPart));
+                }
+
+                int partsCount = localDecoration.getParts().size();
+                grid.addRow(rowIdx++, new Label("Part count :"), new Label(String.valueOf(partsCount)));
+
+                String format = localDecoration.getFormat();
+                grid.addRow(rowIdx++, new Label("Format :"), new Label(format));
+
+                DecimalFormat formatter = new DecimalFormat("#.##");
+                String formattedSizeInMB = formatter.format(localDecoration.getSizeInMegaBytes());
+                grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
+
+            }  else if (decoration instanceof DatabaseDecoration) {
+
+                DatabaseDecoration databaseDecoration = (DatabaseDecoration) decoration;
+
+                grid.addRow(rowIdx++, new Label("Source :"), new Label(databaseDecoration.getSource()));
+                grid.addRow(rowIdx++, new Label("Table :"), new Label(databaseDecoration.getTableName()));
+
             }
-            grid.addRow(rowIdx++, new Label("Part(s) :"), new Label(firstPart));
-
-            int partsCount = decoration.getParts().size();
-            grid.addRow(rowIdx++, new Label("Parts count :"), new Label(String.valueOf(partsCount)));
-
-            String format = decoration.getFormatAsString();
-            grid.addRow(rowIdx++, new Label("Format :"), new Label(format));
-
-            DecimalFormat formatter = new DecimalFormat("#.##");
-            String formattedSizeInMB = decoration.getSizeInMegaBytes() != null ? formatter.format(decoration.getSizeInMegaBytes()) : "?";
-            grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
 
             String selectAll = namedDatasetItem.getChild().stream()
                     .map(ndi -> "\t" + ndi.getCleanedSqlName())
                     .collect(Collectors.joining(",\n"));
             TextArea stack = new TextArea("SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getCleanedSqlName() + ";\n");
-            stack.maxHeight(80);
             stack.setEditable(false);
 
             Scene dialogScene = StageFactory.buildScene(new VBox(grid, stack), -1d, -1d);
