@@ -22,7 +22,7 @@ public class NamedDataset {
     private String localTemporaryViewName;
 
 
-    public NamedDataset(int id, String name, Dataset<Row> dataset, Catalog catalog, Decoration decoration) {
+    public NamedDataset(int id, String name, Dataset<Row> dataset, Decoration decoration) {
 
         this.id = id;
         this.name = name;

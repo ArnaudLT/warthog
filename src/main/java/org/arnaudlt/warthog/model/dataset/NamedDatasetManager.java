@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
@@ -117,7 +116,6 @@ public class NamedDatasetManager {
                 throw new ProcessingException(String.format("Not able to read %s type", fileType));
         }
 
-        Catalog catalog = buildCatalog(dataset);
         String name = determineName(basePath, preferredName);
         Decoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
 
@@ -125,7 +123,6 @@ public class NamedDatasetManager {
                 this.uniqueIdGenerator.getUniqueId(),
                 name,
                 dataset,
-                catalog,
                 decoration);
     }
 
@@ -160,9 +157,7 @@ public class NamedDatasetManager {
                 .read()
                 .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
 
-        Catalog catalog = buildCatalog(dataset);
-
-        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog,
+        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset,
                 new Decoration(null, databaseConnection.getName(), List.of(tableName), null));
     }
 
@@ -242,16 +237,6 @@ public class NamedDatasetManager {
 
     public ObservableList<NamedDataset> getObservableNamedDatasets() {
         return observableNamedDatasets;
-    }
-
-
-    private Catalog buildCatalog(Dataset<Row> dataset) {
-
-        List<StructField> fields = List.of(dataset.schema().fields());
-        List<NamedColumn> columns = fields.stream()
-                .map(field -> new NamedColumn(field.name(), field.dataType().typeName()))
-                .collect(Collectors.toList());
-        return new Catalog(columns);
     }
 
 
