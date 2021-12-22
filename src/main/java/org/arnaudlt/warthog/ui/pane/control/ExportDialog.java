@@ -11,15 +11,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
-import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
-import org.arnaudlt.warthog.ui.service.NamedDatasetExportToDatabaseService;
 import org.arnaudlt.warthog.ui.service.SqlExportToDatabaseService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
@@ -147,23 +145,12 @@ public class ExportDialog {
 
     private void exportToDatabase(Connection selectedConnection, ExportDatabaseSettings exportDatabaseSettings) {
 
-        NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
-        if (selectedNamedDataset == null) {
-
             final String sqlQuery = this.transformPane.getSqlQuery();
             SqlExportToDatabaseService sqlExportToDatabaseService = new SqlExportToDatabaseService(poolService, namedDatasetManager,
                     sqlQuery, selectedConnection, exportDatabaseSettings);
             sqlExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
             sqlExportToDatabaseService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the database export"));
             sqlExportToDatabaseService.start();
-        } else {
-
-            NamedDatasetExportToDatabaseService namedDatasetExportToDatabaseService =
-                    new NamedDatasetExportToDatabaseService(poolService, namedDatasetManager, selectedNamedDataset, selectedConnection, exportDatabaseSettings);
-            namedDatasetExportToDatabaseService.setOnSucceeded(success -> log.info("Database export succeeded"));
-            namedDatasetExportToDatabaseService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the database export"));
-            namedDatasetExportToDatabaseService.start();
-        }
     }
 
 }

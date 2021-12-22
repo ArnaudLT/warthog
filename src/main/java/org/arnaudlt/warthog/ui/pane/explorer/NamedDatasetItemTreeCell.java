@@ -104,7 +104,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             stack.setEditable(false);
 
             Scene dialogScene = StageFactory.buildScene(new VBox(grid, stack), -1d, -1d);
-            Stage datasetInformation = StageFactory.buildModalStage(stage, namedDatasetItem.getCleanedSqlName() + " information");
+            Stage datasetInformation = StageFactory.buildModalStage(stage, "Dataset information");
             datasetInformation.setScene(dialogScene);
             datasetInformation.show();
         });

@@ -1,11 +1,11 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +70,6 @@ public class ExplorerPane {
         TreeView<NamedDatasetItem> tree = new TreeView<>(root);
         tree.setCellFactory(x -> new NamedDatasetItemTreeCell(stage, this));
         tree.setShowRoot(false);
-        tree.addEventFilter(MouseEvent.MOUSE_PRESSED, requestOpenSelectedNamedDatasets);
 
         tree.setOnDragOver(dragEvent -> {
 
@@ -220,23 +219,6 @@ public class ExplorerPane {
         namedDatasetRenameViewService.setOnCancelled(cancel -> log.warn("Renaming dataset to "+ renameProposal + " cancelled"));
         namedDatasetRenameViewService.start();
     }
-
-
-    private final EventHandler<MouseEvent> requestOpenSelectedNamedDatasets = event -> {
-
-        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() >= 2 && event.getTarget() != null) {
-
-            event.consume(); // Avoid expand/collapse on double click on the namedDataset !
-            ObservableList<TreeItem<NamedDatasetItem>> selectedItems = this.treeExplorer.getSelectionModel().getSelectedItems();
-            for (TreeItem<NamedDatasetItem> selectedItem : selectedItems) {
-
-                if (selectedItem == null) continue;
-                NamedDataset selectedNamedDataset = selectedItem.getValue().getNamedDataset();
-                log.info("Request to open named dataset {}", selectedNamedDataset.getName());
-                this.mainPane.getTransformPane().openNamedDataset(selectedNamedDataset);
-            }
-        }
-    };
 
 
     public void setMainPane(MainPane mainPane) {

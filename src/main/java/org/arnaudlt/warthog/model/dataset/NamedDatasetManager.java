@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.connection.Connection;
-import org.arnaudlt.warthog.model.dataset.transformation.SelectNamedColumn;
-import org.arnaudlt.warthog.model.dataset.transformation.WhereClause;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
@@ -120,7 +118,6 @@ public class NamedDatasetManager {
         }
 
         Catalog catalog = buildCatalog(dataset);
-        Transformation transformation = buildTransformation(catalog);
         String name = determineName(basePath, preferredName);
         Decoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
 
@@ -129,7 +126,6 @@ public class NamedDatasetManager {
                 name,
                 dataset,
                 catalog,
-                transformation,
                 decoration);
     }
 
@@ -165,9 +161,8 @@ public class NamedDatasetManager {
                 .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
 
         Catalog catalog = buildCatalog(dataset);
-        Transformation transformation = buildTransformation(catalog);
 
-        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog, transformation,
+        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset, catalog,
                 new Decoration(null, databaseConnection.getName(), List.of(tableName), null));
     }
 
@@ -254,21 +249,9 @@ public class NamedDatasetManager {
 
         List<StructField> fields = List.of(dataset.schema().fields());
         List<NamedColumn> columns = fields.stream()
-                .map(field -> new NamedColumn(this.uniqueIdGenerator.getUniqueId(), field.name(), field.dataType().typeName()))
+                .map(field -> new NamedColumn(field.name(), field.dataType().typeName()))
                 .collect(Collectors.toList());
         return new Catalog(columns);
-    }
-
-
-    private Transformation buildTransformation(Catalog catalog) {
-
-        List<SelectNamedColumn> selectNamedColumns = catalog.getColumns().stream()
-                .map(nc -> new SelectNamedColumn(nc.getId(), nc.getName(), nc.getType()))
-                .collect(Collectors.toList());
-
-        List<WhereClause> whereNamedColumns = new ArrayList<>();
-
-        return new Transformation(selectNamedColumns, whereNamedColumns);
     }
 
 
@@ -281,13 +264,6 @@ public class NamedDatasetManager {
     public void export(String sqlQuery, ExportFileSettings exportFileSettings) {
 
         Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
-        export(output, exportFileSettings);
-    }
-
-
-    public void export(NamedDataset namedDataset, ExportFileSettings exportFileSettings) {
-
-        Dataset<Row> output = namedDataset.applyTransformation();
         export(output, exportFileSettings);
     }
 
@@ -335,7 +311,6 @@ public class NamedDatasetManager {
                         .save(exportFileSettings.getFilePath());
                 break;
         }
-
     }
 
 
@@ -349,15 +324,5 @@ public class NamedDatasetManager {
                 .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.getTableName(), databaseConnection.getDatabaseProperties());
     }
 
-
-    public void exportToDatabase(NamedDataset namedDataset, Connection databaseConnection, ExportDatabaseSettings exportDatabaseSettings) {
-
-        Dataset<Row> output = namedDataset.applyTransformation();
-
-        output
-                .write()
-                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
-                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.getTableName(), databaseConnection.getDatabaseProperties());
-    }
 
 }

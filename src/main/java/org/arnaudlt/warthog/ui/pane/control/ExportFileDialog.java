@@ -8,16 +8,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.util.PoolService;
-import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.util.Format;
+import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
-import org.arnaudlt.warthog.ui.service.NamedDatasetExportToFileService;
 import org.arnaudlt.warthog.ui.service.SqlExportToFileService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
@@ -153,21 +150,11 @@ public class ExportFileDialog {
 
     private void exportToFile(ExportFileSettings exportFileSettings) {
 
-        NamedDataset selectedNamedDataset = this.transformPane.getSelectedNamedDataset();
-        if (selectedNamedDataset == null) {
-
-            final String sqlQuery = this.transformPane.getSqlQuery();
-            SqlExportToFileService exportService = new SqlExportToFileService(poolService, namedDatasetManager, sqlQuery, exportFileSettings);
-            exportService.setOnSucceeded(success -> log.info("Export succeeded"));
-            exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the export"));
-            exportService.start();
-        } else {
-
-            NamedDatasetExportToFileService exportService = new NamedDatasetExportToFileService(poolService, namedDatasetManager, selectedNamedDataset, exportFileSettings);
-            exportService.setOnSucceeded(success -> log.info("Export succeeded"));
-            exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the export"));
-            exportService.start();
-        }
+        final String sqlQuery = this.transformPane.getSqlQuery();
+        SqlExportToFileService exportService = new SqlExportToFileService(poolService, namedDatasetManager, sqlQuery, exportFileSettings);
+        exportService.setOnSucceeded(success -> log.info("Export succeeded"));
+        exportService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Not able to generate the export"));
+        exportService.start();
     }
 
 }

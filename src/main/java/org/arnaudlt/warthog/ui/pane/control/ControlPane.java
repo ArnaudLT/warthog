@@ -13,12 +13,11 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
-import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
-import org.arnaudlt.warthog.ui.service.*;
+import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromFileService;
+import org.arnaudlt.warthog.ui.service.SqlOverviewService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -116,7 +115,7 @@ public class ControlPane {
         deleteItem.setAccelerator(KeyCodeCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
-        fileMenu.getItems().addAll(openFileItem, openFolderItem,  new SeparatorMenuItem(),
+        fileMenu.getItems().addAll(openFileItem, openFolderItem, new SeparatorMenuItem(),
                 importFromItem, new SeparatorMenuItem(),
                 deleteItem);
 
@@ -154,7 +153,7 @@ public class ControlPane {
 
     private EventHandler<ActionEvent> getBackgroundTasksActionEventHandler() {
 
-            return actionEvent -> this.backgroundTasksDialog.showTasksManagerDialog();
+        return actionEvent -> this.backgroundTasksDialog.showTasksManagerDialog();
     }
 
 
@@ -183,21 +182,12 @@ public class ControlPane {
 
         return event -> {
 
-            NamedDataset selectedNamedDataset = this.mainPane.getTransformPane().getSelectedNamedDataset();
-            if (selectedNamedDataset == null) {
+            final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
+            SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
+            overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
+            overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
+            overviewService.start();
 
-                final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
-                SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
-                overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
-                overviewService.start();
-            } else {
-
-                NamedDatasetOverviewService overviewService = new NamedDatasetOverviewService(poolService, selectedNamedDataset, globalSettings.getOverviewRows());
-                overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
-                overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
-                overviewService.start();
-            }
             event.consume();
         };
     }
@@ -235,14 +225,14 @@ public class ControlPane {
 
 
     private final EventHandler<ActionEvent> requestImportFrom = actionEvent ->
-        this.importDialog.showImportDatabaseDialog();
+            this.importDialog.showImportDatabaseDialog();
 
 
     public void importFile(File file) {
 
         NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(poolService, namedDatasetManager, file);
         importService.setOnSucceeded(success -> mainPane.getExplorerPane().addNamedDatasetItem(importService.getValue()));
-        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '"+ file.getName() +"'"));
+        importService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to add the dataset '" + file.getName() + "'"));
         importService.start();
     }
 
@@ -253,7 +243,6 @@ public class ControlPane {
         for (NamedDataset selectedNamedDataset : selectedItems) {
 
             log.info("Request to close named dataset {}", selectedNamedDataset.getName());
-            this.mainPane.getTransformPane().closeNamedDataset(selectedNamedDataset);
             this.mainPane.getExplorerPane().removeNamedDataset(selectedNamedDataset);
             this.namedDatasetManager.deregisterNamedDataset(selectedNamedDataset);
         }

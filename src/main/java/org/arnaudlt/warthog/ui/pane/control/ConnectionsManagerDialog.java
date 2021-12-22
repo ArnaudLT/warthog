@@ -249,8 +249,7 @@ public class ConnectionsManagerDialog {
             } catch (IOException e) {
                 AlertFactory.showFailureAlert(owner, e, "Unable to save connections");
             }
-            Utils.refreshTreeViewAllItems(this.connectionsList);
-
+            this.connectionsList.refresh();
         });
         grid.addRow(i, saveButton);
 
@@ -312,14 +311,14 @@ public class ConnectionsManagerDialog {
             connection.setDatabaseType(databaseType.getValue());
             connection.setUser(user.getText());
             connection.setPassword(password.getText());
-            log.info("Save ... {}", connection.toString());
+            log.info("Save ... {}", connection);
 
             try {
                 this.connectionsCollection.persist();
             } catch (IOException e) {
                 AlertFactory.showFailureAlert(owner, e, "Unable to save connections");
             }
-            Utils.refreshTreeViewAllItems(this.connectionsList);
+            this.connectionsList.refresh();
         });
         grid.addRow(i, saveButton);
         return grid;

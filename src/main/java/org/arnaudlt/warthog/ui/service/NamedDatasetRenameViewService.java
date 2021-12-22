@@ -3,11 +3,8 @@ package org.arnaudlt.warthog.ui.service;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.AnalysisException;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.model.dataset.PreparedDataset;
 import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j

@@ -47,4 +47,6 @@
 ###################
 
 NamedDataset does not correspond to it 'name' attribute. (more like it's original preferred name)
-
+Renaming issues :
+  - Desync query builder tab name
+  - Desync title of mainPane

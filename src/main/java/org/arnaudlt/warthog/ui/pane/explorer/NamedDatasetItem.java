@@ -55,6 +55,16 @@ public class NamedDatasetItem {
     }
 
 
+    public DataType getDataType() {
+        return dataType;
+    }
+
+
+    public List<NamedDatasetItem> getChild() {
+        return child;
+    }
+
+
     public String getCleanedSqlName() {
 
         if (containsSpecialCharacter(sqlName)) {
@@ -64,16 +74,6 @@ public class NamedDatasetItem {
 
             return sqlName;
         }
-    }
-
-
-    public DataType getDataType() {
-        return dataType;
-    }
-
-
-    public List<NamedDatasetItem> getChild() {
-        return child;
     }
 
 
