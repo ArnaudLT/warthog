@@ -69,7 +69,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
     private MenuItem buildCopyMenuItem(NamedDatasetItem namedDatasetItem) {
 
         MenuItem copyMenuItem = new MenuItem("Copy");
-        copyMenuItem.setAccelerator(KeyCombination.valueOf("CTRL+C"));
+        // stupid !!! copyMenuItem.setAccelerator(KeyCombination.valueOf("CTRL+C"));
         copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getCleanedSqlName()));
         return copyMenuItem;
     }
@@ -143,7 +143,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
     private MenuItem buildRenameMenuItem(NamedDatasetItem namedDatasetItem) {
 
         MenuItem renameMenuItem = new MenuItem("Rename...");
-        renameMenuItem.setAccelerator(KeyCombination.valueOf("SHIFT+F6"));
+        // stupid !!! renameMenuItem.setAccelerator(KeyCombination.valueOf("SHIFT+F6"));
         renameMenuItem.setOnAction(evt -> {
 
             Stage renameViewStage = StageFactory.buildModalStage(stage, "Rename dataset ");

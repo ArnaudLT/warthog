@@ -103,6 +103,7 @@ public class OutputPane {
         VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showQueryButton, showSchemaButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
+        hBox.setMinHeight(10);
         this.tableView.prefWidthProperty().bind(hBox.widthProperty());
 
         return hBox;
