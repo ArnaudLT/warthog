@@ -258,7 +258,7 @@ public class NamedDatasetManager {
     public void export(Dataset<Row> output, ExportFileSettings exportFileSettings) {
 
         DataFrameWriter<Row> dfw = output
-                .coalesce(1)
+                .repartition(exportFileSettings.getRepartition())
                 .write()
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
                 .mode(exportFileSettings.getSaveMode());
@@ -286,6 +286,7 @@ public class NamedDatasetManager {
                 break;
             case PARQUET:
                 dfw
+                        .option("compression", exportFileSettings.getCompression().getLabel())
                         .parquet(exportFileSettings.getFilePath());
                 break;
             case ORC:

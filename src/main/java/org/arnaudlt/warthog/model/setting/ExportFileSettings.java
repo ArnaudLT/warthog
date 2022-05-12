@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.model.setting;
 
+import org.arnaudlt.warthog.model.util.Compression;
 import org.arnaudlt.warthog.model.util.Format;
 
 public class ExportFileSettings {
@@ -12,20 +13,28 @@ public class ExportFileSettings {
 
     private final String partitionBy;
 
+    private final int repartition;
+
     // CSV only
     private final String separator;
 
     // CSV only
     private final Boolean header;
 
+    // PARQUET
+    private final Compression compression;
 
-    public ExportFileSettings(String filePath, Format format, String saveMode, String partitionBy, String separator, Boolean header) {
+
+    public ExportFileSettings(String filePath, Format format, String saveMode, String partitionBy, int repartition,
+                              String separator, Boolean header, Compression compression) {
         this.filePath = filePath;
         this.format = format;
         this.saveMode = saveMode;
         this.partitionBy = partitionBy;
+        this.repartition = repartition;
         this.separator = separator;
         this.header = header;
+        this.compression = compression;
     }
 
 
@@ -44,6 +53,11 @@ public class ExportFileSettings {
     }
 
 
+    public int getRepartition() {
+        return repartition;
+    }
+
+
     public String getPartitionBy() {
         return partitionBy;
     }
@@ -58,4 +72,8 @@ public class ExportFileSettings {
         return header;
     }
 
+
+    public Compression getCompression() {
+        return compression;
+    }
 }

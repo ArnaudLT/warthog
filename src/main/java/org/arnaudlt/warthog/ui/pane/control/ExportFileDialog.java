@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
+import org.arnaudlt.warthog.model.util.Compression;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
@@ -113,6 +114,11 @@ public class ExportFileDialog {
         GridPane advancedGrid = GridFactory.buildGrid();
         rowIndex = 0;
 
+        Label repartitionLabel = new Label("Repartition :");
+        Spinner<Integer> repartition = new Spinner<>(1, 1000, 1, 1);
+        repartition.setEditable(true);
+        advancedGrid.addRow(rowIndex++, repartitionLabel, repartition);
+
         Label partitionByLabel = new Label("Partitions :");
         TextField partitionBy = new TextField();
         partitionBy.setMinWidth(300);
@@ -120,6 +126,15 @@ public class ExportFileDialog {
         partitionBy.setTooltip(new Tooltip("Comma separated list of attributes"));
 
         advancedGrid.addRow(rowIndex++, partitionByLabel, partitionBy);
+
+        BooleanBinding parquetSelected = format.valueProperty().isEqualTo(Format.PARQUET);
+        Label compressionLabel = new Label("Compression :");
+        compressionLabel.visibleProperty().bind(parquetSelected);
+        ComboBox<Compression> compression = new ComboBox<>(FXCollections.observableArrayList(Compression.values()));
+        compression.setValue(Compression.SNAPPY);
+        compression.visibleProperty().bind(parquetSelected);
+
+        advancedGrid.addRow(rowIndex++, compressionLabel, compression);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedGrid);
 
@@ -131,7 +146,8 @@ public class ExportFileDialog {
         exportButton.setOnAction(event -> {
 
             ExportFileSettings exportFileSettings = new ExportFileSettings(output.getText(), format.getValue(),
-                    saveMode.getValue(), partitionBy.getText(), separator.getText(), header.isSelected());
+                    saveMode.getValue(), partitionBy.getText(), repartition.getValue(), separator.getText(),
+                    header.isSelected(), compression.getValue());
             exportToFile(exportFileSettings);
             dialog.close();
         });
