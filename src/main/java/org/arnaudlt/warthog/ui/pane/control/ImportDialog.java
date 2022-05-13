@@ -250,7 +250,7 @@ public class ImportDialog {
     }
 
 
-    public void showImportDatabaseDialog() {
+    public void showImportDialog() {
 
         Utils.refreshComboBoxAllItems(connectionsListBox);
         dialog.show();

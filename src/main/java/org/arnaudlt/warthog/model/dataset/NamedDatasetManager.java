@@ -10,6 +10,7 @@ import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
+import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.UniqueIdGenerator;
@@ -21,8 +22,10 @@ import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,8 +83,9 @@ public class NamedDatasetManager {
     public NamedDataset createNamedDataset(Path basePath, List<Path> filePaths, String preferredName) {
 
         Format fileType = FileUtil.getFileType(filePaths);
-        Dataset<Row> dataset;
         String[] filesToLoad = filePaths.stream().map(Path::toString).toArray(String[]::new);
+
+        Dataset<Row> dataset;
         switch (fileType) {
 
             case CSV:
@@ -120,6 +124,55 @@ public class NamedDatasetManager {
 
         String name = determineName(basePath, preferredName);
         LocalDecoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
+
+        return new NamedDataset(
+                this.uniqueIdGenerator.getUniqueId(),
+                name,
+                dataset,
+                decoration);
+    }
+
+
+    public NamedDataset createNamedDataset(ImportDirectorySettings importDirectorySettings) {
+
+        Dataset<Row> dataset;
+        switch (importDirectorySettings.getFormat()) {
+
+            case CSV:
+                dataset = spark.read()
+                        .option("header", true)
+                        .option("inferSchema", "true")
+                        .option("sep", importDirectorySettings.getSeparator())
+                        .option("basePath", importDirectorySettings.getBasePath())
+                        .csv(importDirectorySettings.getFilePath());
+                break;
+            case JSON:
+                dataset = spark.read()
+                        .option("basePath", importDirectorySettings.getBasePath())
+                        .json(importDirectorySettings.getFilePath());
+                break;
+            case PARQUET:
+                dataset = spark.read()
+                        .option("basePath", importDirectorySettings.getBasePath())
+                        .parquet(importDirectorySettings.getFilePath());
+                break;
+            case ORC:
+                dataset = spark.read()
+                        .option("basePath", importDirectorySettings.getBasePath())
+                        .orc(importDirectorySettings.getFilePath());
+                break;
+            case AVRO:
+                dataset = spark.read()
+                        .option("basePath", importDirectorySettings.getBasePath())
+                        .format("avro")
+                        .load(importDirectorySettings.getFilePath());
+                break;
+            default:
+                throw new ProcessingException(String.format("Not able to read %s type", importDirectorySettings.getFormat()));
+        }
+
+        String name = determineName(Paths.get(importDirectorySettings.getBasePath()), importDirectorySettings.getName());
+        LocalDecoration decoration = buildDecoration(importDirectorySettings.getFormat(), importDirectorySettings.getBasePath(), Collections.emptyList());
 
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
@@ -311,6 +364,5 @@ public class NamedDatasetManager {
                 .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
                 .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.getTableName(), databaseConnection.getDatabaseProperties());
     }
-
 
 }

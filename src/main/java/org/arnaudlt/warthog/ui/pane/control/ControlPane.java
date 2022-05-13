@@ -52,13 +52,15 @@ public class ControlPane {
 
     private ImportDialog importDialog;
 
+    private ImportLocalDialog importLocalDialog;
+
 
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
                        ExportDialog exportDialog, GlobalSettings globalSettings,
                        ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
                        ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog,
-                       BackgroundTasksDialog backgroundTasksDialog) {
+                       ImportLocalDialog importLocalDialog, BackgroundTasksDialog backgroundTasksDialog) {
 
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
@@ -68,6 +70,7 @@ public class ControlPane {
         this.settingsDialog = settingsDialog;
         this.connectionsManagerDialog = connectionsManagerDialog;
         this.importDialog = importDialog;
+        this.importLocalDialog = importLocalDialog;
         this.backgroundTasksDialog = backgroundTasksDialog;
     }
 
@@ -90,6 +93,7 @@ public class ControlPane {
         this.exportFileDialog.buildExportFileDialog(stage);
         this.connectionsManagerDialog.buildConnectionsManagerDialog(stage);
         this.importDialog.buildImportDialog(stage);
+        this.importLocalDialog.buildImportLocalDialog(stage);
         this.backgroundTasksDialog.buildBackgroundTasksDialog(stage);
 
         return hBox;
@@ -100,13 +104,9 @@ public class ControlPane {
 
         Menu fileMenu = new Menu("File");
 
-        MenuItem openFileItem = new MenuItem("Import local file...");
-        openFileItem.setAccelerator(KeyCombination.valueOf("CTRL+O"));
-        openFileItem.setOnAction(requestImportFile);
-
-        MenuItem openFolderItem = new MenuItem("Import local directory...");
-        openFolderItem.setAccelerator(KeyCombination.valueOf("CTRL+SHIFT+O"));
-        openFolderItem.setOnAction(requestImportFolder);
+        MenuItem importFromLocal = new MenuItem("Import from local...");
+        importFromLocal.setAccelerator(KeyCombination.valueOf("CTRL+O"));
+        importFromLocal.setOnAction(requestImportLocal);
 
         MenuItem importFromItem = new MenuItem("Import...");
         importFromItem.setOnAction(requestImportFrom);
@@ -115,9 +115,7 @@ public class ControlPane {
         deleteItem.setAccelerator(KeyCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
-        fileMenu.getItems().addAll(openFileItem, openFolderItem, new SeparatorMenuItem(),
-                importFromItem, new SeparatorMenuItem(),
-                deleteItem);
+        fileMenu.getItems().addAll(importFromLocal, importFromItem, new SeparatorMenuItem(), deleteItem);
 
         Menu editMenu = new Menu("Edit");
 
@@ -224,8 +222,12 @@ public class ControlPane {
     };
 
 
+    private final EventHandler<ActionEvent> requestImportLocal = actionEvent ->
+            this.importLocalDialog.showImportLocalDialog();
+
+
     private final EventHandler<ActionEvent> requestImportFrom = actionEvent ->
-            this.importDialog.showImportDatabaseDialog();
+            this.importDialog.showImportDialog();
 
 
     public void importFile(File file) {
