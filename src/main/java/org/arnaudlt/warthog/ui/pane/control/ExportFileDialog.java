@@ -88,11 +88,11 @@ public class ExportFileDialog {
         saveMode.setMinWidth(100);
         basicGrid.addRow(rowIndex++, formatLabel, format, modeLabel, saveMode);
 
+        Separator s = new Separator(Orientation.HORIZONTAL);
+        basicGrid.add(s, 0, rowIndex++, 5, 1);
+
         // Start conditional display
         BooleanBinding csvSelected = format.valueProperty().isEqualTo(Format.CSV);
-        Separator s = new Separator(Orientation.HORIZONTAL);
-        s.visibleProperty().bind(csvSelected);
-        basicGrid.add(s, 0, rowIndex++, 4, 1);
 
         Label separatorLabel = new Label("Separator :");
         separatorLabel.visibleProperty().bind(csvSelected);
@@ -114,11 +114,6 @@ public class ExportFileDialog {
         GridPane advancedGrid = GridFactory.buildGrid();
         rowIndex = 0;
 
-        Label repartitionLabel = new Label("Repartition :");
-        Spinner<Integer> repartition = new Spinner<>(1, 1000, 1, 1);
-        repartition.setEditable(true);
-        advancedGrid.addRow(rowIndex++, repartitionLabel, repartition);
-
         Label partitionByLabel = new Label("Partitions :");
         TextField partitionBy = new TextField();
         partitionBy.setMinWidth(300);
@@ -126,6 +121,11 @@ public class ExportFileDialog {
         partitionBy.setTooltip(new Tooltip("Comma separated list of attributes"));
 
         advancedGrid.addRow(rowIndex++, partitionByLabel, partitionBy);
+
+        Label repartitionLabel = new Label("Repartition :");
+        Spinner<Integer> repartition = new Spinner<>(1, 1000, 1, 1);
+        repartition.setEditable(true);
+        advancedGrid.addRow(rowIndex++, repartitionLabel, repartition);
 
         BooleanBinding parquetSelected = format.valueProperty().isEqualTo(Format.PARQUET);
         Label compressionLabel = new Label("Compression :");
