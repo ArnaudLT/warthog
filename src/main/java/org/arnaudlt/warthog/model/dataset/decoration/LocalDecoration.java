@@ -1,5 +1,7 @@
 package org.arnaudlt.warthog.model.dataset.decoration;
 
+import org.arnaudlt.warthog.model.util.Format;
+
 import java.util.List;
 
 public class LocalDecoration implements Decoration {
@@ -8,12 +10,12 @@ public class LocalDecoration implements Decoration {
 
     private final List<String> parts;
 
-    private final String format;
+    private final Format format;
 
     private final Double sizeInMegaBytes;
 
 
-    public LocalDecoration(String basePath, List<String> parts, String format, Double sizeInMegaBytes) {
+    public LocalDecoration(String basePath, List<String> parts, Format format, Double sizeInMegaBytes) {
 
         this.basePath = basePath;
         this.parts = parts;
@@ -32,7 +34,7 @@ public class LocalDecoration implements Decoration {
     }
 
 
-    public String getFormat() {
+    public Format getFormat() {
         return format;
     }
 

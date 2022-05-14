@@ -10,6 +10,9 @@ import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
+import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
+import org.arnaudlt.warthog.model.util.FileUtil;
+import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
 
 import java.nio.file.Path;
@@ -107,7 +110,13 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
             Path basePath = customBasePath.isBlank() ? baseDirectory : Paths.get(customBasePath);
             String preferredName = basePath.getFileName().toString();
-            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(basePath, listOfPaths, preferredName);
+            Format format = FileUtil.determineFormat(listOfPaths);
+            String separator = FileUtil.inferSeparator(format, listOfPaths);
+
+            ImportDirectorySettings importDirectorySettings = new ImportDirectorySettings(
+                    listOfPaths, format, preferredName, separator, basePath
+            );
+            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(importDirectorySettings);
 
             namedDatasetManager.registerNamedDataset(namedDataset);
             updateProgress(totalWork, totalWork);

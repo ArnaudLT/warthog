@@ -15,6 +15,9 @@ public enum Format {
         this.label = label;
     }
 
+    public String getLabel() {
+        return label;
+    }
 
     static Format valueFromLabel(String label) {
 

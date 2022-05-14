@@ -19,13 +19,13 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,61 +76,16 @@ public class NamedDatasetManager {
             preferredName = file.getName();
             filePaths = List.of(file.toPath());
         }
-        return createNamedDataset(basePath, filePaths, preferredName);
+
+        Format fileType = FileUtil.determineFormat(filePaths);
+        String separator = FileUtil.inferSeparator(fileType, filePaths);
+
+        ImportDirectorySettings importDirectorySettings = new ImportDirectorySettings(
+            filePaths, fileType, preferredName, separator, basePath);
+
+        return createNamedDataset(importDirectorySettings);
     }
 
-
-    public NamedDataset createNamedDataset(Path basePath, List<Path> filePaths, String preferredName) {
-
-        Format fileType = FileUtil.getFileType(filePaths);
-        String[] filesToLoad = filePaths.stream().map(Path::toString).toArray(String[]::new);
-
-        Dataset<Row> dataset;
-        switch (fileType) {
-
-            case CSV:
-                String separator = FileUtil.inferSeparator(filePaths);
-                dataset = spark.read()
-                        .option("header", true)
-                        .option("inferSchema", "true")
-                        .option("sep", separator)
-                        .option("basePath", basePath.toString())
-                        .csv(filesToLoad);
-                break;
-            case JSON:
-                dataset = spark.read()
-                        .option("basePath", basePath.toString())
-                        .json(filesToLoad);
-                break;
-            case PARQUET:
-                dataset = spark.read()
-                        .option("basePath", basePath.toString())
-                        .parquet(filesToLoad);
-                break;
-            case ORC:
-                dataset = spark.read()
-                        .option("basePath", basePath.toString())
-                        .orc(filesToLoad);
-                break;
-            case AVRO:
-                dataset = spark.read()
-                        .option("basePath", basePath.toString())
-                        .format("avro")
-                        .load(filesToLoad);
-                break;
-            default:
-                throw new ProcessingException(String.format("Not able to read %s type", fileType));
-        }
-
-        String name = determineName(basePath, preferredName);
-        LocalDecoration decoration = buildDecoration(fileType, basePath.toString(), filePaths);
-
-        return new NamedDataset(
-                this.uniqueIdGenerator.getUniqueId(),
-                name,
-                dataset,
-                decoration);
-    }
 
 
     public NamedDataset createNamedDataset(ImportDirectorySettings importDirectorySettings) {
@@ -140,7 +95,7 @@ public class NamedDatasetManager {
 
             case CSV:
                 dataset = spark.read()
-                        .option("header", true)
+                        .option("header", importDirectorySettings.getHeader())
                         .option("inferSchema", "true")
                         .option("sep", importDirectorySettings.getSeparator())
                         .option("basePath", importDirectorySettings.getBasePath())
@@ -149,6 +104,7 @@ public class NamedDatasetManager {
             case JSON:
                 dataset = spark.read()
                         .option("basePath", importDirectorySettings.getBasePath())
+                        .option("multiline", importDirectorySettings.getMultiLine())
                         .json(importDirectorySettings.getFilePath());
                 break;
             case PARQUET:
@@ -172,7 +128,7 @@ public class NamedDatasetManager {
         }
 
         String name = determineName(Paths.get(importDirectorySettings.getBasePath()), importDirectorySettings.getName());
-        LocalDecoration decoration = buildDecoration(importDirectorySettings.getFormat(), importDirectorySettings.getBasePath(), Collections.emptyList());
+        LocalDecoration decoration = buildDecoration(importDirectorySettings, dataset);
 
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
@@ -182,17 +138,24 @@ public class NamedDatasetManager {
     }
 
 
-    private LocalDecoration buildDecoration(Format fileType, String basePath, List<Path> filePaths) {
+    private LocalDecoration buildDecoration(ImportDirectorySettings importDirectorySettings, Dataset<Row> dataset) {
 
-        List<String> parts = filePaths.stream()
-                .map(Path::toString)
-                .filter(file -> file.toLowerCase().endsWith(fileType.name().toLowerCase()))
-                .map(file -> file.startsWith(basePath) ? file.replace(basePath, "") : file)
+        List<Path> partPaths = Arrays.stream(dataset.inputFiles())
+                .map(file -> Paths.get(URI.create(file)))
                 .collect(Collectors.toList());
 
-        Double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(filePaths);
+        Double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(partPaths);
 
-        return new LocalDecoration(basePath, parts, fileType.name(), sizeInMegaBytes);
+        List<String> parts = partPaths.stream()
+                .map(path -> path.getFileName().toString())
+                .collect(Collectors.toList());
+
+        return new LocalDecoration(
+                importDirectorySettings.getBasePath(),
+                parts,
+                importDirectorySettings.getFormat(),
+                sizeInMegaBytes
+                );
     }
 
 

@@ -19,7 +19,6 @@ import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
-import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

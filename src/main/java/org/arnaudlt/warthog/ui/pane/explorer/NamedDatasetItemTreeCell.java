@@ -3,7 +3,6 @@ package org.arnaudlt.warthog.ui.pane.explorer;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -13,6 +12,7 @@ import org.arnaudlt.warthog.model.dataset.decoration.AzureDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.Decoration;
 import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
+import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -69,7 +69,6 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
     private MenuItem buildCopyMenuItem(NamedDatasetItem namedDatasetItem) {
 
         MenuItem copyMenuItem = new MenuItem("Copy");
-        // stupid !!! copyMenuItem.setAccelerator(KeyCombination.valueOf("CTRL+C"));
         copyMenuItem.setOnAction(evt -> Utils.copyStringToClipboard(namedDatasetItem.getCleanedSqlName()));
         return copyMenuItem;
     }
@@ -109,8 +108,8 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
                 int partsCount = localDecoration.getParts().size();
                 grid.addRow(rowIdx++, new Label("Part count :"), new Label(String.valueOf(partsCount)));
 
-                String format = localDecoration.getFormat();
-                grid.addRow(rowIdx++, new Label("Format :"), new Label(format));
+                Format format = localDecoration.getFormat();
+                grid.addRow(rowIdx++, new Label("Format :"), new Label(format.getLabel()));
 
                 DecimalFormat formatter = new DecimalFormat("#.##");
                 String formattedSizeInMB = formatter.format(localDecoration.getSizeInMegaBytes());
@@ -143,7 +142,6 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
     private MenuItem buildRenameMenuItem(NamedDatasetItem namedDatasetItem) {
 
         MenuItem renameMenuItem = new MenuItem("Rename...");
-        // stupid !!! renameMenuItem.setAccelerator(KeyCombination.valueOf("SHIFT+F6"));
         renameMenuItem.setOnAction(evt -> {
 
             Stage renameViewStage = StageFactory.buildModalStage(stage, "Rename dataset ");
@@ -165,10 +163,9 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
                 }
             });
             Button newNameButton = new Button("Rename");
-            newNameButton.setOnAction(rneEvt -> {
-
-                this.explorerPane.renameSqlView(namedDatasetItem, newNameText.getText(), renameViewStage::close);
-            });
+            newNameButton.setOnAction(rneEvt ->
+                this.explorerPane.renameSqlView(namedDatasetItem, newNameText.getText(), renameViewStage::close)
+            );
             grid.addRow(rowIdx++, newNameText, newNameButton);
 
             Scene dialogScene = StageFactory.buildScene(new VBox(grid), -1d, -1d);

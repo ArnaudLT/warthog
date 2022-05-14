@@ -19,7 +19,6 @@ import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
-import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromFileService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromLocalService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
@@ -148,7 +147,7 @@ public class ImportLocalDialog {
 
         basePathField.textProperty().bind(basePathFieldBind);
         automaticBasePathCheckBox.selectedProperty().addListener((selectedProperty, oldValue, newValue) -> {
-            if (newValue) {
+            if (Boolean.TRUE.equals(newValue)) {
                 basePathField.textProperty().bind(basePathFieldBind);
             } else {
                 basePathField.textProperty().unbind();
@@ -167,8 +166,14 @@ public class ImportLocalDialog {
         Button exportButton = new Button("Import");
         exportButton.setOnAction(event -> {
 
-            ImportDirectorySettings importDirectorySettings = new ImportDirectorySettings(input.getText(), format.getValue(),
-                    name.getText(), separator.getText(), header.isSelected(), basePathField.getText());
+            ImportDirectorySettings importDirectorySettings = new ImportDirectorySettings(
+                    input.getText(),
+                    format.getValue(),
+                    name.getText(),
+                    separator.getText(),
+                    header.isSelected(),
+                    multiLine.isSelected(),
+                    basePathField.getText());
             importDirectory(importDirectorySettings);
             dialog.close();
         });

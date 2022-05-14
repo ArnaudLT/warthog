@@ -129,10 +129,10 @@ public class ExportFileDialog {
 
         BooleanBinding parquetSelected = format.valueProperty().isEqualTo(Format.PARQUET);
         Label compressionLabel = new Label("Compression :");
-        compressionLabel.visibleProperty().bind(parquetSelected);
+        //compressionLabel.visibleProperty().bind(parquetSelected);
         ComboBox<Compression> compression = new ComboBox<>(FXCollections.observableArrayList(Compression.values()));
         compression.setValue(Compression.SNAPPY);
-        compression.visibleProperty().bind(parquetSelected);
+        //compression.visibleProperty().bind(parquetSelected);
 
         advancedGrid.addRow(rowIndex++, compressionLabel, compression);
 

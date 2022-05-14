@@ -5,7 +5,10 @@ import org.arnaudlt.warthog.model.exception.ProcessingException;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class FileUtil {
@@ -14,7 +17,17 @@ public class FileUtil {
     private FileUtil() {}
 
 
-    public static Format getFileType(List<Path> filePaths) {
+    public static Format determineFormat(String[] filePath) {
+
+        List<Path> filePaths = Arrays.stream(filePath)
+                .map(Paths::get)
+                .collect(Collectors.toList());
+
+        return determineFormat(filePaths);
+    }
+
+
+    public static Format determineFormat(List<Path> filePaths) {
 
         String fileType = filePaths.stream()
                 .map(f -> getLowerCaseExtension(f.getFileName().toString()))
@@ -28,6 +41,15 @@ public class FileUtil {
     public static String getLowerCaseExtension(String fileName) {
 
         return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+    }
+
+
+    public static String inferSeparator(Format format, List<Path> filePaths) {
+
+        if (format != Format.CSV) {
+            return "";
+        }
+        return inferSeparator(filePaths);
     }
 
 

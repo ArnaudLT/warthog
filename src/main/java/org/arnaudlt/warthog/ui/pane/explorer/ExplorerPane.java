@@ -3,7 +3,6 @@ package org.arnaudlt.warthog.ui.pane.explorer;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
@@ -214,12 +213,10 @@ public class ExplorerPane {
             this.treeExplorer.refresh();
             onSuccess.run();
         });
-        namedDatasetRenameViewService.setOnFailed(fail -> {
-            AlertFactory.showFailureAlert(stage, fail, "Not able to rename the dataset to " + renameProposal);
-        });
-        namedDatasetRenameViewService.setOnCancelled(cancel -> {
-            log.warn("Renaming dataset to "+ renameProposal + " cancelled");
-        });
+        namedDatasetRenameViewService.setOnFailed(fail ->
+            AlertFactory.showFailureAlert(stage, fail, "Not able to rename the dataset to " + renameProposal));
+        namedDatasetRenameViewService.setOnCancelled(cancel ->
+            log.warn("Renaming dataset to "+ renameProposal + " cancelled"));
         namedDatasetRenameViewService.start();
     }
 
