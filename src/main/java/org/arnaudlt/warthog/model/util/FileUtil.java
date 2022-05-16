@@ -3,28 +3,18 @@ package org.arnaudlt.warthog.model.util;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class FileUtil {
 
 
     private FileUtil() {}
-
-
-    public static Format determineFormat(String[] filePath) {
-
-        List<Path> filePaths = Arrays.stream(filePath)
-                .map(Paths::get)
-                .collect(Collectors.toList());
-
-        return determineFormat(filePaths);
-    }
 
 
     public static Format determineFormat(List<Path> filePaths) {

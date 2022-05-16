@@ -16,14 +16,4 @@ public enum Compression {
         return label;
     }
 
-    static Compression valueFromLabel(String label) {
-
-        Compression[] values = values();
-        for (Compression c : values) {
-            if (c.label.equals(label)) {
-                return c;
-            }
-        }
-        return null;
-    }
 }
