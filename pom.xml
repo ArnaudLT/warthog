@@ -158,9 +158,7 @@
             <scope>test</scope>
         </dependency>
 
-
     </dependencies>
-
 
     <build>
         <plugins>
@@ -169,7 +167,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <executable>false</executable>
-                    <outputDirectory>${project.build.directory}/warthog</outputDirectory>
+                    <outputDirectory>${project.build.directory}/warthog-${project.version}</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -182,7 +180,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/warthog/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/warthog-${project.version}</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/hadoop</directory>
@@ -192,13 +190,34 @@
                                     </includes>
                                 </resource>
                                 <resource>
-                                    <directory>src/main/resources</directory>
+                                    <directory>src/main/scripts</directory>
                                     <filtering>true</filtering>
                                     <includes>
                                         <include>launch.bat</include>
                                     </includes>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>truezip-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-package</id>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <verbose>true</verbose>
+                            <fileset>
+                                <directory>src/main/jre/jre.zip</directory>
+                                <outputDirectory>${project.build.directory}/warthog-${project.version}/</outputDirectory>
+                            </fileset>
                         </configuration>
                     </execution>
                 </executions>
