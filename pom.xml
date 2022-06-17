@@ -181,6 +181,7 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/warthog-${project.version}</outputDirectory>
+                            <encoding>ASCII</encoding>
                             <resources>
                                 <resource>
                                     <directory>src/main/hadoop</directory>
