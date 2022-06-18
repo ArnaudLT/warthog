@@ -6,20 +6,20 @@
 
     <groupId>org.arnaudlt.warthog</groupId>
     <artifactId>warthog</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
 
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.0.RELEASE</version>
+        <version>2.7.0</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>11</java.version>
-        <javafx.version>11</javafx.version>
+        <java.version>17</java.version>
+        <javafx.version>17.0.2</javafx.version>
         <junit-platform.version>5.3.1</junit-platform.version>
     </properties>
 
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.12</artifactId>
-            <version>3.0.1</version>
+            <version>3.3.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>janino</artifactId>
@@ -74,25 +74,26 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.12</artifactId>
-            <version>3.0.1</version>
+            <version>3.3.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.12</version>
+            <version>42.4.0</version>
         </dependency>
 
         <dependency>
-            <groupId>com.oracle.ojdbc</groupId>
-            <artifactId>ojdbc8</artifactId>
-            <version>19.3.0.0</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc11</artifactId>
+            <version>21.5.0.0</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-avro_2.12</artifactId>
-            <version>3.0.1</version>
+            <version>3.3.0</version>
         </dependency>
 
         <dependency>
@@ -114,15 +115,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jfxtras</groupId>
-            <artifactId>jmetro</artifactId>
-            <version>11.6.12</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.fxmisc.richtext</groupId>
             <artifactId>richtextfx</artifactId>
-            <version>0.10.5</version>
+            <version>0.10.9</version>
         </dependency>
 
         <dependency>
@@ -181,7 +176,10 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/warthog-${project.version}</outputDirectory>
-                            <encoding>ASCII</encoding>
+                            <nonFilteredFileExtensions>
+                                <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                                <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                            </nonFilteredFileExtensions>
                             <resources>
                                 <resource>
                                     <directory>src/main/hadoop</directory>

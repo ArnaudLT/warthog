@@ -38,7 +38,7 @@ public class SqlExportToDatabaseService extends AbstractMonitoredService<Void> {
             protected Void call() {
 
                 log.info("Start generating a DB export for {}", sqlQuery);
-                updateMessage("Exporting to " + exportDatabaseSettings.getTableName() + " table");
+                updateMessage("Exporting to " + exportDatabaseSettings.tableName() + " table");
                 updateProgress(-1,1);
                 namedDatasetManager.exportToDatabase(sqlQuery, databaseConnection, exportDatabaseSettings);
                 updateProgress(1, 1);

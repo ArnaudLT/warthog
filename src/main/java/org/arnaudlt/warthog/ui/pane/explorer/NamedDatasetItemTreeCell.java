@@ -8,7 +8,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.arnaudlt.warthog.model.dataset.decoration.AzureDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.Decoration;
 import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
@@ -83,44 +82,34 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             int rowIdx = 0;
 
             Decoration decoration = namedDatasetItem.getNamedDataset().getDecoration();
-            if (decoration instanceof LocalDecoration) {
+            if (decoration instanceof LocalDecoration localDecoration) {
 
-                if (decoration instanceof AzureDecoration) {
-
-                    AzureDecoration azureDecoration = (AzureDecoration) decoration;
-                    grid.addRow(rowIdx++, new Label("Downloaded from :"), new Label(azureDecoration.getSource()));
-                }
-
-                LocalDecoration localDecoration = (LocalDecoration) decoration;
-
-                String basePath = localDecoration.getBasePath();
+                String basePath = localDecoration.basePath();
                 grid.addRow(rowIdx++, new Label("Base path :"), new Label(basePath));
 
-                String firstPart = localDecoration.getParts().get(0);
+                String firstPart = localDecoration.parts().get(0);
 
-                boolean isMultiParts = localDecoration.getParts().size() > 1;
+                boolean isMultiParts = localDecoration.parts().size() > 1;
                 if (isMultiParts) {
                     grid.addRow(rowIdx++, new Label("Parts :"), new Label(firstPart + ",..."));
                 } else {
                     grid.addRow(rowIdx++, new Label("Part :"), new Label(firstPart));
                 }
 
-                int partsCount = localDecoration.getParts().size();
+                int partsCount = localDecoration.parts().size();
                 grid.addRow(rowIdx++, new Label("Part count :"), new Label(String.valueOf(partsCount)));
 
-                Format format = localDecoration.getFormat();
+                Format format = localDecoration.format();
                 grid.addRow(rowIdx++, new Label("Format :"), new Label(format.getLabel()));
 
                 DecimalFormat formatter = new DecimalFormat("#.##");
-                String formattedSizeInMB = formatter.format(localDecoration.getSizeInMegaBytes());
+                String formattedSizeInMB = formatter.format(localDecoration.sizeInMegaBytes());
                 grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
 
-            }  else if (decoration instanceof DatabaseDecoration) {
+            }  else if (decoration instanceof DatabaseDecoration databaseDecoration) {
 
-                DatabaseDecoration databaseDecoration = (DatabaseDecoration) decoration;
-
-                grid.addRow(rowIdx++, new Label("Source :"), new Label(databaseDecoration.getSource()));
-                grid.addRow(rowIdx++, new Label("Table :"), new Label(databaseDecoration.getTableName()));
+                grid.addRow(rowIdx++, new Label("Source :"), new Label(databaseDecoration.source()));
+                grid.addRow(rowIdx++, new Label("Table :"), new Label(databaseDecoration.tableName()));
 
             }
 

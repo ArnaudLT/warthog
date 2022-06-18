@@ -75,25 +75,20 @@ public class Connection implements Serializable {
 
     public void cleanUselessAttributs() {
 
-        switch (connectionType) {
-
-            case ORACLE_DATABASE:
-            case POSTGRESQL:
-                this.tenantId = null;
-                this.clientId = null;
-                this.clientKey = null;
-                this.proxyUrl = null;
-                this.proxyPort = null;
-                this.storageAccount = null;
-                break;
-            case AZURE_STORAGE:
-                this.host = null;
-                this.port = null;
-                this.database = null;
-                this.databaseType = null;
-                this.user = null;
-                this.password = null;
-                break;
+        if (connectionType == ConnectionType.ORACLE_DATABASE || connectionType == ConnectionType.POSTGRESQL) {
+            this.tenantId = null;
+            this.clientId = null;
+            this.clientKey = null;
+            this.proxyUrl = null;
+            this.proxyPort = null;
+            this.storageAccount = null;
+        } else if (connectionType == ConnectionType.AZURE_STORAGE) {
+            this.host = null;
+            this.port = null;
+            this.database = null;
+            this.databaseType = null;
+            this.user = null;
+            this.password = null;
         }
     }
 

@@ -6,8 +6,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
+
 
 public class StageFactory {
 
@@ -61,12 +60,9 @@ public class StageFactory {
 
     private static Scene enrichScene(Scene scene) {
 
-        JMetro metro = new JMetro(Style.LIGHT);
-        metro.setAutomaticallyColorPanes(true);
-        metro.setScene(scene);
-        String styleSheet = StageFactory.class.getResource("/style.css").toExternalForm();
+        //String styleSheet = StageFactory.class.getResource("/style.css").toExternalForm();
         String sqlStyleSheet = StageFactory.class.getResource("/sql-keywords.css").toExternalForm();
-        scene.getStylesheets().add(styleSheet);
+        //scene.getStylesheets().add(styleSheet);
         scene.getStylesheets().add(sqlStyleSheet);
         return scene;
     }

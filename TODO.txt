@@ -1,21 +1,13 @@
 ### BUGS
 
 
-### FEATURES
 
-=> Export
-    => Choose repartition/coalesce
+### FEATURES
 
 => Azure DFS connector
     => Export
     => Import a list of files/directory
     => Option to repartition/coalesce(n) after import
-
-=> Query builder :
-    => Improve the Visual Query Builder :
-        => Something to (un)select all the columns in one click
-    => Validate transformation before execution (and provide feedback to user).
-        => Visual warning when using map/array column in where, group by, ...
 
 => SQL :
     => Auto-completion
@@ -23,30 +15,6 @@
 => UI :
     => Capability to change the size of the font
 
-=> Tasks management :
-    => More precise follow-up of the tasks
-
-=> Dataset modifications :
-    => Capability to add column ? (primitive types)
-    => Capability to empty a dataset
-    => Capability to add / remove lines
-
-
-### DEPLOY
-
-=> Deploy :
-    => -Dhadoop.home.dir=C:\<path>\winutils
-    => How to handle the binary : \bin\winutils.exe
-
-=> enableHiveSupport on SparkSession  :
-    => String warehouseLocation = new File("spark-warehouse").getAbsolutePath();
-    => .config("spark.sql.warehouse.dir", warehouseLocation) /
-    => hive.exec.scratchdir custom
-    => How to handle command : \bin\winutils.exe chmod 777 \tmp\hive
-
 ###################
 
 NamedDataset does not correspond to it 'name' attribute. (more like it's original preferred name)
-Renaming issues :
-  - Desync query builder tab name
-  - Desync title of mainPane

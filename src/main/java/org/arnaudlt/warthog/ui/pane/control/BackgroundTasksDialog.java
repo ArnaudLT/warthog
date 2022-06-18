@@ -10,7 +10,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.util.StageFactory;
@@ -73,7 +72,7 @@ public class BackgroundTasksDialog {
             this.label = new Label();
             this.label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
             Pane pane = new Pane();
-            this.cancelButton = new Button("", new MDL2IconFont("\uF78A"));
+            this.cancelButton = new Button("");
 
             HBox hBox = new HBox(this.label, pane, cancelButton);
             hBox.setAlignment(Pos.CENTER);

@@ -11,7 +11,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
@@ -124,7 +123,7 @@ public class ConnectionsManagerDialog {
         Group group = new Group(databaseConnectionNode, azureStorageConnectionNode);
 
 
-        Button createConnectionButton = new Button("", new MDL2IconFont("\uE710"));
+        Button createConnectionButton = new Button("");
         createConnectionButton.setTooltip(new Tooltip("Create a new connection"));
         createConnectionButton.setOnAction(event -> {
 
@@ -136,7 +135,7 @@ public class ConnectionsManagerDialog {
             this.connectionsList.getSelectionModel().select(newConnectionItem);
         });
 
-        Button cloneConnectionButton = new Button("", new MDL2IconFont("\uE8C8"));
+        Button cloneConnectionButton = new Button("");
         cloneConnectionButton.setTooltip(new Tooltip("Clone selected connection"));
         cloneConnectionButton.setOnAction(event -> {
 
@@ -152,7 +151,7 @@ public class ConnectionsManagerDialog {
             }
         });
 
-        Button deleteConnectionButton = new Button("", new MDL2IconFont("\uE74D"));
+        Button deleteConnectionButton = new Button("");
         deleteConnectionButton.setTooltip(new Tooltip("Delete selected connection"));
         deleteConnectionButton.setOnAction(event -> {
 

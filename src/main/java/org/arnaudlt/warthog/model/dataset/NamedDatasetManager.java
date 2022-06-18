@@ -27,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -65,7 +64,7 @@ public class NamedDatasetManager {
                 filePaths = walk
                         .filter(path -> !path.toFile().isDirectory())
                         .filter(path -> !path.toFile().isHidden())
-                        .collect(Collectors.toList());
+                        .toList();
             } catch (IOException e) {
 
                 throw new ProcessingException(String.format("Not able to scan directory %s", file.getName()), e);
@@ -90,42 +89,28 @@ public class NamedDatasetManager {
 
     public NamedDataset createNamedDataset(ImportDirectorySettings importDirectorySettings) {
 
-        Dataset<Row> dataset;
-        switch (importDirectorySettings.getFormat()) {
-
-            case CSV:
-                dataset = spark.read()
-                        .option("header", importDirectorySettings.getHeader())
-                        .option("inferSchema", "true")
-                        .option("sep", importDirectorySettings.getSeparator())
-                        .option("basePath", importDirectorySettings.getBasePath())
-                        .csv(importDirectorySettings.getFilePath());
-                break;
-            case JSON:
-                dataset = spark.read()
-                        .option("basePath", importDirectorySettings.getBasePath())
-                        .option("multiline", importDirectorySettings.getMultiLine())
-                        .json(importDirectorySettings.getFilePath());
-                break;
-            case PARQUET:
-                dataset = spark.read()
-                        .option("basePath", importDirectorySettings.getBasePath())
-                        .parquet(importDirectorySettings.getFilePath());
-                break;
-            case ORC:
-                dataset = spark.read()
-                        .option("basePath", importDirectorySettings.getBasePath())
-                        .orc(importDirectorySettings.getFilePath());
-                break;
-            case AVRO:
-                dataset = spark.read()
-                        .option("basePath", importDirectorySettings.getBasePath())
-                        .format("avro")
-                        .load(importDirectorySettings.getFilePath());
-                break;
-            default:
-                throw new ProcessingException(String.format("Not able to read %s type", importDirectorySettings.getFormat()));
-        }
+        Dataset<Row> dataset = switch (importDirectorySettings.getFormat()) {
+            case CSV -> spark.read()
+                    .option("header", importDirectorySettings.getHeader())
+                    .option("inferSchema", "true")
+                    .option("sep", importDirectorySettings.getSeparator())
+                    .option("basePath", importDirectorySettings.getBasePath())
+                    .csv(importDirectorySettings.getFilePath());
+            case JSON -> spark.read()
+                    .option("basePath", importDirectorySettings.getBasePath())
+                    .option("multiline", importDirectorySettings.getMultiLine())
+                    .json(importDirectorySettings.getFilePath());
+            case PARQUET -> spark.read()
+                    .option("basePath", importDirectorySettings.getBasePath())
+                    .parquet(importDirectorySettings.getFilePath());
+            case ORC -> spark.read()
+                    .option("basePath", importDirectorySettings.getBasePath())
+                    .orc(importDirectorySettings.getFilePath());
+            case AVRO -> spark.read()
+                    .option("basePath", importDirectorySettings.getBasePath())
+                    .format("avro")
+                    .load(importDirectorySettings.getFilePath());
+        };
 
         String name = determineName(Paths.get(importDirectorySettings.getBasePath()), importDirectorySettings.getName());
         LocalDecoration decoration = buildDecoration(importDirectorySettings, dataset);
@@ -142,13 +127,13 @@ public class NamedDatasetManager {
 
         List<Path> partPaths = Arrays.stream(dataset.inputFiles())
                 .map(file -> Paths.get(URI.create(file)))
-                .collect(Collectors.toList());
+                .toList();
 
         Double sizeInMegaBytes = FileUtil.getSizeInMegaBytes(partPaths);
 
         List<String> parts = partPaths.stream()
                 .map(path -> path.getFileName().toString())
-                .collect(Collectors.toList());
+                .toList();
 
         return new LocalDecoration(
                 importDirectorySettings.getBasePath(),
@@ -274,46 +259,36 @@ public class NamedDatasetManager {
     public void export(Dataset<Row> output, ExportFileSettings exportFileSettings) {
 
         DataFrameWriter<Row> dfw = output
-                .repartition(exportFileSettings.getRepartition())
+                .repartition(exportFileSettings.repartition())
                 .write()
                 .option("mapreduce.fileoutputcommitter.marksuccessfuljobs", false)
-                .mode(exportFileSettings.getSaveMode());
+                .mode(exportFileSettings.saveMode());
 
-        if (!exportFileSettings.getPartitionBy().isBlank()) {
+        if (!exportFileSettings.partitionBy().isBlank()) {
 
             dfw = dfw.partitionBy(
-                    Arrays.stream(exportFileSettings.getPartitionBy().split(",", -1))
+                    Arrays.stream(exportFileSettings.partitionBy().split(",", -1))
                             .map(String::trim)
                             .toArray(String[]::new));
         }
 
-        final Format format = exportFileSettings.getFormat();
+        final Format format = exportFileSettings.format();
 
         switch (format) {
-            case CSV:
-                dfw
-                        .option("sep", exportFileSettings.getSeparator())
-                        .option("header", exportFileSettings.getHeader())
-                        .csv(exportFileSettings.getFilePath());
-                break;
-            case JSON:
-                dfw
-                        .json(exportFileSettings.getFilePath());
-                break;
-            case PARQUET:
-                dfw
-                        .option("compression", exportFileSettings.getCompression().getLabel())
-                        .parquet(exportFileSettings.getFilePath());
-                break;
-            case ORC:
-                dfw
-                        .orc(exportFileSettings.getFilePath());
-                break;
-            case AVRO:
-                dfw
-                        .format("avro")
-                        .save(exportFileSettings.getFilePath());
-                break;
+            case CSV -> dfw
+                    .option("sep", exportFileSettings.separator())
+                    .option("header", exportFileSettings.header())
+                    .csv(exportFileSettings.filePath());
+            case JSON -> dfw
+                    .json(exportFileSettings.filePath());
+            case PARQUET -> dfw
+                    .option("compression", exportFileSettings.compression().getLabel())
+                    .parquet(exportFileSettings.filePath());
+            case ORC -> dfw
+                    .orc(exportFileSettings.filePath());
+            case AVRO -> dfw
+                    .format("avro")
+                    .save(exportFileSettings.filePath());
         }
     }
 
@@ -324,8 +299,8 @@ public class NamedDatasetManager {
 
         output
                 .write()
-                .mode(SaveMode.valueOf(exportDatabaseSettings.getSaveMode()))
-                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.getTableName(), databaseConnection.getDatabaseProperties());
+                .mode(SaveMode.valueOf(exportDatabaseSettings.saveMode()))
+                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.tableName(), databaseConnection.getDatabaseProperties());
     }
 
 }

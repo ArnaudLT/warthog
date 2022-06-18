@@ -142,8 +142,7 @@ public class ExplorerPane {
     private void addSubItems(TreeItem<NamedDatasetItem> parent, DataType dataType) {
 
         switch (dataType.typeName()) {
-
-            case "struct":
+            case "struct" -> {
                 Iterator<StructField> iterator = ((StructType) dataType).iterator();
                 while (iterator.hasNext()) {
 
@@ -159,22 +158,20 @@ public class ExplorerPane {
                     parent.getChildren().add(child);
                     addSubItems(child, field.dataType());
                 }
-                break;
-            case "map":
+            }
+            case "map" -> {
                 MapType mapType = (MapType) dataType;
                 parent.getValue().setLabel(parent.getValue().getLabel() +
                         "<" + mapType.keyType().typeName() + "," + mapType.valueType().typeName() + ">");
-
                 addSubItems(parent, mapType.valueType());
-                break;
-            case "array":
+            }
+            case "array" -> {
                 ArrayType arrayType = (ArrayType) dataType;
                 parent.getValue().setLabel(parent.getValue().getLabel() +
                         "<" + arrayType.elementType().typeName() + ">");
-
                 addSubItems(parent, arrayType.elementType());
-                break;
-            default:
+            }
+            default -> {}
         }
     }
 

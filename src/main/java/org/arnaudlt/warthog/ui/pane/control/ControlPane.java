@@ -7,8 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -196,30 +193,6 @@ public class ControlPane {
         return event -> this.exportFileDialog.showExportFileDialog();
     }
 
-
-    private final EventHandler<ActionEvent> requestImportFile = actionEvent -> {
-
-        FileChooser chooser = new FileChooser();
-        List<File> files = chooser.showOpenMultipleDialog(this.getStage());
-        if (files != null) {
-
-            for (File file : files) {
-
-                importFile(file);
-            }
-        }
-    };
-
-
-    private final EventHandler<ActionEvent> requestImportFolder = actionEvent -> {
-
-        DirectoryChooser chooser = new DirectoryChooser();
-        File file = chooser.showDialog(this.getStage());
-        if (file != null) {
-
-            importFile(file);
-        }
-    };
 
 
     private final EventHandler<ActionEvent> requestImportLocal = actionEvent ->

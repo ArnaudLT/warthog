@@ -33,7 +33,7 @@ public class SqlExportToFileService extends AbstractMonitoredService<Void> {
             protected Void call() {
 
                 log.info("Start generating an export for {}", sqlQuery);
-                updateMessage("Exporting to " + exportFileSettings.getFilePath());
+                updateMessage("Exporting to " + exportFileSettings.filePath());
                 updateProgress(-1,1);
                 namedDatasetManager.export(sqlQuery, exportFileSettings);
                 updateProgress(1, 1);
