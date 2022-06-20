@@ -176,14 +176,10 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/warthog-${project.version}</outputDirectory>
-                            <nonFilteredFileExtensions>
-                                <nonFilteredFileExtension>exe</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>dll</nonFilteredFileExtension>
-                            </nonFilteredFileExtensions>
                             <resources>
                                 <resource>
                                     <directory>src/main/hadoop</directory>
-                                    <filtering>true</filtering>
+                                    <filtering>false</filtering>
                                     <includes>
                                         <include>*/**</include>
                                     </includes>

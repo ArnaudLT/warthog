@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.ui.util;
 
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -60,9 +61,7 @@ public class StageFactory {
 
     private static Scene enrichScene(Scene scene) {
 
-        //String styleSheet = StageFactory.class.getResource("/style.css").toExternalForm();
         String sqlStyleSheet = StageFactory.class.getResource("/sql-keywords.css").toExternalForm();
-        //scene.getStylesheets().add(styleSheet);
         scene.getStylesheets().add(sqlStyleSheet);
         return scene;
     }
