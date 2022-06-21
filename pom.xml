@@ -89,7 +89,6 @@
             <version>21.5.0.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-avro_2.12</artifactId>
@@ -99,13 +98,13 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-file-datalake</artifactId>
-            <version>12.4.1</version>
+            <version>12.10.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.microsoft.azure</groupId>
             <artifactId>azure-client-authentication</artifactId>
-            <version>1.7.12</version>
+            <version>1.7.14</version>
         </dependency>
 
         <dependency>

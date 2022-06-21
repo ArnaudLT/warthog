@@ -10,7 +10,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
@@ -21,9 +20,7 @@ import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -38,7 +35,7 @@ public class OutputPane {
 
     private final GlobalSettings globalSettings;
 
-    private TableView<Row> tableView;
+    private TableView<Map<String,String>> tableView;
 
     private PreparedDataset preparedDataset;
 
@@ -115,7 +112,7 @@ public class OutputPane {
 
             if (this.preparedDataset == null) return;
 
-            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(poolService, this.preparedDataset.getDataset());
+            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(poolService, this.preparedDataset.dataset());
             datasetCountRowsService.setOnSucceeded(success ->
                 AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue())));
             datasetCountRowsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Failed to count rows"));
@@ -129,7 +126,7 @@ public class OutputPane {
         return event -> {
 
             if (this.preparedDataset == null) return;
-            AlertFactory.showInformationAlert(owner, "Schema : ", this.preparedDataset.getDataset().schema().prettyJson());
+            AlertFactory.showInformationAlert(owner, "Schema : ", this.preparedDataset.dataset().schema().prettyJson());
         };
     }
 
@@ -139,7 +136,7 @@ public class OutputPane {
         return event -> {
 
             if (this.preparedDataset == null) return;
-            AlertFactory.showInformationAlert(owner, "SQL query : ", this.preparedDataset.getSqlQuery());
+            AlertFactory.showInformationAlert(owner, "SQL query : ", this.preparedDataset.sqlQuery());
         };
     }
 
@@ -213,20 +210,20 @@ public class OutputPane {
     public void fill(PreparedDataset preparedDataset) {
 
         this.preparedDataset = preparedDataset;
-        List<Row> rows = preparedDataset.getOverview();
+        List<Map<String, String>> rows = preparedDataset.overview();
 
         clearTableView();
 
         boolean truncateAfterEnabled = globalSettings.getOverviewTruncateAfter() != 0;
 
-        for (StructField field : preparedDataset.getDataset().schema().fields()) {
+        for (StructField field : preparedDataset.dataset().schema().fields()) {
 
-            TableColumn<Row, Object> col = new TableColumn<>(field.name());
+            TableColumn<Map<String,String>, Object> col = new TableColumn<>(field.name());
             col.setCellValueFactory(param -> {
 
                 String fieldValue = "";
 
-                Object rawValue = param.getValue().getAs(field.name());
+                Object rawValue = param.getValue().get(field.name());
                 if (rawValue != null) {
                     fieldValue = rawValue.toString();
                 }
@@ -238,6 +235,7 @@ public class OutputPane {
             });
             this.tableView.getColumns().add(col);
         }
+
         this.tableView.getItems().addAll(rows);
     }
 
