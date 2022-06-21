@@ -72,7 +72,7 @@ public class BackgroundTasksDialog {
             this.label = new Label();
             this.label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
             Pane pane = new Pane();
-            this.cancelButton = new Button("");
+            this.cancelButton = new Button("Cancel");
 
             HBox hBox = new HBox(this.label, pane, cancelButton);
             hBox.setAlignment(Pos.CENTER);

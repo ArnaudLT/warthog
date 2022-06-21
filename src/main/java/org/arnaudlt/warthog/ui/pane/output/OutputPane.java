@@ -76,23 +76,23 @@ public class OutputPane {
             }
         });
 
-        Button clearButton = new Button(""/*, new MDL2IconFont("\uE74D")*/);
+        Button clearButton = new Button("Clear"/*, new MDL2IconFont("\uE74D")*/);
         clearButton.setTooltip(new Tooltip("Clear overview"));
         clearButton.setOnAction(event -> clear());
 
-        Button copyButton = new Button(""/*, new MDL2IconFont("\uE8C8")*/);
+        Button copyButton = new Button("Copy"/*, new MDL2IconFont("\uE8C8")*/);
         copyButton.setTooltip(new Tooltip("Copy all to clipboard"));
         copyButton.setOnAction(event -> copyAllToClipboard());
 
-        Button countRowsButton = new Button(""/*, new MDL2IconFont("\uF272")*/);
+        Button countRowsButton = new Button("Count"/*, new MDL2IconFont("\uF272")*/);
         countRowsButton.setTooltip(new Tooltip("Count rows"));
         countRowsButton.setOnAction(getDatasetCountRowsEventHandler());
 
-        Button showQueryButton = new Button(""/*, new MDL2IconFont("\uEC42")*/);
+        Button showQueryButton = new Button("Sql"/*, new MDL2IconFont("\uEC42")*/);
         showQueryButton.setTooltip(new Tooltip("Show query"));
         showQueryButton.setOnAction(getShowQueryEventHandler());
 
-        Button showSchemaButton = new Button(""/*, new MDL2IconFont("\ue822")*/);
+        Button showSchemaButton = new Button("Schema"/*, new MDL2IconFont("\ue822")*/);
         showSchemaButton.setTooltip(new Tooltip("Show schema"));
         showSchemaButton.setOnAction(getDatasetShowSchemaEventHandler());
 

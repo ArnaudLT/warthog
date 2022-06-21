@@ -123,7 +123,7 @@ public class ConnectionsManagerDialog {
         Group group = new Group(databaseConnectionNode, azureStorageConnectionNode);
 
 
-        Button createConnectionButton = new Button("");
+        Button createConnectionButton = new Button("Create");
         createConnectionButton.setTooltip(new Tooltip("Create a new connection"));
         createConnectionButton.setOnAction(event -> {
 
@@ -135,7 +135,7 @@ public class ConnectionsManagerDialog {
             this.connectionsList.getSelectionModel().select(newConnectionItem);
         });
 
-        Button cloneConnectionButton = new Button("");
+        Button cloneConnectionButton = new Button("Clone");
         cloneConnectionButton.setTooltip(new Tooltip("Clone selected connection"));
         cloneConnectionButton.setOnAction(event -> {
 
@@ -151,7 +151,7 @@ public class ConnectionsManagerDialog {
             }
         });
 
-        Button deleteConnectionButton = new Button("");
+        Button deleteConnectionButton = new Button("Delete");
         deleteConnectionButton.setTooltip(new Tooltip("Delete selected connection"));
         deleteConnectionButton.setOnAction(event -> {
 
