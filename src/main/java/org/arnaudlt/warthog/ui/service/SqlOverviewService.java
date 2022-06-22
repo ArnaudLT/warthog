@@ -49,7 +49,15 @@ public class SqlOverviewService extends AbstractMonitoredService<PreparedDataset
                         .map(r -> {
                             Map<String, String> map = new HashMap<>();
                             for (StructField field : ds.schema().fields()) {
-                                map.put(field.name(), r.getAs(field.name()).toString());
+
+                                String valueAsString;
+                                Object value = r.getAs(field.name());
+                                if (value != null) {
+                                    valueAsString = value.toString();
+                                } else {
+                                    valueAsString = "";
+                                }
+                                map.put(field.name(), valueAsString);
                             }
                             return map;
                         })

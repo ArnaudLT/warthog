@@ -221,17 +221,13 @@ public class OutputPane {
             TableColumn<Map<String,String>, Object> col = new TableColumn<>(field.name());
             col.setCellValueFactory(param -> {
 
-                String fieldValue = "";
+                String rawValue = param.getValue().get(field.name());
 
-                Object rawValue = param.getValue().get(field.name());
-                if (rawValue != null) {
-                    fieldValue = rawValue.toString();
-                }
-                if (truncateAfterEnabled && fieldValue.length() > globalSettings.getOverviewTruncateAfter()) {
+                if (truncateAfterEnabled && rawValue.length() > globalSettings.getOverviewTruncateAfter()) {
 
-                    fieldValue = fieldValue.substring(0,globalSettings.getOverviewTruncateAfter()).concat("...");
+                    rawValue = rawValue.substring(0,globalSettings.getOverviewTruncateAfter()).concat("...");
                 }
-                return new SimpleObjectProperty<>(fieldValue);
+                return new SimpleObjectProperty<>(rawValue);
             });
             this.tableView.getColumns().add(col);
         }
