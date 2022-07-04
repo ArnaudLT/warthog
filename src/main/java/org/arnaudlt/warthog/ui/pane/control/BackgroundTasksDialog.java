@@ -12,6 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
+import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -72,7 +73,7 @@ public class BackgroundTasksDialog {
             this.label = new Label();
             this.label.setTextOverrun(OverrunStyle.CENTER_WORD_ELLIPSIS);
             Pane pane = new Pane();
-            this.cancelButton = new Button("Cancel");
+            this.cancelButton = ButtonFactory.buildSegoeButton("\uF78A", "Cancel");
 
             HBox hBox = new HBox(this.label, pane, cancelButton);
             hBox.setAlignment(Pos.CENTER);

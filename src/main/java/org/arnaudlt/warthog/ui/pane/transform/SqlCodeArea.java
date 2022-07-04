@@ -119,11 +119,15 @@ public class SqlCodeArea {
                 .filterMap(t -> t.isSuccess() ? Optional.of(t.get()) : Optional.empty())
                 .subscribe(this::applyHighlighting);
 
-        this.codeArea.appendText("/*\n" +
-                "   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V)\n" +
-                "   Press 'CTRL+ENTER' to run your query\n\n" +
-                "   https://spark.apache.org/docs/latest/api/sql/index.html\n" +
-                "*/\n"
+        this.codeArea.appendText(
+                """
+                /*
+                  You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V).
+                  Press 'CTRL+ENTER' to run your query.
+                
+                  https://spark.apache.org/docs/latest/api/sql/index.html
+                */
+                """
         );
     }
 

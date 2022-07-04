@@ -41,6 +41,7 @@ public class MainPane {
     public Parent build(Stage stage) {
 
         Node controlNode = this.controlPane.buildControlPane(stage);
+
         Node explorerNode = this.explorerPane.buildExplorerPane(stage);
         Node transformNode = this.transformPane.buildTransformPane(stage);
         Node outputNode = this.outputPane.buildOutputPane(stage);

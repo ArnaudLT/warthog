@@ -16,6 +16,7 @@ import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
+import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -76,31 +77,26 @@ public class OutputPane {
             }
         });
 
-        Button clearButton = new Button("Clear"/*, new MDL2IconFont("\uE74D")*/);
-        clearButton.setTooltip(new Tooltip("Clear overview"));
+        Button clearButton = ButtonFactory.buildSegoeButton("\uE74D", "Clear overview");
         clearButton.setOnAction(event -> clear());
 
-        Button copyButton = new Button("Copy"/*, new MDL2IconFont("\uE8C8")*/);
-        copyButton.setTooltip(new Tooltip("Copy all to clipboard"));
+        Button copyButton = ButtonFactory.buildSegoeButton("\uE8C8", "Copy all to clipboard");
         copyButton.setOnAction(event -> copyAllToClipboard());
 
-        Button countRowsButton = new Button("Count"/*, new MDL2IconFont("\uF272")*/);
-        countRowsButton.setTooltip(new Tooltip("Count rows"));
+        Button countRowsButton = ButtonFactory.buildSegoeButton("\uF272", "Count rows");
         countRowsButton.setOnAction(getDatasetCountRowsEventHandler());
 
-        Button showQueryButton = new Button("Sql"/*, new MDL2IconFont("\uEC42")*/);
-        showQueryButton.setTooltip(new Tooltip("Show query"));
+        Button showQueryButton = ButtonFactory.buildSegoeButton("\uEC42", "Show query");
         showQueryButton.setOnAction(getShowQueryEventHandler());
 
-        Button showSchemaButton = new Button("Schema"/*, new MDL2IconFont("\ue822")*/);
-        showSchemaButton.setTooltip(new Tooltip("Show schema"));
+        Button showSchemaButton = ButtonFactory.buildSegoeButton("\ue822", "Show schema");
         showSchemaButton.setOnAction(getDatasetShowSchemaEventHandler());
 
         VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showQueryButton, showSchemaButton);
 
         HBox hBox = new HBox(buttonBar, this.tableView);
         hBox.setMinHeight(10);
-        this.tableView.prefWidthProperty().bind(hBox.widthProperty());
+        this.tableView.prefWidthProperty().bind(hBox.widthProperty().add(-27));
 
         return hBox;
     }

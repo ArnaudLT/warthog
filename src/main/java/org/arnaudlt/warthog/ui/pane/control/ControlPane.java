@@ -82,9 +82,9 @@ public class ControlPane {
         progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
 
         HBox hBox = new HBox(10, menuBar, progressBar);
-        hBox.setMaxHeight(30);
-        hBox.setMinHeight(30);
-        hBox.setAlignment(Pos.BASELINE_LEFT); // bas
+        hBox.setMaxHeight(25);
+        hBox.setMinHeight(25);
+        hBox.setAlignment(Pos.CENTER_LEFT);
 
         this.exportDialog.buildExportDialog(stage);
         this.exportFileDialog.buildExportFileDialog(stage);

@@ -171,7 +171,6 @@ public class ExplorerPane {
                         "<" + arrayType.elementType().typeName() + ">");
                 addSubItems(parent, arrayType.elementType());
             }
-            default -> {}
         }
     }
 
