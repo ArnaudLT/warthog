@@ -80,6 +80,7 @@ public class BackgroundTasksDialog {
             HBox.setHgrow(pane, Priority.ALWAYS);
 
             this.progressIndicator = new ProgressBar();
+            this.progressIndicator.prefWidthProperty().bind(hBox.widthProperty());
             this.content = new VBox(0, hBox, this.progressIndicator);
             this.content.setPrefWidth(300);
 
