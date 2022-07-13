@@ -27,6 +27,8 @@ public class ConnectionsCollection implements Iterable<Connection> {
 
     public static final long serialVersionUID = 7372913086816112179L;
 
+    public static final String CONNECTIONS_JSON_FILENAME = "connections.json";
+
     private String userDirectory;
 
     private Gson gson;
@@ -50,27 +52,27 @@ public class ConnectionsCollection implements Iterable<Connection> {
 
     public void persist() throws IOException {
 
-        log.info("Try to delete the '{}/connections.json'", userDirectory);
-        Files.deleteIfExists(Paths.get(userDirectory, "connections.json"));
+        log.info("Try to delete the '{}/{}'", userDirectory, CONNECTIONS_JSON_FILENAME);
+        Files.deleteIfExists(Paths.get(userDirectory, CONNECTIONS_JSON_FILENAME));
 
-        log.info("Start to write connections in '{}/connections.json'", userDirectory);
+        log.info("Start to write connections in '{}/{}'", userDirectory, CONNECTIONS_JSON_FILENAME);
 
         SerializableConnectionsCollection serializableConnectionsCollection = this.getSerializableConnectionsCollection();
         String connectionsJson = gson.toJson(serializableConnectionsCollection);
 
         Files.createDirectories(Paths.get(userDirectory));
-        Files.writeString(Paths.get(userDirectory, "connections.json"), connectionsJson, StandardOpenOption.CREATE);
+        Files.writeString(Paths.get(userDirectory, CONNECTIONS_JSON_FILENAME), connectionsJson, StandardOpenOption.CREATE);
 
-        log.info("Connections written in '{}/connections.json'", userDirectory);
+        log.info("Connections written in '{}/{}'", userDirectory, CONNECTIONS_JSON_FILENAME);
     }
 
 
     public static ConnectionsCollection load(Gson gson, String userDirectory) throws IOException {
 
-        log.info("Start to load connections from '{}/connections.json'", userDirectory);
+        log.info("Start to load connections from '{}/{}'", userDirectory, CONNECTIONS_JSON_FILENAME);
 
         SerializableConnectionsCollection serializableConnectionsCollection =
-                gson.fromJson(new FileReader(new File(userDirectory, "connections.json")), SerializableConnectionsCollection.class);
+                gson.fromJson(new FileReader(new File(userDirectory, CONNECTIONS_JSON_FILENAME)), SerializableConnectionsCollection.class);
         ConnectionsCollection connectionsCollection = getConnectionsCollection(gson, userDirectory, serializableConnectionsCollection);
         log.info("{} connections loaded", connectionsCollection.getConnections().size());
 

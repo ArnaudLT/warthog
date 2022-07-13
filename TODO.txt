@@ -9,11 +9,20 @@
     => Import a list of files/directory
     => Option to repartition/coalesce(n) after import
 
+
 => SQL :
     => Auto-completion
+    => Several tabs
+    => Open files on fs
+    => Queries history
 
 => UI :
     => Capability to change the size of the font
+
+
+=> Others
+    => Update HiveConf !!!
+    => Save/Open a session (with dataset + sql sheets)
 
 ###################
 

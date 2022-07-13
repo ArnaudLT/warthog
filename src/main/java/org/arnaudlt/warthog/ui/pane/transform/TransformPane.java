@@ -36,9 +36,7 @@ public class TransformPane {
         this.namedDatasetsTabPane.setSide(Side.BOTTOM);
         this.namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
-        SqlTab sqlTab = new SqlTab(poolService);
-        sqlTab.build();
-        this.namedDatasetsTabPane.getTabs().add(sqlTab); // Permanent tab, always added (not closeable)
+        addSqlNewTab();
 
         return this.namedDatasetsTabPane;
     }
@@ -50,5 +48,18 @@ public class TransformPane {
         return selectedSqlTab.getSqlQuery();
     }
 
+
+    public void addSqlNewTab() {
+
+        int openTabsCount = this.namedDatasetsTabPane.getTabs().size();
+        String tabName = "SQL";
+        if (openTabsCount > 0) {
+            tabName = "SQL (" + openTabsCount + ")";
+        }
+
+        SqlTab sqlTab = new SqlTab(poolService);
+        sqlTab.build(tabName);
+        this.namedDatasetsTabPane.getTabs().add(sqlTab);
+    }
 
 }

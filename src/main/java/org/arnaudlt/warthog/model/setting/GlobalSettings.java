@@ -11,6 +11,7 @@ import java.nio.file.StandardOpenOption;
 @Slf4j
 public class GlobalSettings implements Serializable {
 
+    private static final String SETTINGS_JSON_FILENAME = "settings.json";
 
     private transient Gson gson;
 
@@ -81,13 +82,13 @@ public class GlobalSettings implements Serializable {
 
     public void persist() throws IOException {
 
-        log.info("Try to delete the '{}/settings.json'", userDirectory);
-        Files.deleteIfExists(Paths.get(userDirectory, "settings.json"));
+        log.info("Try to delete the '{}/{}'", userDirectory, SETTINGS_JSON_FILENAME);
+        Files.deleteIfExists(Paths.get(userDirectory, SETTINGS_JSON_FILENAME));
 
-        log.info("Start to write settings in '{}/settings.json'", userDirectory);
+        log.info("Start to write settings in '{}/{}'", userDirectory, SETTINGS_JSON_FILENAME);
         String settingsJson = gson.toJson(this);
         Files.createDirectories(Paths.get(userDirectory));
-        Files.writeString(Paths.get(userDirectory,"settings.json"), settingsJson, StandardOpenOption.CREATE);
+        Files.writeString(Paths.get(userDirectory,SETTINGS_JSON_FILENAME), settingsJson, StandardOpenOption.CREATE);
 
         log.info("Settings written : {}", this);
     }
@@ -95,8 +96,8 @@ public class GlobalSettings implements Serializable {
 
     public static GlobalSettings load(Gson gson, String userDirectory) throws FileNotFoundException {
 
-        log.info("Start to load settings from '{}/settings.json'", userDirectory);
-        GlobalSettings settings = gson.fromJson(new FileReader(new File(userDirectory, "settings.json")), GlobalSettings.class);
+        log.info("Start to load settings from '{}/{}'", userDirectory, SETTINGS_JSON_FILENAME);
+        GlobalSettings settings = gson.fromJson(new FileReader(new File(userDirectory, SETTINGS_JSON_FILENAME)), GlobalSettings.class);
         settings.setGson(gson);
         settings.setUserDirectory(userDirectory);
         log.info("Settings read : {}", settings);

@@ -73,7 +73,7 @@ public class Connection implements Serializable {
     }
 
 
-    public void cleanUselessAttributs() {
+    public void cleanUselessAttributes() {
 
         if (connectionType == ConnectionType.ORACLE_DATABASE || connectionType == ConnectionType.POSTGRESQL) {
             this.tenantId = null;

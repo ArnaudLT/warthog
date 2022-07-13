@@ -194,7 +194,7 @@ public class ImportDialog {
 
         basePathField.textProperty().bind(basePathFieldBind);
         automaticBasePathCheckBox.selectedProperty().addListener((selectedProperty, oldValue, newValue) -> {
-            if (newValue) {
+            if (Boolean.TRUE.equals(newValue)) {
                 basePathField.textProperty().bind(basePathFieldBind);
             } else {
                 basePathField.textProperty().unbind();

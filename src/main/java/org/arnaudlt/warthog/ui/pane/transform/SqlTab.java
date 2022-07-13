@@ -1,6 +1,8 @@
 package org.arnaudlt.warthog.ui.pane.transform;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TextField;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
 
@@ -14,19 +16,36 @@ public class SqlTab extends Tab {
 
     public SqlTab(PoolService poolService) {
 
-        super("SQL");
+        super();
         this.poolService = poolService;
-        this.setId("SQL");
     }
 
 
-    public void build() {
+    public void build(String name) {
 
-        // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
-        // https://spark.apache.org/docs/latest/api/sql/index.html
         this.sqlArea = new SqlCodeArea(poolService);
         this.setContent(this.sqlArea.getWrappedSqlArea());
-        this.setClosable(false);
+
+        final Label label = new Label(name);
+        this.setGraphic(label);
+        final TextField textField = new TextField();
+
+        label.setOnMouseClicked(evt -> {
+            textField.setText(label.getText());
+            this.setGraphic(textField);
+            textField.selectAll();
+            textField.requestFocus();
+        });
+
+        textField.setOnAction(evt -> label.setText(textField.getText()));
+
+        textField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+
+            if (Boolean.FALSE.equals(newValue)) {
+                label.setText(textField.getText());
+                this.setGraphic(label);
+            }
+        });
     }
 
 

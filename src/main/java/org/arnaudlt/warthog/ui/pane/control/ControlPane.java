@@ -101,6 +101,10 @@ public class ControlPane {
 
         Menu fileMenu = new Menu("File");
 
+        MenuItem newSqlTabItem = new MenuItem("New SQL sheet");
+        newSqlTabItem.setAccelerator(KeyCombination.valueOf("CTRL+N"));
+        newSqlTabItem.setOnAction(requestNewSqlTab);
+
         MenuItem importFromLocal = new MenuItem("Import from local...");
         importFromLocal.setAccelerator(KeyCombination.valueOf("CTRL+O"));
         importFromLocal.setOnAction(requestImportLocal);
@@ -112,7 +116,7 @@ public class ControlPane {
         deleteItem.setAccelerator(KeyCombination.valueOf("DELETE"));
         deleteItem.setOnAction(requestDelete);
 
-        fileMenu.getItems().addAll(importFromLocal, importFromItem, new SeparatorMenuItem(), deleteItem);
+        fileMenu.getItems().addAll(newSqlTabItem, new SeparatorMenuItem(), importFromLocal, importFromItem, new SeparatorMenuItem(), deleteItem);
 
         Menu editMenu = new Menu("Edit");
 
@@ -193,6 +197,9 @@ public class ControlPane {
         return event -> this.exportFileDialog.showExportFileDialog();
     }
 
+
+    private final EventHandler<ActionEvent> requestNewSqlTab = actionEvent ->
+            this.mainPane.getTransformPane().addSqlNewTab();
 
 
     private final EventHandler<ActionEvent> requestImportLocal = actionEvent ->

@@ -231,7 +231,7 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> selectedConnectionItem = this.connectionsList.getSelectionModel().getSelectedItem();
 
             Connection connection = selectedConnectionItem.getValue();
-            connection.cleanUselessAttributs(); // not mandatory if the connection type has not changed
+            connection.cleanUselessAttributes(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());
             connection.setConnectionType(connectionType.getValue());
             connection.setTenantId(tenantId.getText());
@@ -300,7 +300,7 @@ public class ConnectionsManagerDialog {
             TreeItem<Connection> selectedConnectionItem = this.connectionsList.getSelectionModel().getSelectedItem();
 
             Connection connection = selectedConnectionItem.getValue();
-            connection.cleanUselessAttributs(); // not mandatory if the connection type has not changed
+            connection.cleanUselessAttributes(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());
             connection.setConnectionType(connectionType.getValue());
             connection.setHost(host.getText());

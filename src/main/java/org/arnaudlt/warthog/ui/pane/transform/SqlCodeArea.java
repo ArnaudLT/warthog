@@ -119,7 +119,7 @@ public class SqlCodeArea {
                 .filterMap(t -> t.isSuccess() ? Optional.of(t.get()) : Optional.empty())
                 .subscribe(this::applyHighlighting);
 
-        this.codeArea.appendText(
+        this.setText(
                 """
                 /*
                   You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V).
@@ -234,5 +234,12 @@ public class SqlCodeArea {
     public Node getWrappedSqlArea() {
 
         return new VirtualizedScrollPane<>(codeArea);
+    }
+
+
+    public void setText(String text) {
+
+        this.codeArea.clear();
+        this.codeArea.appendText(text);
     }
 }
