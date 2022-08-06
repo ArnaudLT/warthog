@@ -67,7 +67,6 @@ public class SettingsDialog {
 
         Tab sparkTab = new Tab("Spark", sparkGrid);
 
-
         TabPane tabPane = new TabPane(generalsTab, sparkTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 

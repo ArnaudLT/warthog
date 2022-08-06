@@ -25,8 +25,6 @@ import java.util.List;
 @Setter
 public class ConnectionsCollection implements Iterable<Connection> {
 
-    public static final long serialVersionUID = 7372913086816112179L;
-
     public static final String CONNECTIONS_JSON_FILENAME = "connections.json";
 
     private String userDirectory;
@@ -37,6 +35,7 @@ public class ConnectionsCollection implements Iterable<Connection> {
 
 
     public ConnectionsCollection(Gson gson, String userDirectory) {
+
         this.gson = gson;
         this.userDirectory = userDirectory;
         this.connections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(new ArrayList<>()));
@@ -44,6 +43,7 @@ public class ConnectionsCollection implements Iterable<Connection> {
 
 
     public ConnectionsCollection(Gson gson, String userDirectory, List<Connection> connections) {
+
         this.gson = gson;
         this.userDirectory = userDirectory;
         this.connections = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(connections));

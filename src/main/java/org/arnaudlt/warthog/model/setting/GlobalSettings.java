@@ -1,6 +1,10 @@
 package org.arnaudlt.warthog.model.setting;
 
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -9,6 +13,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @Slf4j
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GlobalSettings implements Serializable {
 
     private static final String SETTINGS_JSON_FILENAME = "settings.json";
@@ -27,58 +35,6 @@ public class GlobalSettings implements Serializable {
 
     private Integer overviewTruncateAfter;
 
-
-    public GlobalSettings(Gson gson, String userDirectory,
-                          Integer sparkThreads, Boolean sparkUI,
-                          Integer overviewRows, Integer overviewTruncateAfter) {
-
-        this.gson = gson;
-        this.userDirectory = userDirectory;
-        this.sparkThreads = sparkThreads;
-        this.sparkUI = sparkUI;
-        this.overviewRows = overviewRows;
-        this.overviewTruncateAfter = overviewTruncateAfter;
-    }
-
-
-    public Integer getOverviewRows() {
-        return overviewRows;
-    }
-
-
-    public void setOverviewRows(Integer overviewRows) {
-        this.overviewRows = overviewRows;
-    }
-
-
-    public Integer getSparkThreads() {
-        return sparkThreads;
-    }
-
-
-    public void setSparkThreads(Integer sparkThreads) {
-        this.sparkThreads = sparkThreads;
-    }
-
-
-    public Boolean getSparkUI() {
-        return sparkUI;
-    }
-
-
-    public void setSparkUI(Boolean sparkUI) {
-        this.sparkUI = sparkUI;
-    }
-
-
-    public Integer getOverviewTruncateAfter() {
-        return overviewTruncateAfter;
-    }
-
-
-    public void setOverviewTruncateAfter(Integer overviewTruncateAfter) {
-        this.overviewTruncateAfter = overviewTruncateAfter;
-    }
 
     public void persist() throws IOException {
 
@@ -102,16 +58,6 @@ public class GlobalSettings implements Serializable {
         settings.setUserDirectory(userDirectory);
         log.info("Settings read : {}", settings);
         return settings;
-    }
-
-
-    private void setGson(Gson gson) {
-        this.gson = gson;
-    }
-
-
-    private void setUserDirectory(String userDirectory) {
-        this.userDirectory = userDirectory;
     }
 
 

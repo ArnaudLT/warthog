@@ -3,11 +3,13 @@ package org.arnaudlt.warthog.model.connection;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 @Slf4j
+@SpringBootTest
 class ConnectionsCollectionTest {
 
 
