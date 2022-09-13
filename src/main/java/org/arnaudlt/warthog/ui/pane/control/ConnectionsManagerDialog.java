@@ -331,26 +331,23 @@ public class ConnectionsManagerDialog {
         clearConnectionDetailsView();
 
         switch (connection.getConnectionType()) {
-
-            case ORACLE_DATABASE:
-            case POSTGRESQL:
+            case ORACLE_DATABASE, POSTGRESQL -> {
                 this.host.setText(connection.getHost());
                 this.port.setText(connection.getPort());
                 this.database.setText(connection.getDatabase());
                 this.databaseType.setValue(connection.getDatabaseType());
                 this.user.setText(connection.getUser());
                 this.password.setText(connection.getPassword());
-                break;
-            case AZURE_STORAGE:
+            }
+            case AZURE_STORAGE -> {
                 this.tenantId.setText(connection.getTenantId());
                 this.clientId.setText(connection.getClientId());
                 this.clientKey.setText(connection.getClientKey());
                 this.proxyUrl.setText(connection.getProxyUrl());
                 this.proxyPort.setText(connection.getProxyPort().toString());
                 this.storageAccount.setText(connection.getStorageAccount());
-                break;
-            default:
-                throw new IllegalStateException("Unexpected connection type : " + connection.getConnectionType());
+            }
+            default -> throw new IllegalStateException("Unexpected connection type : " + connection.getConnectionType());
         }
     }
 

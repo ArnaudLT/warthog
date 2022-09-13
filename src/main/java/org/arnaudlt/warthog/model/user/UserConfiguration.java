@@ -5,13 +5,11 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.setting.GlobalSettings;
-import org.arnaudlt.warthog.model.setting.SqlHistoryCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Slf4j
@@ -38,7 +36,18 @@ public class UserConfiguration {
         try {
 
             settings = GlobalSettings.load(gson, userDirectory);
-            // TODO if new properties have been added, we should default them.
+            if (settings.getSparkThreads() == null) {
+                settings.setSparkThreads(sparkThreads);
+            }
+            if (settings.getSparkUI() == null) {
+                settings.setSparkUI(sparkUI);
+            }
+            if (settings.getOverviewRows() == null) {
+                settings.setOverviewRows(overviewRows);
+            }
+            if (settings.getOverviewTruncateAfter() == null) {
+                settings.setOverviewTruncateAfter(overviewTruncateAfter);
+            }
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
@@ -79,28 +88,4 @@ public class UserConfiguration {
         return connectionsCollection;
     }
 
-
-    @Bean
-    @Autowired
-    public SqlHistoryCollection getSqlHistoryCollection(Gson gson,
-                                                        @Value("${warthog.user.directory}") String userDirectory) {
-
-        SqlHistoryCollection sqlHistoryCollection;
-        try {
-
-            sqlHistoryCollection = SqlHistoryCollection.load(gson, userDirectory);
-        } catch (IOException e) {
-
-            log.warn("Unable to read Sql history");
-            sqlHistoryCollection = new SqlHistoryCollection(gson, userDirectory);
-            try {
-
-                sqlHistoryCollection.persist();
-            } catch (IOException ioException) {
-                log.error("Unable to write Sql history", ioException);
-            }
-        }
-
-        return sqlHistoryCollection;
-    }
 }
