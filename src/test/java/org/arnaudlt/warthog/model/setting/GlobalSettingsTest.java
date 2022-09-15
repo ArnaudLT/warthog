@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.model.setting;
 
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

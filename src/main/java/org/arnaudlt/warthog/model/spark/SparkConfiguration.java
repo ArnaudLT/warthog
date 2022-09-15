@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.api.java.UDF1;
 import org.apache.spark.sql.types.DataTypes;
-import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +23,8 @@ public class SparkConfiguration {
         SparkSession spark = SparkSession
                 .builder()
                 .appName("Warthog")
-                .master("local["+ globalSettings.getSparkThreads() +"]")
-                .config("spark.ui.enabled", globalSettings.getSparkUI())
+                .master("local["+ globalSettings.getSpark().getThreads() +"]")
+                .config("spark.ui.enabled", globalSettings.getSpark().getUi())
                 .enableHiveSupport()
                 .getOrCreate();
 

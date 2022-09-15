@@ -273,7 +273,7 @@ public class ImportDialog {
                 poolService, namedDatasetManager, connection, importAzureDfsStorageSettings, statistics);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail,
-                "Not able to import the dataset '" + importAzureDfsStorageSettings.getAzDirectoryPath() + "'"));
+                "Not able to import the dataset '" + importAzureDfsStorageSettings.azDirectoryPath() + "'"));
         importService.start();
     }
 

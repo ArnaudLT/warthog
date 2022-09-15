@@ -21,8 +21,8 @@ public class DirectoryStatisticsService extends AbstractMonitoredService<Directo
 
         super(poolService);
         this.connection = connection;
-        this.azContainer = importAzureDfsStorageSettings.getAzContainer();
-        this.azPath = importAzureDfsStorageSettings.getAzDirectoryPath();
+        this.azContainer = importAzureDfsStorageSettings.azContainer();
+        this.azPath = importAzureDfsStorageSettings.azDirectoryPath();
     }
 
 

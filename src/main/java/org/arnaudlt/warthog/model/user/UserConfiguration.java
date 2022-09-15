@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
-import org.arnaudlt.warthog.model.setting.GlobalSettings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,33 +23,17 @@ public class UserConfiguration {
 
     @Bean
     @Autowired
-    public GlobalSettings getGlobalSettings(Gson gson,
-                                            @Value("${warthog.user.directory}") String userDirectory,
-                                            @Value("${warthog.spark.threads}") Integer sparkThreads,
-                                            @Value("${warthog.spark.ui}") Boolean sparkUI,
-                                            @Value("${warthog.overview.rows}") Integer overviewRows,
-                                            @Value("${warthog.overview.truncate-after}") Integer overviewTruncateAfter) {
+    public GlobalSettings getGlobalSettings(Gson gson, DefaultSettings defaultSettings) {
 
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.load(gson, userDirectory);
-            if (settings.getSparkThreads() == null) {
-                settings.setSparkThreads(sparkThreads);
-            }
-            if (settings.getSparkUI() == null) {
-                settings.setSparkUI(sparkUI);
-            }
-            if (settings.getOverviewRows() == null) {
-                settings.setOverviewRows(overviewRows);
-            }
-            if (settings.getOverviewTruncateAfter() == null) {
-                settings.setOverviewTruncateAfter(overviewTruncateAfter);
-            }
+            settings = GlobalSettings.load(gson, defaultSettings.user().getDirectory());
+            defaultMissingSettings(settings, defaultSettings);
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
-            settings = new GlobalSettings(gson, userDirectory, sparkThreads, sparkUI, overviewRows, overviewTruncateAfter);
+            settings = new GlobalSettings(gson, defaultSettings);
             try {
 
                 settings.persist();
@@ -64,19 +46,42 @@ public class UserConfiguration {
     }
 
 
+    private void defaultMissingSettings(GlobalSettings settings, DefaultSettings defaultSettings) {
+
+        if (settings.getSpark() == null) {
+            settings.setSpark(new SparkSettings());
+        }
+        if (settings.getOverview() == null) {
+            settings.setOverview(new OverviewSettings());
+        }
+
+        if (settings.getSpark().getThreads() == null) {
+            settings.getSpark().setThreads(defaultSettings.spark().getThreads());
+        }
+        if (settings.getSpark().getUi() == null) {
+            settings.getSpark().setUi(defaultSettings.spark().getUi());
+        }
+        if (settings.getOverview().getRows() == null) {
+            settings.getOverview().setRows(defaultSettings.overview().getRows());
+        }
+        if (settings.getOverview().getTruncateAfter() == null) {
+            settings.getOverview().setTruncateAfter(defaultSettings.overview().getTruncateAfter());
+        }
+    }
+
+
     @Bean
     @Autowired
-    public ConnectionsCollection getConnectionsCollection(Gson gson,
-                                                          @Value("${warthog.user.directory}") String userDirectory) {
+    public ConnectionsCollection getConnectionsCollection(Gson gson, DefaultSettings defaultSettings) {
 
         ConnectionsCollection connectionsCollection;
         try {
 
-            connectionsCollection = ConnectionsCollection.load(gson, userDirectory);
+            connectionsCollection = ConnectionsCollection.load(gson, defaultSettings.user().getDirectory());
         } catch (IOException e) {
 
             log.warn("Unable to read connections");
-            connectionsCollection = new ConnectionsCollection(gson, userDirectory);
+            connectionsCollection = new ConnectionsCollection(gson, defaultSettings.user().getDirectory());
             try {
 
                 connectionsCollection.persist();

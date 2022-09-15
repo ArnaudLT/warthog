@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromFileService;
@@ -182,7 +182,7 @@ public class ControlPane {
         return event -> {
 
             final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
-            SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverviewRows());
+            SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverview().getRows());
             overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
             overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
             overviewService.start();

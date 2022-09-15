@@ -78,16 +78,16 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
         @Override
         protected NamedDataset call() throws Exception {
 
-            updateMessage("Importing " + importAzureDfsStorageSettings.getAzContainer() + "/" +
-                    importAzureDfsStorageSettings.getAzDirectoryPath());
+            updateMessage("Importing " + importAzureDfsStorageSettings.azContainer() + "/" +
+                    importAzureDfsStorageSettings.azDirectoryPath());
             long totalWork = statistics.bytes + 5_000_000; // 5_000_000 is an arbitrary amount for the creation and the registration of the dataset
             long workDone = 0;
             updateProgress(workDone, totalWork);
 
-            final String container = importAzureDfsStorageSettings.getAzContainer();
-            final String azDirectoryPath = importAzureDfsStorageSettings.getAzDirectoryPath();
-            final String localDirectoryPath = importAzureDfsStorageSettings.getLocalDirectoryPath();
-            final String customBasePath = importAzureDfsStorageSettings.getBasePath();
+            final String container = importAzureDfsStorageSettings.azContainer();
+            final String azDirectoryPath = importAzureDfsStorageSettings.azDirectoryPath();
+            final String localDirectoryPath = importAzureDfsStorageSettings.localDirectoryPath();
+            final String customBasePath = importAzureDfsStorageSettings.basePath();
 
             DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
             DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(azDirectoryPath);

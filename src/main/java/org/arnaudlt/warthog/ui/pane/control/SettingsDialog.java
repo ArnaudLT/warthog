@@ -6,7 +6,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
@@ -38,12 +38,12 @@ public class SettingsDialog {
         int rowIndex = 0;
 
         Label rowsNumberLabel = new Label("Number of rows in overview :");
-        Spinner<Integer> rowsNumber = new Spinner<>(1, 1000, globalSettings.getOverviewRows(), 1);
+        Spinner<Integer> rowsNumber = new Spinner<>(1, 1000, globalSettings.getOverview().getRows(), 1);
         rowsNumber.setEditable(true);
         generalGrid.addRow(rowIndex++, rowsNumberLabel, rowsNumber);
 
         Label truncateAfterLabel = new Label("Truncate after (chars) :");
-        Spinner<Integer> truncateAfter = new Spinner<>(0, 1000, globalSettings.getOverviewTruncateAfter(), 1);
+        Spinner<Integer> truncateAfter = new Spinner<>(0, 1000, globalSettings.getOverview().getTruncateAfter(), 1);
         truncateAfter.setEditable(true);
         truncateAfter.setTooltip(new Tooltip("Set to 0 if you don't want to truncate value"));
         generalGrid.addRow(rowIndex++, truncateAfterLabel, truncateAfter);
@@ -54,7 +54,7 @@ public class SettingsDialog {
         rowIndex = 0;
 
         Label sparkThreadsLabel = new Label("Threads :");
-        Spinner<Integer> sparkThreads = new Spinner<>(1, 100, globalSettings.getSparkThreads(), 1);
+        Spinner<Integer> sparkThreads = new Spinner<>(1, 100, globalSettings.getSpark().getThreads(), 1);
         sparkGrid.addRow(rowIndex++, sparkThreadsLabel, sparkThreads);
 
         Label sparkUILabel = new Label("Monitoring UI :");
@@ -62,7 +62,7 @@ public class SettingsDialog {
         sparkUILabel.setTooltip(monitoringUI);
         CheckBox sparkUI = new CheckBox();
         sparkUI.setTooltip(monitoringUI);
-        sparkUI.setSelected(globalSettings.getSparkUI());
+        sparkUI.setSelected(globalSettings.getSpark().getUi());
         sparkGrid.addRow(rowIndex++, sparkUILabel, sparkUI);
 
         Tab sparkTab = new Tab("Spark", sparkGrid);
@@ -76,10 +76,10 @@ public class SettingsDialog {
 
             try {
 
-                globalSettings.setOverviewRows(rowsNumber.getValue());
-                globalSettings.setOverviewTruncateAfter(truncateAfter.getValue());
-                globalSettings.setSparkThreads(sparkThreads.getValue());
-                globalSettings.setSparkUI(sparkUI.isSelected());
+                globalSettings.getOverview().setRows(rowsNumber.getValue());
+                globalSettings.getOverview().setTruncateAfter(truncateAfter.getValue());
+                globalSettings.getSpark().setThreads(sparkThreads.getValue());
+                globalSettings.getSpark().setUi(sparkUI.isSelected());
                 globalSettings.persist();
             } catch (Exception e) {
                 AlertFactory.showFailureAlert(owner, e, "Unable to save settings");

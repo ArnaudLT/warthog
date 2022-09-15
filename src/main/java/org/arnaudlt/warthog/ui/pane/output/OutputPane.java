@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.StructField;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
-import org.arnaudlt.warthog.model.setting.GlobalSettings;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
@@ -210,7 +210,7 @@ public class OutputPane {
 
         clearTableView();
 
-        boolean truncateAfterEnabled = globalSettings.getOverviewTruncateAfter() != 0;
+        boolean truncateAfterEnabled = globalSettings.getOverview().getTruncateAfter() != 0;
 
         for (StructField field : preparedDataset.dataset().schema().fields()) {
 
@@ -219,9 +219,9 @@ public class OutputPane {
 
                 String rawValue = param.getValue().get(field.name());
 
-                if (truncateAfterEnabled && rawValue.length() > globalSettings.getOverviewTruncateAfter()) {
+                if (truncateAfterEnabled && rawValue.length() > globalSettings.getOverview().getTruncateAfter()) {
 
-                    rawValue = rawValue.substring(0,globalSettings.getOverviewTruncateAfter()).concat("...");
+                    rawValue = rawValue.substring(0,globalSettings.getOverview().getTruncateAfter()).concat("...");
                 }
                 return new SimpleObjectProperty<>(rawValue);
             });
