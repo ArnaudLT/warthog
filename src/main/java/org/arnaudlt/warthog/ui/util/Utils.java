@@ -14,6 +14,7 @@ public class Utils {
     public static <T> void refreshComboBoxAllItems(ComboBox<T> comboBox) {
 
         T selectedItem = comboBox.getSelectionModel().getSelectedItem();
+        comboBox.getSelectionModel().clearSelection();
         for (int i = 0; i < comboBox.getItems().size(); i++) {
 
             comboBox.getSelectionModel().select(i);

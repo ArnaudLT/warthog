@@ -116,16 +116,7 @@ public class AzureStorageDfsClient {
     }
 
 
-
-    private static class AzureTokenCredential implements TokenCredential {
-
-
-        private final Connection connection;
-
-
-        public AzureTokenCredential(Connection connection) {
-            this.connection = connection;
-        }
+    private record AzureTokenCredential(Connection connection) implements TokenCredential {
 
 
         @Override

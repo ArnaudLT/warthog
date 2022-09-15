@@ -7,23 +7,19 @@
 => Azure DFS connector
     => Export
     => Import a list of files/directory
-    => Option to repartition/coalesce(n) after import
-
 
 => SQL :
     => Auto-completion
-    => Several tabs
-    => Open files on fs
+    => Open files on fs (tabs)
     => Queries history
 
 => UI :
     => Capability to change the size of the font
+    => Help menu
 
 
 => Others
     => Update HiveConf !!!
     => Save/Open a session (with dataset + sql sheets)
 
-###################
 
-NamedDataset does not correspond to it 'name' attribute. (more like it's original preferred name)
