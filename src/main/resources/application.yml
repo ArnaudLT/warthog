@@ -9,6 +9,8 @@ warthog:
   default-settings:
     user:
       directory: user
+    sql-history:
+      directory: history
     overview:
       rows: 50
       truncate-after: 0

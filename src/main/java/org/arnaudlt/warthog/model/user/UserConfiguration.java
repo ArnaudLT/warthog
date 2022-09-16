@@ -28,7 +28,7 @@ public class UserConfiguration {
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.load(gson, defaultSettings.user().getDirectory());
+            settings = GlobalSettings.load(gson, defaultSettings.user());
             defaultMissingSettings(settings, defaultSettings);
         } catch (IOException e) {
 
@@ -41,7 +41,7 @@ public class UserConfiguration {
                 log.error("Unable to write settings", ioException);
             }
         }
-
+        log.info("Settings read : {}", settings);
         return settings;
     }
 
@@ -54,7 +54,13 @@ public class UserConfiguration {
         if (settings.getOverview() == null) {
             settings.setOverview(new OverviewSettings());
         }
+        if (settings.getSqlHistory() == null) {
+            settings.setSqlHistory(new SqlHistorySettings());
+        }
 
+        if (settings.getSqlHistory().getDirectory() == null) {
+            settings.getSqlHistory().setDirectory(defaultSettings.sqlHistory().getDirectory());
+        }
         if (settings.getSpark().getThreads() == null) {
             settings.getSpark().setThreads(defaultSettings.spark().getThreads());
         }

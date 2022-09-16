@@ -4,9 +4,11 @@ package org.arnaudlt.warthog.model.user;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
-public final class OverviewSettings {
+public final class OverviewSettings implements Serializable {
 
     private Integer rows;
 

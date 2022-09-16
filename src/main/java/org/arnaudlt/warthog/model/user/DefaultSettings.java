@@ -10,5 +10,6 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConfigurationPropertiesScan
 public record DefaultSettings(
         UserSettings user,
+        SqlHistorySettings sqlHistory,
         OverviewSettings overview,
         SparkSettings spark) {}

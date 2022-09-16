@@ -34,6 +34,7 @@ public class GlobalSettings implements Serializable {
 
         this.gson = gson;
         this.user = new UserSettings(defaultSettings.user());
+        this.sqlHistory = new SqlHistorySettings(defaultSettings.sqlHistory());
         this.overview = new OverviewSettings(defaultSettings.overview());
         this.spark = new SparkSettings(defaultSettings.spark());
     }
@@ -53,13 +54,12 @@ public class GlobalSettings implements Serializable {
     }
 
 
-    public static GlobalSettings load(Gson gson, String userDirectory) throws FileNotFoundException {
+    public static GlobalSettings load(Gson gson, UserSettings user) throws FileNotFoundException {
 
-        log.info("Start to load settings from '{}/{}'", userDirectory, SETTINGS_JSON_FILENAME);
-        GlobalSettings settings = gson.fromJson(new FileReader(new File(userDirectory, SETTINGS_JSON_FILENAME)), GlobalSettings.class);
+        log.info("Start to load settings from '{}/{}'", user.getDirectory(), SETTINGS_JSON_FILENAME);
+        GlobalSettings settings = gson.fromJson(new FileReader(new File(user.getDirectory(), SETTINGS_JSON_FILENAME)), GlobalSettings.class);
         settings.setGson(gson);
-        settings.setUser(new UserSettings(userDirectory));
-        log.info("Settings read : {}", settings);
+        settings.setUser(user);
         return settings;
     }
 
@@ -67,10 +67,10 @@ public class GlobalSettings implements Serializable {
     @Override
     public String toString() {
         return "GlobalSettings{" +
-                "sparkThreads=" + spark.getThreads() +
-                ", sparkUI=" + spark.getUi() +
-                ", overviewRows=" + overview.getRows() +
-                ", overviewTruncateAfter=" + overview.getTruncateAfter() +
+                "user=" + user +
+                ", sqlHistory=" + sqlHistory +
+                ", overview=" + overview +
+                ", spark=" + spark +
                 '}';
     }
 }
