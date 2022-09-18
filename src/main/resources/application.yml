@@ -11,6 +11,7 @@ warthog:
       directory: user
     sql-history:
       directory: history
+      size: 10
     overview:
       rows: 50
       truncate-after: 0

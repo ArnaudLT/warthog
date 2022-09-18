@@ -74,7 +74,7 @@ public class ConnectionsCollection implements Iterable<Connection> {
         SerializableConnectionsCollection serializableConnectionsCollection =
                 gson.fromJson(new FileReader(new File(userDirectory, CONNECTIONS_JSON_FILENAME)), SerializableConnectionsCollection.class);
         ConnectionsCollection connectionsCollection = getConnectionsCollection(gson, userDirectory, serializableConnectionsCollection);
-        log.info("{} connections loaded", connectionsCollection.getConnections().size());
+        log.info("{} connections loaded", connectionsCollection.connections.size());
 
         return connectionsCollection;
     }

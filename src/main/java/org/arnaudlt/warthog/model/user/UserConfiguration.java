@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
+import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,6 +62,9 @@ public class UserConfiguration {
         if (settings.getSqlHistory().getDirectory() == null) {
             settings.getSqlHistory().setDirectory(defaultSettings.sqlHistory().getDirectory());
         }
+        if (settings.getSqlHistory().getSize() == null) {
+            settings.getSqlHistory().setSize(defaultSettings.sqlHistory().getSize());
+        }
         if (settings.getSpark().getThreads() == null) {
             settings.getSpark().setThreads(defaultSettings.spark().getThreads());
         }
@@ -97,6 +101,24 @@ public class UserConfiguration {
         }
 
         return connectionsCollection;
+    }
+
+
+    @Bean
+    @Autowired
+    public SqlHistoryCollection getSqlHistoryCollection(Gson gson, DefaultSettings defaultSettings) {
+
+        SqlHistoryCollection sqlHistoryCollection;
+        try {
+
+            sqlHistoryCollection = SqlHistoryCollection.load(gson, defaultSettings.sqlHistory());
+        } catch (IOException e) {
+
+            log.warn("Unable to read history");
+            sqlHistoryCollection = new SqlHistoryCollection(gson, defaultSettings.sqlHistory());
+        }
+
+        return sqlHistoryCollection;
     }
 
 }

@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
 import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
@@ -39,6 +40,8 @@ public class ControlPane {
 
     private final GlobalSettings globalSettings;
 
+    private final SqlHistoryCollection sqlHistoryCollection;
+
     private final ExportFileDialog exportFileDialog;
 
     private final SettingsDialog settingsDialog;
@@ -55,7 +58,7 @@ public class ControlPane {
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
                        ExportDialog exportDialog, GlobalSettings globalSettings,
-                       ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
+                       SqlHistoryCollection sqlHistoryCollection, ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
                        ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog,
                        ImportLocalDialog importLocalDialog, BackgroundTasksDialog backgroundTasksDialog) {
 
@@ -63,6 +66,7 @@ public class ControlPane {
         this.poolService = poolService;
         this.exportDialog = exportDialog;
         this.globalSettings = globalSettings;
+        this.sqlHistoryCollection = sqlHistoryCollection;
         this.exportFileDialog = exportFileDialog;
         this.settingsDialog = settingsDialog;
         this.connectionsManagerDialog = connectionsManagerDialog;
@@ -182,7 +186,7 @@ public class ControlPane {
         return event -> {
 
             final String sqlQuery = this.mainPane.getTransformPane().getSqlQuery();
-            SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings.getOverview().getRows());
+            SqlOverviewService overviewService = new SqlOverviewService(poolService, namedDatasetManager, sqlQuery, globalSettings, sqlHistoryCollection);
             overviewService.setOnSucceeded(success -> this.mainPane.getOutputPane().fill(overviewService.getValue()));
             overviewService.setOnFailed(fail -> AlertFactory.showFailureAlert(stage, fail, "Not able to generate the overview"));
             overviewService.start();
