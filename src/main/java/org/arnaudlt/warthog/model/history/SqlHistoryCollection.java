@@ -8,23 +8,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.user.SqlHistorySettings;
+import org.arnaudlt.warthog.model.util.FileUtil;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Getter
 @Setter
 public class SqlHistoryCollection implements Iterable<SqlHistory> {
 
+
+    private static final String SQL_HISTORY_FILE_EXTENSION = "json";
 
     private SqlHistorySettings sqlHistorySettings;
 
@@ -53,10 +55,34 @@ public class SqlHistoryCollection implements Iterable<SqlHistory> {
 
         log.info("Start to load sql history from '{}'", sqlHistorySettings.getDirectory());
 
-
         SerializableSqlHistoryCollection serializableSqlHistoryCollection = new SerializableSqlHistoryCollection(new ArrayList<>());
-        // TODO load queries from disk
 
+        try (Stream<Path> walk = Files.walk(Paths.get(sqlHistorySettings.getDirectory()), FileVisitOption.FOLLOW_LINKS)) {
+
+            List<SqlHistory> sqlHistoryLoaded = walk
+                    .filter(path -> !path.toFile().isDirectory())
+                    .filter(path -> !path.toFile().isHidden())
+                    .filter(path -> SQL_HISTORY_FILE_EXTENSION.equals(FileUtil.getLowerCaseExtension(path.getFileName().toString())))
+                    .map(path -> {
+                        SqlHistory sqlHistory = null;
+                        try {
+                            sqlHistory = gson.fromJson(new FileReader(path.toFile()), SqlHistory.class);
+                        } catch (FileNotFoundException e) {
+                            log.error("Unable to load sql query history from '"+ path +"'", e);
+                        }
+                        return sqlHistory;
+                    })
+                    .filter(Objects::nonNull)
+                    .sorted(Comparator.comparingLong(SqlHistory::getTimestamp).reversed())
+                    .limit(sqlHistorySettings.getSize())
+                    .toList();
+
+            serializableSqlHistoryCollection.setSqlQueries(sqlHistoryLoaded);
+
+        } catch (IOException e) {
+
+            throw new ProcessingException(String.format("Not able to scan directory %s", sqlHistorySettings.getDirectory()), e);
+        }
 
         SqlHistoryCollection sqlHistoryCollection = getSqlHistoryCollection(gson, sqlHistorySettings, serializableSqlHistoryCollection);
         log.info("{} sql queries loaded in history", sqlHistoryCollection.sqlQueries.size());
@@ -75,7 +101,7 @@ public class SqlHistoryCollection implements Iterable<SqlHistory> {
 
         this.sqlQueries.add(0, sqlHistory);
 
-        final String queryFileName = UUID.randomUUID() + ".json";
+        final String queryFileName = UUID.randomUUID() + "." + SQL_HISTORY_FILE_EXTENSION;
         sqlHistory.setFileName(queryFileName);
         String sqlQueryHistoryJson = gson.toJson(sqlHistory);
         try {

@@ -81,6 +81,8 @@ public class SqlOverviewService extends AbstractMonitoredService<PreparedDataset
                 SqlHistory sqlHistory = new SqlHistory(sqlQuery, startTimestamp, durationTimestamp);
                 sqlHistoryCollection.persistOne(sqlHistory);
 
+                log.info("Overview generated");
+
                 updateProgress(1, 1);
                 return preparedDataset;
             }

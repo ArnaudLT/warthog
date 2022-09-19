@@ -23,7 +23,7 @@ public class GlobalSettings implements Serializable {
 
     private transient UserSettings user;
 
-    private SqlHistorySettings sqlHistory;
+    private transient SqlHistorySettings sqlHistory;
 
     private OverviewSettings overview;
 
@@ -57,10 +57,7 @@ public class GlobalSettings implements Serializable {
     public static GlobalSettings load(Gson gson, UserSettings user) throws FileNotFoundException {
 
         log.info("Start to load settings from '{}/{}'", user.getDirectory(), SETTINGS_JSON_FILENAME);
-        GlobalSettings settings = gson.fromJson(new FileReader(new File(user.getDirectory(), SETTINGS_JSON_FILENAME)), GlobalSettings.class);
-        settings.setGson(gson);
-        settings.setUser(user);
-        return settings;
+        return gson.fromJson(new FileReader(new File(user.getDirectory(), SETTINGS_JSON_FILENAME)), GlobalSettings.class);
     }
 
 

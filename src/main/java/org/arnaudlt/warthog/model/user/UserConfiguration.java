@@ -18,7 +18,7 @@ public class UserConfiguration {
     @Bean
     public Gson getGson() {
 
-        return new GsonBuilder().setPrettyPrinting().create();
+        return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     }
 
 
@@ -30,7 +30,7 @@ public class UserConfiguration {
         try {
 
             settings = GlobalSettings.load(gson, defaultSettings.user());
-            defaultMissingSettings(settings, defaultSettings);
+            defaultMissingSettings(gson, settings, defaultSettings);
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
@@ -42,12 +42,15 @@ public class UserConfiguration {
                 log.error("Unable to write settings", ioException);
             }
         }
-        log.info("Settings read : {}", settings);
+        log.info("Settings loaded : {}", settings);
         return settings;
     }
 
 
-    private void defaultMissingSettings(GlobalSettings settings, DefaultSettings defaultSettings) {
+    private void defaultMissingSettings(Gson gson, GlobalSettings settings, DefaultSettings defaultSettings) {
+
+        settings.setGson(gson);
+        settings.setUser(defaultSettings.user());
 
         if (settings.getSpark() == null) {
             settings.setSpark(new SparkSettings());

@@ -221,7 +221,7 @@ public class OutputPane {
 
                 if (truncateAfterEnabled && rawValue.length() > globalSettings.getOverview().getTruncateAfter()) {
 
-                    rawValue = rawValue.substring(0,globalSettings.getOverview().getTruncateAfter()).concat("...");
+                    rawValue = rawValue.substring(0, globalSettings.getOverview().getTruncateAfter()).concat("...");
                 }
                 return new SimpleObjectProperty<>(rawValue);
             });

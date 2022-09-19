@@ -407,6 +407,7 @@ public class HiveConf extends Configuration {
      * with non-null values to this list as they will override any values defined
      * in the underlying Hadoop configuration.
      */
+    @SuppressWarnings("UnnecessaryEnumModifier")
     public static enum ConfVars {
         // QL execution stuff
         SCRIPTWRAPPER("hive.exec.script.wrapper", null, ""),

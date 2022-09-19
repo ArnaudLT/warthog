@@ -42,6 +42,8 @@ public class ControlPane {
 
     private final SqlHistoryCollection sqlHistoryCollection;
 
+    private final SqlHistoryDialog sqlHistoryDialog;
+
     private final ExportFileDialog exportFileDialog;
 
     private final SettingsDialog settingsDialog;
@@ -58,7 +60,7 @@ public class ControlPane {
     @Autowired
     public ControlPane(NamedDatasetManager namedDatasetManager, PoolService poolService,
                        ExportDialog exportDialog, GlobalSettings globalSettings,
-                       SqlHistoryCollection sqlHistoryCollection, ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
+                       SqlHistoryCollection sqlHistoryCollection, SqlHistoryDialog sqlHistoryDialog, ExportFileDialog exportFileDialog, SettingsDialog settingsDialog,
                        ConnectionsManagerDialog connectionsManagerDialog, ImportDialog importDialog,
                        ImportLocalDialog importLocalDialog, BackgroundTasksDialog backgroundTasksDialog) {
 
@@ -67,6 +69,7 @@ public class ControlPane {
         this.exportDialog = exportDialog;
         this.globalSettings = globalSettings;
         this.sqlHistoryCollection = sqlHistoryCollection;
+        this.sqlHistoryDialog = sqlHistoryDialog;
         this.exportFileDialog = exportFileDialog;
         this.settingsDialog = settingsDialog;
         this.connectionsManagerDialog = connectionsManagerDialog;
@@ -96,6 +99,7 @@ public class ControlPane {
         this.importDialog.buildImportDialog(stage);
         this.importLocalDialog.buildImportLocalDialog(stage);
         this.backgroundTasksDialog.buildBackgroundTasksDialog(stage);
+        this.sqlHistoryDialog.buildBackgroundTasksDialog(stage);
 
         return hBox;
     }
@@ -122,16 +126,23 @@ public class ControlPane {
 
         fileMenu.getItems().addAll(newSqlTabItem, new SeparatorMenuItem(), importFromLocal, importFromItem, new SeparatorMenuItem(), deleteItem);
 
-        Menu editMenu = new Menu("Edit");
+        Menu viewMenu = new Menu("View");
 
-        MenuItem connectionManagerItem = new MenuItem("Connections Manager...");
+        MenuItem connectionManagerItem = new MenuItem("Connections manager...");
         connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
 
         MenuItem settingsItem = new MenuItem("Settings...");
         settingsItem.setAccelerator(KeyCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
-        editMenu.getItems().addAll(connectionManagerItem, settingsItem);
+        MenuItem backgroundTasksItem = new MenuItem("Background tasks...");
+        backgroundTasksItem.setOnAction(getBackgroundTasksActionEventHandler());
+
+        MenuItem sqlHistoryItem = new MenuItem("SQL history...");
+        sqlHistoryItem.setOnAction(getSqlHistoryActionEventHandler());
+
+        viewMenu.getItems().addAll(connectionManagerItem, settingsItem, new SeparatorMenuItem(), sqlHistoryItem,
+                new SeparatorMenuItem(), backgroundTasksItem);
 
         Menu runMenu = new Menu("Run");
 
@@ -145,12 +156,15 @@ public class ControlPane {
         MenuItem exportItem = new MenuItem("Export...");
         exportItem.setOnAction(getExportActionEventHandler());
 
-        MenuItem backgroundTasksItem = new MenuItem("Background tasks...");
-        backgroundTasksItem.setOnAction(getBackgroundTasksActionEventHandler());
+        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem);
 
-        runMenu.getItems().addAll(overviewItem, new SeparatorMenuItem(), exportToFileItem, exportItem, new SeparatorMenuItem(), backgroundTasksItem);
+        return new MenuBar(fileMenu, viewMenu, runMenu);
+    }
 
-        return new MenuBar(fileMenu, editMenu, runMenu);
+
+    private EventHandler<ActionEvent> getSqlHistoryActionEventHandler() {
+
+        return actionEvent -> this.sqlHistoryDialog.showTasksManagerDialog();
     }
 
 
