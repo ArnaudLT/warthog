@@ -1,11 +1,12 @@
 package org.arnaudlt.warthog.ui.pane.output;
 
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.PreparedDataset;
+import org.arnaudlt.warthog.ui.util.LabelFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.stream.IntStream;
 
 @Setter
 @Getter
+@Slf4j
 public class OutputResultTab extends Tab {
 
 
@@ -34,37 +36,27 @@ public class OutputResultTab extends Tab {
 
     public void build(String name) {
 
-        // TODO duplicated code !! (SqlTab)
-        final Label label = new Label(name);
-        this.setGraphic(label);
-        final TextField textField = new TextField();
+        final Label pinLabel = LabelFactory.buildSegoeLabel("\uE718");
+        final Label unpinLabel = LabelFactory.buildSegoeLabel("\uE77A");
 
-        label.setOnMouseClicked(evt -> {
+        this.setText(name);
+        this.setGraphic(unpinLabel);
 
-            textField.setText(label.getText());
-            this.setGraphic(textField);
-            textField.selectAll();
-            textField.requestFocus();
-        });
+        pinLabel.setOnMouseClicked(evt -> {
 
-        textField.setOnAction(evt -> {
-
-            label.setText(textField.getText());
-        });
-
-        textField.setOnKeyPressed(evt -> {
-
-            if (KeyCode.ENTER.equals(evt.getCode())) {
-                label.setText(textField.getText());
-                this.setGraphic(label);
+            if (pin) {
+                this.setGraphic(unpinLabel);
+                pin = false;
+                log.info("PIN TO UNPIN");
             }
         });
 
-        textField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+        unpinLabel.setOnMouseClicked(evt -> {
 
-            if (Boolean.FALSE.equals(newValue)) {
-                label.setText(textField.getText());
-                this.setGraphic(label);
+            if (!pin) {
+                this.setGraphic(pinLabel);
+                pin = true;
+                log.info("UNPIN TO PIN");
             }
         });
 
