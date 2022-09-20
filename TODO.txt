@@ -17,6 +17,12 @@
     => Capability to change the size of the font
     => Help menu
 
+=> Overview
+    => Multiple result panes
+    =>
+
+=> Import
+    => choose dataset name (azure)
 
 => Others
     => Update HiveConf !!!

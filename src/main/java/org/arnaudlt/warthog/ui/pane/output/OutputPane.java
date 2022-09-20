@@ -3,6 +3,7 @@ package org.arnaudlt.warthog.ui.pane.output;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
@@ -36,9 +37,8 @@ public class OutputPane {
 
     private final GlobalSettings globalSettings;
 
-    private TableView<Map<String,String>> tableView;
+    private TabPane outputResultTabPane;
 
-    private PreparedDataset preparedDataset;
 
 
     @Autowired
@@ -53,29 +53,9 @@ public class OutputPane {
 
         this.owner = owner;
 
-        this.tableView = new TableView<>();
-        this.tableView.setPlaceholder(new Label("No data to display"));
-        this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        this.tableView.getSelectionModel().setCellSelectionEnabled(true);
-
-        final KeyCombination keyCodeCopy = KeyCombination.valueOf("CTRL+C");
-        final KeyCombination keyCodeCopyLineWithHeader = KeyCombination.valueOf("CTRL+SHIFT+C");
-        final KeyCombination keyCodeCopyWithHeader = KeyCombination.valueOf("CTRL+ALT+C");
-        this.tableView.setOnKeyPressed(event -> {
-            if (keyCodeCopy.match(event)) {
-
-                copySelectionToClipboard(false, false);
-                event.consume();
-            } else if (keyCodeCopyLineWithHeader.match(event)) {
-
-                copySelectionToClipboard(true, true);
-                event.consume();
-            } else if (keyCodeCopyWithHeader.match(event)) {
-
-                copySelectionToClipboard(true, false);
-                event.consume();
-            }
-        });
+        this.outputResultTabPane = new TabPane();
+        this.outputResultTabPane.setSide(Side.TOP);
+        this.outputResultTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
         Button clearButton = ButtonFactory.buildSegoeButton("\uE74D", "Clear overview");
         clearButton.setOnAction(event -> clear());
@@ -94,11 +74,35 @@ public class OutputPane {
 
         VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showQueryButton, showSchemaButton);
 
-        HBox hBox = new HBox(buttonBar, this.tableView);
+        HBox hBox = new HBox(buttonBar, this.outputResultTabPane);
         hBox.setMinHeight(10);
-        this.tableView.prefWidthProperty().bind(hBox.widthProperty().add(-27));
+        this.outputResultTabPane.prefWidthProperty().bind(hBox.widthProperty().add(-27));
 
         return hBox;
+    }
+
+
+    private void copyAllToClipboard() {
+
+        OutputResultTab selectedOutputResultTab = getSelectedOutputResultTab();
+        if (selectedOutputResultTab == null || selectedOutputResultTab.getTableView() == null) return;
+
+        selectedOutputResultTab.copyAllToClipboard();
+    }
+
+
+    private OutputResultTab addOutputResultTab() {
+
+        int openTabsCount = this.outputResultTabPane.getTabs().size();
+        String tabName = "Output";
+        if (openTabsCount > 0) {
+            tabName = "Output (" + openTabsCount + ")";
+        }
+
+        OutputResultTab outputResultTab = new OutputResultTab();
+        outputResultTab.build(tabName);
+        this.outputResultTabPane.getTabs().add(outputResultTab);
+        return outputResultTab;
     }
 
 
@@ -106,9 +110,10 @@ public class OutputPane {
 
         return event -> {
 
-            if (this.preparedDataset == null) return;
+            OutputResultTab selectedOutputResultTab = getSelectedOutputResultTab();
+            if (selectedOutputResultTab == null || selectedOutputResultTab.getPreparedDataset() == null) return;
 
-            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(poolService, this.preparedDataset.dataset());
+            DatasetCountRowsService datasetCountRowsService = new DatasetCountRowsService(poolService, selectedOutputResultTab.getPreparedDataset().dataset());
             datasetCountRowsService.setOnSucceeded(success ->
                 AlertFactory.showInformationAlert(owner, "Number of rows : " + String.format(Locale.US,"%,d", datasetCountRowsService.getValue())));
             datasetCountRowsService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail, "Failed to count rows"));
@@ -121,8 +126,9 @@ public class OutputPane {
 
         return event -> {
 
-            if (this.preparedDataset == null) return;
-            AlertFactory.showInformationAlert(owner, "Schema : ", this.preparedDataset.dataset().schema().prettyJson());
+            OutputResultTab selectedOutputResultTab = getSelectedOutputResultTab();
+            if (selectedOutputResultTab == null || selectedOutputResultTab.getPreparedDataset() == null) return;
+            AlertFactory.showInformationAlert(owner, "Schema : ", selectedOutputResultTab.getPreparedDataset().dataset().schema().prettyJson());
         };
     }
 
@@ -131,84 +137,36 @@ public class OutputPane {
 
         return event -> {
 
-            if (this.preparedDataset == null) return;
-            AlertFactory.showInformationAlert(owner, "SQL query : ", this.preparedDataset.sqlQuery());
+            OutputResultTab selectedOutputResultTab = getSelectedOutputResultTab();
+            if (selectedOutputResultTab == null || selectedOutputResultTab.getPreparedDataset() == null) return;
+            AlertFactory.showInformationAlert(owner, "SQL query : ", selectedOutputResultTab.getPreparedDataset().sqlQuery());
         };
     }
 
 
-    private void copyAllToClipboard() {
+    private OutputResultTab getSelectedOutputResultTab() {
 
-        tableView.getSelectionModel().selectAll();
-        copySelectionToClipboard(true, true);
-    }
-
-
-    private void copySelectionToClipboard(boolean withHeader, boolean allColumns) {
-
-        TreeSet<Integer> selectedRows = tableView.getSelectionModel().getSelectedCells()
-                .stream()
-                .map(TablePositionBase::getRow)
-                .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
-
-        TreeSet<Integer> selectedColumns;
-
-        if (allColumns) {
-
-            selectedColumns = IntStream.range(0, tableView.getColumns().size())
-                    .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
-
-        } else {
-
-            selectedColumns = tableView.getSelectionModel().getSelectedCells()
-                    .stream()
-                    .map(TablePosition::getColumn)
-                    .collect(TreeSet::new, TreeSet::add, TreeSet::addAll);
-        }
-
-        String content = "";
-
-        if (withHeader) {
-
-            content += selectedColumns.stream()
-                    .map(column -> tableView.getColumns().get(column).getText())
-                    .map(data -> data == null ? "" : data)
-                    .collect(Collectors.joining(";"));
-            content += "\n";
-        }
-
-        content += selectedRows.stream()
-                .map(rowIndex -> selectedColumns.stream()
-                        .map(column -> tableView.getColumns().get(column).getCellData(rowIndex))
-                        .map(cellData -> cellData == null ? "" : cellData.toString())
-                        .collect(Collectors.joining(";"))
-                )
-                .collect(Collectors.joining("\n"));
-
-        Utils.copyStringToClipboard(content);
+        return (OutputResultTab) this.outputResultTabPane.getSelectionModel().getSelectedItem();
     }
 
 
     public void clear() {
 
-        this.preparedDataset = null;
-        this.clearTableView();
-    }
+        OutputResultTab selectedOutputResultTab = getSelectedOutputResultTab();
+        if (selectedOutputResultTab == null) return;
 
-
-    protected void clearTableView() {
-
-        this.tableView.getItems().clear();
-        this.tableView.getColumns().clear();
+        selectedOutputResultTab.clear();
     }
 
 
     public void fill(PreparedDataset preparedDataset) {
 
-        this.preparedDataset = preparedDataset;
-        List<Map<String, String>> rows = preparedDataset.overview();
+        // TODO find the last unpin tab to edit its content.
 
-        clearTableView();
+        OutputResultTab newOutputResultTab = addOutputResultTab();
+
+        newOutputResultTab.setPreparedDataset(preparedDataset);
+        List<Map<String, String>> rows = preparedDataset.overview();
 
         boolean truncateAfterEnabled = globalSettings.getOverview().getTruncateAfter() != 0;
 
@@ -225,10 +183,11 @@ public class OutputPane {
                 }
                 return new SimpleObjectProperty<>(rawValue);
             });
-            this.tableView.getColumns().add(col);
+            newOutputResultTab.getTableView().getColumns().add(col);
         }
 
-        this.tableView.getItems().addAll(rows);
+        newOutputResultTab.getTableView().getItems().addAll(rows);
+        this.outputResultTabPane.getSelectionModel().select(newOutputResultTab);
     }
 
 }

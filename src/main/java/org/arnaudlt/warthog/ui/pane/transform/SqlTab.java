@@ -27,6 +27,7 @@ public class SqlTab extends Tab {
         this.sqlArea = new SqlCodeArea(poolService);
         this.setContent(this.sqlArea.getWrappedSqlArea());
 
+        // TODO duplicated code !! (OutputResultTab)
         final Label label = new Label(name);
         this.setGraphic(label);
         final TextField textField = new TextField();
