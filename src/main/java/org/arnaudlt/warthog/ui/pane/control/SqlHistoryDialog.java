@@ -93,8 +93,7 @@ public class SqlHistoryDialog {
 
         tableView.getColumns().setAll(timeCol, sqlCol, durationCol);
 
-        VBox vBox = new VBox(tableView);
-        Scene dialogScene = StageFactory.buildScene(vBox, 720, 400);
+        Scene dialogScene = StageFactory.buildScene(tableView, 720, 400);
         tableView.prefWidthProperty().bind(dialogScene.widthProperty());
         dialog.setScene(dialogScene);
     }
