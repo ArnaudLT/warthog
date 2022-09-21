@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.model.user.SqlHistorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 
@@ -78,10 +77,6 @@ public class SqlHistoryCollection implements Iterable<SqlHistory> {
                     .toList();
 
             serializableSqlHistoryCollection.setSqlQueries(sqlHistoryLoaded);
-
-        } catch (IOException e) {
-
-            throw new ProcessingException(String.format("Not able to scan directory %s", sqlHistorySettings.getDirectory()), e);
         }
 
         SqlHistoryCollection sqlHistoryCollection = getSqlHistoryCollection(gson, sqlHistorySettings, serializableSqlHistoryCollection);
@@ -114,6 +109,13 @@ public class SqlHistoryCollection implements Iterable<SqlHistory> {
         } catch (IOException e) {
             log.warn("Unable to save history", e);
         }
+    }
+
+
+    public void initializeHistoryDirectory() throws IOException {
+
+        log.info("Initializing sql queries directory in '{}'", sqlHistorySettings.getDirectory());
+        Files.createDirectories(Paths.get(sqlHistorySettings.getDirectory()));
     }
 
 

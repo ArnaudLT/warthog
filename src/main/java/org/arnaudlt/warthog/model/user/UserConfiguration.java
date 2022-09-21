@@ -119,6 +119,12 @@ public class UserConfiguration {
 
             log.warn("Unable to read history");
             sqlHistoryCollection = new SqlHistoryCollection(gson, defaultSettings.sqlHistory());
+            try {
+
+                sqlHistoryCollection.initializeHistoryDirectory();
+            } catch (IOException ioException) {
+                log.error("Unable to write history");
+            }
         }
 
         return sqlHistoryCollection;
