@@ -2,6 +2,7 @@ package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -171,7 +172,21 @@ public class ImportDialog {
             if (exportFile == null) return;
             localDirectoryField.setText(exportFile.getAbsolutePath());
         });
+
+
+
         basicSettingsNode.addRow(rowIndex++, localDirectoryLabel, localDirectoryField, directoryChooserButton);
+
+        Label nameLabel = new Label("Name :");
+        TextField nameField = new TextField();
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            if (!newValue.matches("^[a-zA-Z0-9_]*$")) {
+
+                ((StringProperty)observable).setValue(oldValue);
+            }
+        });
+        basicSettingsNode.addRow(rowIndex++, nameLabel, nameField);
 
         Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
 
@@ -218,9 +233,10 @@ public class ImportDialog {
             final String azDirectoryPath = azDirectoryField.getText().strip();
             final String localDirectory = localDirectoryField.getText().strip();
             final String basePath = basePathField.getText().strip();
+            final String name = nameField.getText().strip();
 
             ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
-                    new ImportAzureDfsStorageSettings(azContainer, azDirectoryPath, localDirectory, basePath);
+                    new ImportAzureDfsStorageSettings(azContainer, azDirectoryPath, localDirectory, basePath, name);
 
             DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
             directoryStatisticsService.setOnSucceeded(success -> {

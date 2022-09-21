@@ -88,6 +88,7 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
             final String azDirectoryPath = importAzureDfsStorageSettings.azDirectoryPath();
             final String localDirectoryPath = importAzureDfsStorageSettings.localDirectoryPath();
             final String customBasePath = importAzureDfsStorageSettings.basePath();
+            final String preferredName = importAzureDfsStorageSettings.name();
 
             DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
             DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(azDirectoryPath);
@@ -109,7 +110,6 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
             updateProgress(statistics.bytes, totalWork);
 
             Path basePath = customBasePath.isBlank() ? baseDirectory : Paths.get(customBasePath);
-            String preferredName = basePath.getFileName().toString();
             Format format = FileUtil.determineFormat(listOfPaths);
             String separator = FileUtil.inferSeparator(format, listOfPaths);
 
