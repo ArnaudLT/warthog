@@ -6,7 +6,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -18,13 +17,12 @@ import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.DatasetCountRowsService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.ButtonFactory;
-import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -161,11 +159,10 @@ public class OutputPane {
 
     public void fill(PreparedDataset preparedDataset) {
 
-        // TODO find the last unpin tab to edit its content.
+        OutputResultTab outputResultTabToFill = lastUnpinnedOutputResultTab();
+        outputResultTabToFill.clear();
 
-        OutputResultTab newOutputResultTab = addOutputResultTab();
-
-        newOutputResultTab.setPreparedDataset(preparedDataset);
+        outputResultTabToFill.setPreparedDataset(preparedDataset);
         List<Map<String, String>> rows = preparedDataset.overview();
 
         boolean truncateAfterEnabled = globalSettings.getOverview().getTruncateAfter() != 0;
@@ -183,11 +180,21 @@ public class OutputPane {
                 }
                 return new SimpleObjectProperty<>(rawValue);
             });
-            newOutputResultTab.getTableView().getColumns().add(col);
+            outputResultTabToFill.getTableView().getColumns().add(col);
         }
 
-        newOutputResultTab.getTableView().getItems().addAll(rows);
-        this.outputResultTabPane.getSelectionModel().select(newOutputResultTab);
+        outputResultTabToFill.getTableView().getItems().addAll(rows);
+        this.outputResultTabPane.getSelectionModel().select(outputResultTabToFill);
+    }
+
+
+    private OutputResultTab lastUnpinnedOutputResultTab() {
+
+        return outputResultTabPane.getTabs().stream()
+                .map(OutputResultTab.class::cast)
+                .filter(Predicate.not(OutputResultTab::isPin))
+                .findFirst()
+                .orElseGet(this::addOutputResultTab);
     }
 
 }

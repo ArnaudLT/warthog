@@ -47,7 +47,6 @@ public class OutputResultTab extends Tab {
             if (pin) {
                 this.setGraphic(unpinLabel);
                 pin = false;
-                log.info("PIN TO UNPIN");
             }
         });
 
@@ -56,7 +55,6 @@ public class OutputResultTab extends Tab {
             if (!pin) {
                 this.setGraphic(pinLabel);
                 pin = true;
-                log.info("UNPIN TO PIN");
             }
         });
 
