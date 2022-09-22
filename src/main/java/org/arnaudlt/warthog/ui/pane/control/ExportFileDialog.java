@@ -24,6 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 @Slf4j
@@ -142,6 +146,36 @@ public class ExportFileDialog {
         GridPane bottomGrid = GridFactory.buildGrid();
         Button exportButton = new Button("Export");
         exportButton.setOnAction(event -> {
+
+            if ("Overwrite".equals(saveMode.getValue())) {
+
+                Path outputDirectoryPath = Paths.get(output.getText());
+
+                boolean atLeastOneFileInOutputDirectory;
+                try {
+                    atLeastOneFileInOutputDirectory = Files.list(outputDirectoryPath)
+                            .findFirst()
+                            .isPresent();
+                } catch (IOException e) {
+                    log.error("Unable to check output directory", e);
+                    return;
+                }
+
+                if (atLeastOneFileInOutputDirectory) {
+
+                    boolean cancelled = AlertFactory.showConfirmationAlert(owner,
+                             """
+                             All data in the following directory will be lost:
+                             '%s'
+                                                 
+                             Do you want to continue ?
+                             """.formatted(output.getText()))
+                            .filter(button -> button != ButtonType.OK)
+                            .isPresent();
+
+                    if (cancelled) return;
+                }
+            }
 
             ExportFileSettings exportFileSettings = new ExportFileSettings(output.getText(), format.getValue(),
                     saveMode.getValue(), partitionBy.getText(), repartition.getValue(), separator.getText(),

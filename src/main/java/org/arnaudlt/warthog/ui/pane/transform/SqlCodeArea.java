@@ -118,17 +118,6 @@ public class SqlCodeArea {
                 .awaitLatest(this.codeArea.multiPlainChanges())
                 .filterMap(t -> t.isSuccess() ? Optional.of(t.get()) : Optional.empty())
                 .subscribe(this::applyHighlighting);
-
-        this.setText(
-                """
-                /*
-                  You can copy (CTRL+C) from the left menu the name of the table/column, and paste it here (CTRL+V).
-                  Press 'CTRL+ENTER' to run your query.
-                
-                  https://spark.apache.org/docs/latest/api/sql/index.html
-                */
-                """
-        );
     }
 
 
