@@ -118,6 +118,7 @@ public class ControlPane {
         importFromLocal.setOnAction(requestImportLocal);
 
         MenuItem importFromItem = new MenuItem("Import...");
+        importFromItem.setAccelerator(KeyCombination.valueOf("CTRL+SHIFT+O"));
         importFromItem.setOnAction(requestImportFrom);
 
         MenuItem deleteItem = new MenuItem("Delete");
