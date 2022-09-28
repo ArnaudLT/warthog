@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Slf4j
 public class AzureStorageDfsClient {
@@ -53,6 +54,34 @@ public class AzureStorageDfsClient {
             }
         }
         return directoryStatistics;
+    }
+
+
+    public static DirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container,
+                                                                               String path, List<AzurePathItem> azurePathItems) {
+
+        if (azurePathItems == null || azurePathItems.isEmpty()) {
+
+            return getStatistics(connection, container, path);
+        } else {
+
+            DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
+            DirectoryStatisticsService.DirectoryStatistics directoryStatistics = new DirectoryStatisticsService.DirectoryStatistics();
+            for (AzurePathItem azurePathItem : azurePathItems) {
+
+                if (!azurePathItem.getPathItem().isDirectory()) {
+
+                    DataLakeFileClient fileClient = fileSystem.getFileClient(azurePathItem.getPathItem().getName());
+                    directoryStatistics.filesCount++;
+                    directoryStatistics.bytes += fileClient.getProperties().getFileSize();
+                } else {
+
+                    DirectoryStatisticsService.DirectoryStatistics subDirectoryStatistics = getStatistics(connection, container, azurePathItem.getPathItem().getName());
+                    directoryStatistics.add(subDirectoryStatistics);
+                }
+            }
+            return directoryStatistics;
+        }
     }
 
 

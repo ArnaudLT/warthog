@@ -6,6 +6,8 @@ import com.azure.storage.file.datalake.DataLakeFileSystemClient;
 import com.azure.storage.file.datalake.models.PathItem;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.azure.AzurePathItem;
+import org.arnaudlt.warthog.model.azure.AzureStorageDfsClient;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
@@ -14,7 +16,9 @@ import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -64,6 +68,10 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
         private final DirectoryStatisticsService.DirectoryStatistics statistics;
 
+        private long totalWork;
+
+        private long workDone;
+
 
         private NamedDatasetImportFromAzureDfsStorageTask(NamedDatasetManager namedDatasetManager, Connection connection,
                                                           ImportAzureDfsStorageSettings importAzureDfsStorageSettings,
@@ -72,6 +80,8 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
             this.connection = connection;
             this.importAzureDfsStorageSettings = importAzureDfsStorageSettings;
             this.statistics = statistics;
+            this.totalWork = statistics.bytes + 5_000_000;
+            this.workDone = 0;
         }
 
 
@@ -80,34 +90,71 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
             updateMessage("Importing " + importAzureDfsStorageSettings.azContainer() + "/" +
                     importAzureDfsStorageSettings.azDirectoryPath());
-            long totalWork = statistics.bytes + 5_000_000; // 5_000_000 is an arbitrary amount for the creation and the registration of the dataset
-            long workDone = 0;
+
             updateProgress(workDone, totalWork);
 
-            final String container = importAzureDfsStorageSettings.azContainer();
-            final String azDirectoryPath = importAzureDfsStorageSettings.azDirectoryPath();
-            final String localDirectoryPath = importAzureDfsStorageSettings.localDirectoryPath();
+            final List<AzurePathItem> azurePathItems = importAzureDfsStorageSettings.azPathItems();
             final String customBasePath = importAzureDfsStorageSettings.basePath();
             final String name = importAzureDfsStorageSettings.name();
 
-            DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
-            DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(azDirectoryPath);
+            DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, importAzureDfsStorageSettings.azContainer());
 
-            Path baseDirectory = Paths.get(localDirectoryPath, container, azDirectoryPath);
+            Path baseDirectory = Paths.get(importAzureDfsStorageSettings.localDirectoryPath(), importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
             createDirectory(baseDirectory);
 
-            List<Path> listOfPaths = new ArrayList<>();
-            PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
-            log.info("Starting to download {}/{}", container, azDirectoryPath);
-            for (PathItem pathItem : pathItems) {
+            List<Path> listOfPaths = new ArrayList<>(); // feed by side effect
+            log.info("Starting to download {}/{}", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
+            if (azurePathItems == null || azurePathItems.isEmpty()) {
 
-                Path localFilePath = Paths.get(localDirectoryPath, container, pathItem.getName());
-                workDone += downloadOnePathItem(fileSystem, pathItem, localFilePath);
-                listOfPaths.add(localFilePath);
-                updateProgress(workDone, totalWork);
+                importAllPathItems(fileSystem, importAzureDfsStorageSettings.azDirectoryPath(), listOfPaths);
+            } else {
+
+                for (AzurePathItem azurePathItem : azurePathItems) {
+
+                    final PathItem pathItem = azurePathItem.getPathItem();
+                    if (!pathItem.isDirectory()) {
+
+                        importOnePathItem(fileSystem, pathItem, listOfPaths);
+                    } else {
+
+                        importAllPathItems(fileSystem, pathItem.getName(), listOfPaths);
+                    }
+                }
             }
-            log.info("Download of {}/{} completed", container, azDirectoryPath);
+            log.info("Download of {}/{} completed", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
             updateProgress(statistics.bytes, totalWork);
+
+            ImportDirectorySettings importDirectorySettings = getImportDirectorySettings(customBasePath, name, baseDirectory, listOfPaths);
+            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(importDirectorySettings);
+
+            namedDatasetManager.registerNamedDataset(namedDataset);
+            updateProgress(totalWork, totalWork);
+            return namedDataset;
+        }
+
+
+        private void importAllPathItems(DataLakeFileSystemClient fileSystem, String pathItem, List<Path> listOfPaths) throws IOException {
+
+            DataLakeDirectoryClient subDirectory = fileSystem.getDirectoryClient(pathItem);
+            PagedIterable<PathItem> subPathItems = subDirectory.listPaths(true, false, null, null);
+            for (PathItem subPathItem : subPathItems) {
+
+                importOnePathItem(fileSystem, subPathItem, listOfPaths);
+            }
+        }
+
+
+        private void importOnePathItem(DataLakeFileSystemClient fileSystem, PathItem pathItem, List<Path> listOfPaths) throws IOException {
+
+            Path localFilePath = Paths.get(importAzureDfsStorageSettings.localDirectoryPath(), importAzureDfsStorageSettings.azContainer(), pathItem.getName());
+            updateMessage("Downloading " + pathItem.getName());
+            workDone += AzureStorageDfsClient.downloadOnePathItem(fileSystem, pathItem, localFilePath);
+            listOfPaths.add(localFilePath);
+            updateProgress(workDone, totalWork);
+        }
+
+
+        private static ImportDirectorySettings getImportDirectorySettings(String customBasePath, String name, Path baseDirectory, List<Path> listOfPaths) {
 
             Path basePath = customBasePath.isBlank() ? baseDirectory : Paths.get(customBasePath);
             Format format = FileUtil.determineFormat(listOfPaths);
@@ -119,16 +166,11 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
                 preferredName = name;
             }
 
-            ImportDirectorySettings importDirectorySettings = new ImportDirectorySettings(
-                    listOfPaths, format, preferredName, separator, basePath
-            );
-            NamedDataset namedDataset = namedDatasetManager.createNamedDataset(importDirectorySettings);
-
-            namedDatasetManager.registerNamedDataset(namedDataset);
-            updateProgress(totalWork, totalWork);
-            return namedDataset;
+            return new ImportDirectorySettings(listOfPaths, format, preferredName, separator, basePath);
         }
     }
+
+
 
 
 }

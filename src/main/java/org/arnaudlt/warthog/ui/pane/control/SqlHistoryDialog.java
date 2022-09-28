@@ -6,7 +6,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +93,7 @@ public class SqlHistoryDialog {
         tableView.getColumns().setAll(timeCol, sqlCol, durationCol);
 
         Scene dialogScene = StageFactory.buildScene(tableView, 720, 400);
-        tableView.prefWidthProperty().bind(dialogScene.widthProperty());
+        tableView.prefWidthProperty().bind(dialogScene.widthProperty()); // TODO useless ?
         dialog.setScene(dialogScene);
     }
 

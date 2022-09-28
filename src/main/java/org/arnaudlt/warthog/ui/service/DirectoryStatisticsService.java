@@ -12,17 +12,14 @@ public class DirectoryStatisticsService extends AbstractMonitoredService<Directo
 
     private final Connection connection;
 
-    private final String azContainer;
-
-    private final String azPath;
+    private final ImportAzureDfsStorageSettings importAzureDfsStorageSettings;
 
 
     public DirectoryStatisticsService(PoolService poolService, Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings) {
 
         super(poolService);
         this.connection = connection;
-        this.azContainer = importAzureDfsStorageSettings.azContainer();
-        this.azPath = importAzureDfsStorageSettings.azDirectoryPath();
+        this.importAzureDfsStorageSettings = importAzureDfsStorageSettings;
     }
 
 
@@ -33,9 +30,10 @@ public class DirectoryStatisticsService extends AbstractMonitoredService<Directo
             @Override
             protected DirectoryStatistics call() {
 
-                updateMessage("Gather statistics on " + azContainer + "/" + azPath);
+                updateMessage("Gather statistics on " + importAzureDfsStorageSettings.azContainer() + "/" + importAzureDfsStorageSettings.azDirectoryPath());
                 updateProgress(-1,1);
-                DirectoryStatistics statistics = AzureStorageDfsClient.getStatistics(connection, azContainer, azPath);
+                DirectoryStatistics statistics = AzureStorageDfsClient.getStatistics(connection,
+                        importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath(), importAzureDfsStorageSettings.azPathItems());
                 updateProgress(1, 1);
                 return statistics;
             }
@@ -48,6 +46,12 @@ public class DirectoryStatisticsService extends AbstractMonitoredService<Directo
         public long filesCount;
         public long bytes;
 
+
+        public void add(DirectoryStatistics subDirectoryStatistics) {
+
+            this.filesCount += subDirectoryStatistics.filesCount;
+            this.bytes += subDirectoryStatistics.bytes;
+        }
     }
 
 }

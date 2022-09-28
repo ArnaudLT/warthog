@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.azure.AzurePathItem;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -155,7 +158,17 @@ public class ImportDialog {
 
         Label azDirectoryLabel = new Label("Azure directory :");
         TextField azDirectoryField = new TextField();
-        basicSettingsNode.addRow(rowIndex++, azDirectoryLabel, azDirectoryField);
+        Button azureDirectoryBrowserButton = new Button("...");
+        //azureDirectoryBrowserButton.visibleProperty().bind(azContainerField.textProperty().isEmpty().not());
+        List<AzurePathItem> selectedAzureFiles = new ArrayList<>();
+        azureDirectoryBrowserButton.setOnAction(event -> {
+
+            Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
+            String azureStartingDirectory = azDirectoryField.getText().strip();
+            AzureStorageBrowser azureStorageBrowser = new AzureStorageBrowser(this.dialog, selectedConnection, azureStartingDirectory);
+            azureStorageBrowser.browseAndSelect(selectedAzureFiles);
+        });
+        basicSettingsNode.addRow(rowIndex++, azDirectoryLabel, azDirectoryField, azureDirectoryBrowserButton);
 
         basicSettingsNode.add(new Separator(Orientation.HORIZONTAL), 0, rowIndex++, 3, 1);
 
@@ -172,7 +185,6 @@ public class ImportDialog {
             if (exportFile == null) return;
             localDirectoryField.setText(exportFile.getAbsolutePath());
         });
-
 
 
         basicSettingsNode.addRow(rowIndex++, localDirectoryLabel, localDirectoryField, directoryChooserButton);
@@ -235,8 +247,8 @@ public class ImportDialog {
             final String basePath = basePathField.getText().strip();
             final String name = nameField.getText().strip();
 
-            ImportAzureDfsStorageSettings importAzureDfsStorageSettings =
-                    new ImportAzureDfsStorageSettings(azContainer, azDirectoryPath, localDirectory, basePath, name);
+            ImportAzureDfsStorageSettings importAzureDfsStorageSettings = new ImportAzureDfsStorageSettings(
+                    azContainer, azDirectoryPath, selectedAzureFiles, localDirectory, basePath, name);
 
             DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
             directoryStatisticsService.setOnSucceeded(success -> {

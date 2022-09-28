@@ -78,7 +78,7 @@ public class ConnectionsManagerDialog {
     public void buildConnectionsManagerDialog(Stage owner) {
 
         this.owner = owner;
-        dialog = StageFactory.buildModalStage(owner, "Connections Manager");
+        dialog = StageFactory.buildModalStage(owner, "Connections manager");
 
         HBox hBox = new HBox();
 
