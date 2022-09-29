@@ -14,7 +14,7 @@ import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
-import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
+import org.arnaudlt.warthog.ui.service.AzureDirectoryStatisticsService;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -35,12 +35,12 @@ public class AzureStorageDfsClient {
     private AzureStorageDfsClient() {}
 
 
-    public static DirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container, String path) {
+    public static AzureDirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container, String path) {
 
         DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
         DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(path);
 
-        DirectoryStatisticsService.DirectoryStatistics directoryStatistics = new DirectoryStatisticsService.DirectoryStatistics();
+        AzureDirectoryStatisticsService.DirectoryStatistics directoryStatistics = new AzureDirectoryStatisticsService.DirectoryStatistics();
 
         PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
         for (PathItem pathItem : pathItems) {
@@ -57,16 +57,16 @@ public class AzureStorageDfsClient {
     }
 
 
-    public static DirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container,
-                                                                               String path, List<AzurePathItem> azurePathItems) {
+    public static AzureDirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container,
+                                                                                    String path, AzurePathItems azurePathItems) {
 
-        if (azurePathItems == null || azurePathItems.isEmpty()) {
+        if (azurePathItems.isEmpty()) {
 
             return getStatistics(connection, container, path);
         } else {
 
             DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
-            DirectoryStatisticsService.DirectoryStatistics directoryStatistics = new DirectoryStatisticsService.DirectoryStatistics();
+            AzureDirectoryStatisticsService.DirectoryStatistics directoryStatistics = new AzureDirectoryStatisticsService.DirectoryStatistics();
             for (AzurePathItem azurePathItem : azurePathItems) {
 
                 if (!azurePathItem.getPathItem().isDirectory()) {
@@ -76,12 +76,26 @@ public class AzureStorageDfsClient {
                     directoryStatistics.bytes += fileClient.getProperties().getFileSize();
                 } else {
 
-                    DirectoryStatisticsService.DirectoryStatistics subDirectoryStatistics = getStatistics(connection, container, azurePathItem.getPathItem().getName());
+                    AzureDirectoryStatisticsService.DirectoryStatistics subDirectoryStatistics = getStatistics(connection, container, azurePathItem.getPathItem().getName());
                     directoryStatistics.add(subDirectoryStatistics);
                 }
             }
             return directoryStatistics;
         }
+    }
+
+
+    public static AzurePathItems listDirectoryContent(Connection connection, String container, String directory) {
+
+        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
+        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(directory);
+
+        List<AzurePathItem> azurePathItems = directoryClient.listPaths(false, false, null, null)
+                .stream()
+                .map(AzurePathItem::new)
+                .toList();
+
+        return new AzurePathItems(azurePathItems);
     }
 
 

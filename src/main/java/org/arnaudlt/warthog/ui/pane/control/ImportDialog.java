@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.arnaudlt.warthog.model.azure.AzurePathItem;
+import org.arnaudlt.warthog.model.azure.AzurePathItems;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
@@ -21,7 +21,7 @@ import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
-import org.arnaudlt.warthog.ui.service.DirectoryStatisticsService;
+import org.arnaudlt.warthog.ui.service.AzureDirectoryStatisticsService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromAzureDfsStorageService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromDatabaseService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
@@ -33,8 +33,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Slf4j
@@ -159,14 +157,16 @@ public class ImportDialog {
         Label azDirectoryLabel = new Label("Azure directory :");
         TextField azDirectoryField = new TextField();
         Button azureDirectoryBrowserButton = new Button("...");
-        //azureDirectoryBrowserButton.visibleProperty().bind(azContainerField.textProperty().isEmpty().not());
-        List<AzurePathItem> selectedAzureFiles = new ArrayList<>();
+
+        AzurePathItems azurePathItems = new AzurePathItems();
         azureDirectoryBrowserButton.setOnAction(event -> {
 
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
+            String azureContainer = azContainerField.getText().strip();
             String azureStartingDirectory = azDirectoryField.getText().strip();
-            AzureStorageBrowser azureStorageBrowser = new AzureStorageBrowser(this.dialog, selectedConnection, azureStartingDirectory);
-            azureStorageBrowser.browseAndSelect(selectedAzureFiles);
+            AzureStorageBrowser azureStorageBrowser = new AzureStorageBrowser(
+                    dialog, poolService, selectedConnection, azureContainer, azureStartingDirectory);
+            azureStorageBrowser.browseAndSelect(azurePathItems);
         });
         basicSettingsNode.addRow(rowIndex++, azDirectoryLabel, azDirectoryField, azureDirectoryBrowserButton);
 
@@ -248,12 +248,12 @@ public class ImportDialog {
             final String name = nameField.getText().strip();
 
             ImportAzureDfsStorageSettings importAzureDfsStorageSettings = new ImportAzureDfsStorageSettings(
-                    azContainer, azDirectoryPath, selectedAzureFiles, localDirectory, basePath, name);
+                    azContainer, azDirectoryPath, azurePathItems, localDirectory, basePath, name);
 
-            DirectoryStatisticsService directoryStatisticsService = new DirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
+            AzureDirectoryStatisticsService directoryStatisticsService = new AzureDirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
             directoryStatisticsService.setOnSucceeded(success -> {
 
-                DirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
+                AzureDirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
                 AlertFactory.showConfirmationAlert(owner, "Do you want to download " + statistics.filesCount + " files for " + statistics.bytes / 1_000_000 + " MB ?")
                         .filter(button -> button == ButtonType.OK)
                         .ifPresent(b -> {
@@ -295,7 +295,7 @@ public class ImportDialog {
 
 
     public void importFromAzure(Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings,
-                                DirectoryStatisticsService.DirectoryStatistics statistics) {
+                                AzureDirectoryStatisticsService.DirectoryStatistics statistics) {
 
         NamedDatasetImportFromAzureDfsStorageService importService = new NamedDatasetImportFromAzureDfsStorageService(
                 poolService, namedDatasetManager, connection, importAzureDfsStorageSettings, statistics);

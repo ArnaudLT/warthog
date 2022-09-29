@@ -1,9 +1,7 @@
 package org.arnaudlt.warthog.model.setting;
 
 
-import org.arnaudlt.warthog.model.azure.AzurePathItem;
+import org.arnaudlt.warthog.model.azure.AzurePathItems;
 
-import java.util.List;
-
-public record ImportAzureDfsStorageSettings(String azContainer, String azDirectoryPath, List<AzurePathItem> azPathItems,
+public record ImportAzureDfsStorageSettings(String azContainer, String azDirectoryPath, AzurePathItems azPathItems,
                                             String localDirectoryPath, String basePath, String name) {}

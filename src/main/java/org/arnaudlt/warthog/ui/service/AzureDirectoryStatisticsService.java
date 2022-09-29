@@ -8,14 +8,14 @@ import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 
 @Slf4j
-public class DirectoryStatisticsService extends AbstractMonitoredService<DirectoryStatisticsService.DirectoryStatistics> {
+public class AzureDirectoryStatisticsService extends AbstractMonitoredService<AzureDirectoryStatisticsService.DirectoryStatistics> {
 
     private final Connection connection;
 
     private final ImportAzureDfsStorageSettings importAzureDfsStorageSettings;
 
 
-    public DirectoryStatisticsService(PoolService poolService, Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings) {
+    public AzureDirectoryStatisticsService(PoolService poolService, Connection connection, ImportAzureDfsStorageSettings importAzureDfsStorageSettings) {
 
         super(poolService);
         this.connection = connection;

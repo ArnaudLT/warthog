@@ -18,36 +18,44 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.azure.AzurePathItem;
+import org.arnaudlt.warthog.model.azure.AzurePathItems;
 import org.arnaudlt.warthog.model.connection.Connection;
+import org.arnaudlt.warthog.model.util.PoolService;
+import org.arnaudlt.warthog.ui.service.AzureDirectoryListingService;
+import org.arnaudlt.warthog.ui.util.AlertFactory;
+import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class AzureStorageBrowser {
 
     private final Stage owner;
 
+    private final PoolService poolService;
+
     private final Connection connection;
 
-    private final String startingDirectory;
+    private final String azureContainer;
+
+    private final String azureStartingDirectory;
 
 
-    public AzureStorageBrowser(Stage owner, Connection connection, String startingDirectory) {
+    public AzureStorageBrowser(Stage owner, PoolService poolService, Connection connection, String azureContainer, String azureStartingDirectory) {
 
 
         this.owner = owner;
+        this.poolService = poolService;
         this.connection = connection;
-        this.startingDirectory = startingDirectory;
+        this.azureContainer = azureContainer;
+        this.azureStartingDirectory = azureStartingDirectory;
     }
 
 
-    public void browseAndSelect(List<AzurePathItem> selectedAzureFiles) {
+    public void browseAndSelect(AzurePathItems azurePathItems) {
 
         Stage dialog = StageFactory.buildModalStage(owner, "Azure storage browser", Modality.APPLICATION_MODAL, true);
 
@@ -79,26 +87,57 @@ public class AzureStorageBrowser {
                         .subtract(2)
         );
 
-        // TODO Scan and fill the list with real data
-        filesObservableList.addAll(AzureSelectableItem.sampleData());
+        AzureDirectoryListingService azureDirectoryListingService = new AzureDirectoryListingService(
+                poolService, connection, azureContainer, azureStartingDirectory);
+
+        azureDirectoryListingService.setOnSucceeded(success -> {
+
+            List<AzureSelectableItem> azureSelectableItems = azureDirectoryListingService.getValue().getItems()
+                    .stream()
+                    .map(api -> new AzureSelectableItem(api.getPathItem()))
+                    .toList();
+
+            log.info("Listing Azure directory content succeeded");
+
+            filesObservableList.clear();
+            filesObservableList.addAll(azureSelectableItems);
+        });
+
+        azureDirectoryListingService.setOnFailed(fail -> {
+
+            log.error("Unable to list Azure directory content {}/{}", azureContainer, azureStartingDirectory);
+            AlertFactory.showFailureAlert(owner, fail, "Not able to list Azure directory content");
+            filesView.setPlaceholder(new Label("Failed to list Azure directory content"));
+        });
+
+        azureDirectoryListingService.setOnCancelled(cancel -> {
+
+            log.warn("Listing Azure directory {}/{} cancelled", azureContainer, azureStartingDirectory);
+            filesView.setPlaceholder(new Label("Listing Azure directory content cancelled"));
+        });
+
+        azureDirectoryListingService.setOnRunning(running -> {
+
+            filesView.setPlaceholder(new ProgressBar(-1));
+        });
+        azureDirectoryListingService.start();
 
         HBox topControlBar = new HBox();
-        TextField currentDirectory = new TextField(startingDirectory);
+        TextField currentDirectory = new TextField(azureStartingDirectory);
         currentDirectory.setDisable(true);
         HBox.setHgrow(currentDirectory, Priority.ALWAYS);
 
-        Button magic1Button = new Button("Magic trick 1 !");
-        magic1Button.setOnAction(evt -> filesView.getItems().forEach(asi -> asi.setSelected(true)));
-        Button magic2Button = new Button("Magic trick 2 !");
-        magic2Button.setOnAction(evt -> filesView.getItems().forEach(asi -> asi.setSelected(false)));
+        Button cancelNavigation = ButtonFactory.buildSegoeButton("\uF78A", "Cancel navigation");
+        cancelNavigation.setOnAction(event -> azureDirectoryListingService.cancel());
+        cancelNavigation.disableProperty().bind(azureDirectoryListingService.runningProperty().not());
 
-        topControlBar.getChildren().addAll(magic1Button, magic2Button, currentDirectory);
+        topControlBar.getChildren().addAll(cancelNavigation, currentDirectory);
 
         HBox bottomControlBar = new HBox();
         Button okButton = new Button("Ok");
         okButton.setOnAction(evt -> {
 
-            selectedAzureFiles.addAll(
+            azurePathItems.getItems().addAll(
                     filesView.getItems().stream()
                         .filter(p -> p.selected.getValue())
                         .toList()
@@ -141,14 +180,5 @@ public class AzureStorageBrowser {
             return pathItem.getName() + ", selected = " + isSelected();
         }
 
-        static List<AzureSelectableItem> sampleData() {
-
-            return List.of(
-                    new AzureSelectableItem(new PathItem("eTag", OffsetDateTime.now(), 8_192, "admin", false, "toto.json", "arnaud", "rwx-rw-r")),
-                    new AzureSelectableItem(new PathItem("eTag", OffsetDateTime.now(), 0, "power_users", true, "data", "camille", "rwx-rw-r")),
-                    new AzureSelectableItem(new PathItem("eTag", OffsetDateTime.now(), 23_496, "power_users", false, "titi.json", "camille", "rwx-rw-r")),
-                    new AzureSelectableItem(new PathItem("eTag", OffsetDateTime.now(), 1_024, "admin", false, "tete.json", "arnaud", "rwx-rw-r")),
-                    new AzureSelectableItem(new PathItem("eTag", OffsetDateTime.now(), 16_384, "user", false, "tata.json", "virginie", "rwx-rw-r")));
-        }
     }
 }

@@ -7,6 +7,7 @@ import com.azure.storage.file.datalake.models.PathItem;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.azure.AzurePathItem;
+import org.arnaudlt.warthog.model.azure.AzurePathItems;
 import org.arnaudlt.warthog.model.azure.AzureStorageDfsClient;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -16,7 +17,6 @@ import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,12 +35,12 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
     private final ImportAzureDfsStorageSettings importAzureDfsStorageSettings;
 
-    private final DirectoryStatisticsService.DirectoryStatistics statistics;
+    private final AzureDirectoryStatisticsService.DirectoryStatistics statistics;
 
 
     public NamedDatasetImportFromAzureDfsStorageService(PoolService poolService, NamedDatasetManager namedDatasetManager, Connection connection,
                                                         ImportAzureDfsStorageSettings importAzureDfsStorageSettings,
-                                                        DirectoryStatisticsService.DirectoryStatistics statistics) {
+                                                        AzureDirectoryStatisticsService.DirectoryStatistics statistics) {
 
         super(poolService);
         this.namedDatasetManager = namedDatasetManager;
@@ -66,16 +66,16 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
         private final ImportAzureDfsStorageSettings importAzureDfsStorageSettings;
 
-        private final DirectoryStatisticsService.DirectoryStatistics statistics;
+        private final AzureDirectoryStatisticsService.DirectoryStatistics statistics;
 
-        private long totalWork;
+        private final long totalWork;
 
         private long workDone;
 
 
         private NamedDatasetImportFromAzureDfsStorageTask(NamedDatasetManager namedDatasetManager, Connection connection,
                                                           ImportAzureDfsStorageSettings importAzureDfsStorageSettings,
-                                                          DirectoryStatisticsService.DirectoryStatistics statistics) {
+                                                          AzureDirectoryStatisticsService.DirectoryStatistics statistics) {
             this.namedDatasetManager = namedDatasetManager;
             this.connection = connection;
             this.importAzureDfsStorageSettings = importAzureDfsStorageSettings;
@@ -93,7 +93,7 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
             updateProgress(workDone, totalWork);
 
-            final List<AzurePathItem> azurePathItems = importAzureDfsStorageSettings.azPathItems();
+            final AzurePathItems azurePathItems = importAzureDfsStorageSettings.azPathItems();
             final String customBasePath = importAzureDfsStorageSettings.basePath();
             final String name = importAzureDfsStorageSettings.name();
 
@@ -104,7 +104,7 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
             List<Path> listOfPaths = new ArrayList<>(); // feed by side effect
             log.info("Starting to download {}/{}", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
-            if (azurePathItems == null || azurePathItems.isEmpty()) {
+            if (azurePathItems.isEmpty()) {
 
                 importAllPathItems(fileSystem, importAzureDfsStorageSettings.azDirectoryPath(), listOfPaths);
             } else {
