@@ -133,13 +133,10 @@ public class AzureStorageBrowser {
 
         Button parentDirectoryButton = ButtonFactory.buildSegoeButton("\uE752", "Parent directory");
         parentDirectoryButton.setOnAction(event -> {
-            String currentAzureDirectory = azureCurrentDirectory.getValue();
-            Path parentDirectoryPath = Paths.get(currentAzureDirectory).getParent();
-            if (parentDirectoryPath == null) {
-                parentDirectoryPath = Paths.get("");
-            }
-             azureCurrentDirectory.set(parentDirectoryPath.toString());
-             startAzureDirectoryListingService();
+
+            String azureParentDirectoryString = getAzureParentDirectory();
+            azureCurrentDirectory.set(azureParentDirectoryString);
+            startAzureDirectoryListingService();
         });
 
         topControlBar.getChildren().addAll(parentDirectoryButton, currentDirectory);
@@ -163,6 +160,18 @@ public class AzureStorageBrowser {
         dialog.setScene(dialogScene);
         dialog.show();
         return selectedAzurePathItems;
+    }
+
+
+    @NotNull
+    private String getAzureParentDirectory() {
+
+        String currentAzureDirectory = azureCurrentDirectory.getValue();
+        Path parentDirectoryPath = Paths.get(currentAzureDirectory).getParent();
+        if (parentDirectoryPath == null) {
+            parentDirectoryPath = Paths.get("");
+        }
+        return parentDirectoryPath.toString().replace("\\", "/");
     }
 
 
