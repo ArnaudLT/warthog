@@ -143,6 +143,7 @@ public class AzureStorageBrowser {
 
         HBox bottomControlBar = new HBox();
         Button okButton = new Button("Ok");
+        okButton.setPrefWidth(150);
         okButton.setOnAction(evt -> {
 
             selectedAzurePathItems.getItems().addAll(
