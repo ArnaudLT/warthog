@@ -53,6 +53,8 @@ public class ImportDialog {
 
     private Stage dialog;
 
+    private AzurePathItems azurePathItems;
+
 
     @Autowired
     public ImportDialog(ConnectionsCollection connectionsCollection, NamedDatasetManager namedDatasetManager, PoolService poolService, ExplorerPane explorerPane) {
@@ -158,7 +160,6 @@ public class ImportDialog {
         TextField azDirectoryField = new TextField();
         Button azureDirectoryBrowserButton = new Button("...");
 
-        AzurePathItems azurePathItems = new AzurePathItems();
         azureDirectoryBrowserButton.setOnAction(event -> {
 
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
@@ -166,7 +167,7 @@ public class ImportDialog {
             String azureStartingDirectory = azDirectoryField.getText().strip();
             AzureStorageBrowser azureStorageBrowser = new AzureStorageBrowser(
                     dialog, poolService, selectedConnection, azureContainer, azureStartingDirectory);
-            azureStorageBrowser.browseAndSelect(azurePathItems);
+            azurePathItems = azureStorageBrowser.browseAndSelect();
         });
         basicSettingsNode.addRow(rowIndex++, azDirectoryLabel, azDirectoryField, azureDirectoryBrowserButton);
 
