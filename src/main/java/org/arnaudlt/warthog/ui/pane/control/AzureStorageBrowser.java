@@ -1,12 +1,11 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import com.azure.storage.file.datalake.models.PathItem;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -24,12 +23,15 @@ import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.AzureDirectoryListingService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.ButtonFactory;
+import org.arnaudlt.warthog.ui.util.LabelFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 public class AzureStorageBrowser {
@@ -46,10 +48,10 @@ public class AzureStorageBrowser {
 
     private final String azureContainer;
 
-    private final String azureStartingDirectory;
+    private final StringProperty azureCurrentDirectory;
 
 
-    public AzureStorageBrowser(Stage owner, PoolService poolService, Connection connection, String azureContainer, String azureStartingDirectory) {
+    public AzureStorageBrowser(Stage owner, PoolService poolService, Connection connection, String azureContainer, StringProperty azureCurrentDirectory) {
 
 
         this.owner = owner;
@@ -57,7 +59,7 @@ public class AzureStorageBrowser {
         this.connection = connection;
         this.selectedAzurePathItems = new AzurePathItems();
         this.azureContainer = azureContainer;
-        this.azureStartingDirectory = azureStartingDirectory;
+        this.azureCurrentDirectory = azureCurrentDirectory;
     }
 
 
@@ -75,9 +77,8 @@ public class AzureStorageBrowser {
 
         CheckBox selectAll = new CheckBox();
         selectAll.setSelected(true);
-        selectAll.selectedProperty().addListener((obs, oldValue, newValue) -> {
-            setAllCheckBoxAzurePathItems(!Boolean.TRUE.equals(oldValue));
-        });
+        selectAll.selectedProperty().addListener((obs, oldValue, newValue) ->
+                setAllCheckBoxAzurePathItems(!Boolean.TRUE.equals(oldValue)));
         checkBoxColumn.setGraphic(selectAll);
         checkBoxColumn.setPrefWidth(40);
         checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
@@ -85,8 +86,14 @@ public class AzureStorageBrowser {
         checkBoxColumn.setEditable(true);
         filesView.getColumns().add(checkBoxColumn);
 
-        TableColumn<AzureSelectableItem, String> itemName = new TableColumn<>("Name");
-        itemName.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getItemShortName()));
+        TableColumn<AzureSelectableItem, Node> itemName = new TableColumn<>("Name");
+
+        itemName.setCellValueFactory(param -> {
+
+            Label icon = getIcon(param);
+            Label name = new Label(param.getValue().getItemShortName());
+            return new SimpleObjectProperty<>(new IconAndName(10, icon, name));
+        });
         filesView.getColumns().add(itemName);
 
         TableColumn<AzureSelectableItem, String> itemLastModification = new TableColumn<>("Last modified");
@@ -102,19 +109,40 @@ public class AzureStorageBrowser {
                         .subtract(2)
         );
 
-        AzureDirectoryListingService azureDirectoryListingService = startAzureDirectoryListingService();
+        filesView.setRowFactory(tv -> {
+            TableRow<AzureSelectableItem> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    AzureSelectableItem clickedAzureItem = row.getItem();
+                    if (clickedAzureItem.getPathItem().isDirectory()) {
+                        azureCurrentDirectory.set(clickedAzureItem.getPathItem().getName());
+                        startAzureDirectoryListingService();
+                    }
+                }
+            });
+            return row;
+        });
+
+        startAzureDirectoryListingService();
 
         HBox topControlBar = new HBox();
-        TextField currentDirectory = new TextField(azureStartingDirectory);
+        TextField currentDirectory = new TextField();
+        currentDirectory.textProperty().bind(azureCurrentDirectory);
         currentDirectory.setDisable(true);
         HBox.setHgrow(currentDirectory, Priority.ALWAYS);
 
+        Button parentDirectoryButton = ButtonFactory.buildSegoeButton("\uE752", "Parent directory");
+        parentDirectoryButton.setOnAction(event -> {
+            String currentAzureDirectory = azureCurrentDirectory.getValue();
+            Path parentDirectoryPath = Paths.get(currentAzureDirectory).getParent();
+            if (parentDirectoryPath == null) {
+                parentDirectoryPath = Paths.get("");
+            }
+             azureCurrentDirectory.set(parentDirectoryPath.toString());
+             startAzureDirectoryListingService();
+        });
 
-        Button cancelNavigation = ButtonFactory.buildSegoeButton("\uF78A", "Cancel navigation");
-        cancelNavigation.setOnAction(event -> azureDirectoryListingService.cancel());
-        cancelNavigation.disableProperty().bind(azureDirectoryListingService.runningProperty().not());
-
-        topControlBar.getChildren().addAll(cancelNavigation, currentDirectory);
+        topControlBar.getChildren().addAll(parentDirectoryButton, currentDirectory);
 
         HBox bottomControlBar = new HBox();
         Button okButton = new Button("Ok");
@@ -138,17 +166,30 @@ public class AzureStorageBrowser {
     }
 
 
+    @NotNull
+    private Label getIcon(TableColumn.CellDataFeatures<AzureSelectableItem, Node> param) {
+
+        Label icon;
+        if (param.getValue().getPathItem().isDirectory()) {
+            icon = LabelFactory.buildSegoeLabel("\uF12B");
+            icon.setStyle("-fx-text-fill: #F1C40F;");
+        } else {
+            icon = LabelFactory.buildSegoeLabel("\uE7C3");
+        }
+        return icon;
+    }
+
+
     private void setAllCheckBoxAzurePathItems(boolean select) {
 
         filesView.getItems().forEach(asi -> asi.setSelected(select));
     }
 
 
-    @NotNull
-    private AzureDirectoryListingService startAzureDirectoryListingService() {
+    private void startAzureDirectoryListingService() {
 
         AzureDirectoryListingService azureDirectoryListingService = new AzureDirectoryListingService(
-                poolService, connection, azureContainer, azureStartingDirectory);
+                poolService, connection, azureContainer, azureCurrentDirectory.getValue());
 
         azureDirectoryListingService.setOnSucceeded(success -> {
 
@@ -165,14 +206,14 @@ public class AzureStorageBrowser {
 
         azureDirectoryListingService.setOnFailed(fail -> {
 
-            log.error("Unable to list Azure directory content {}/{}", azureContainer, azureStartingDirectory);
+            log.error("Unable to list Azure directory content {}/{}", azureContainer, azureCurrentDirectory);
             AlertFactory.showFailureAlert(owner, fail, "Not able to list Azure directory content");
             filesView.setPlaceholder(new Label("Failed to list Azure directory content"));
         });
 
         azureDirectoryListingService.setOnCancelled(cancel -> {
 
-            log.warn("Listing Azure directory {}/{} cancelled", azureContainer, azureStartingDirectory);
+            log.warn("Listing Azure directory {}/{} cancelled", azureContainer, azureCurrentDirectory);
             filesView.setPlaceholder(new Label("Listing Azure directory content cancelled"));
         });
 
@@ -181,8 +222,43 @@ public class AzureStorageBrowser {
             filesView.setPlaceholder(new ProgressBar(-1));
         });
         azureDirectoryListingService.start();
+    }
 
-        return azureDirectoryListingService;
+
+    public static class IconAndName extends HBox implements Comparable<IconAndName> {
+
+        private final String icon;
+
+        private final String name;
+
+        public IconAndName(double spacing, Label icon, Label name) {
+            super(spacing, icon, name);
+            this.icon = icon.getText();
+            this.name = name.getText();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            IconAndName that = (IconAndName) o;
+
+            if (!Objects.equals(icon, that.icon)) return false;
+            return Objects.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = icon != null ? icon.hashCode() : 0;
+            result = 31 * result + (name != null ? name.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public int compareTo(@NotNull AzureStorageBrowser.IconAndName o) {
+            return this.name.compareTo(o.name);
+        }
     }
 
 

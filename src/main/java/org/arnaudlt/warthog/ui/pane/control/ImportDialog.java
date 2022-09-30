@@ -164,9 +164,8 @@ public class ImportDialog {
 
             Connection selectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
             String azureContainer = azContainerField.getText().strip();
-            String azureStartingDirectory = azDirectoryField.getText().strip();
             AzureStorageBrowser azureStorageBrowser = new AzureStorageBrowser(
-                    dialog, poolService, selectedConnection, azureContainer, azureStartingDirectory);
+                    dialog, poolService, selectedConnection, azureContainer, azDirectoryField.textProperty());
             azurePathItems = azureStorageBrowser.browseAndSelect();
         });
         basicSettingsNode.addRow(rowIndex++, azDirectoryLabel, azDirectoryField, azureDirectoryBrowserButton);

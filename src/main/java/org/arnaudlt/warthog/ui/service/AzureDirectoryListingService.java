@@ -43,23 +43,13 @@ public class AzureDirectoryListingService extends AbstractMonitoredService<Azure
 
         return new Task<>() {
             @Override
-            protected AzurePathItems call() throws InterruptedException {
+            protected AzurePathItems call() {
 
                 updateMessage("Listing content of " + azContainer + "/" + azDirectoryPath);
                 updateProgress(-1,1);
 
                 AzurePathItems azurePathItems = AzureStorageDfsClient.listDirectoryContent(connection, azContainer, azDirectoryPath);
-/*
-                TimeUnit.SECONDS.sleep(3);
-                List<AzurePathItem> tmp = List.of(
-                        new AzurePathItem(new PathItem("eTag", OffsetDateTime.now(), 8_192, "admin", false, "toto.json", "arnaud", "rwx-rw-r")),
-                        new AzurePathItem(new PathItem("eTag", OffsetDateTime.now(), 0, "power_users", true, "data", "camille", "rwx-rw-r")),
-                        new AzurePathItem(new PathItem("eTag", OffsetDateTime.now(), 23_496, "power_users", false, "titi.json", "camille", "rwx-rw-r")),
-                        new AzurePathItem(new PathItem("eTag", OffsetDateTime.now(), 1_024, "admin", false, "tete.json", "arnaud", "rwx-rw-r")),
-                        new AzurePathItem(new PathItem("eTag", OffsetDateTime.now(), 16_384, "user", false, "tata.json", "virginie", "rwx-rw-r"))
-                );
-                AzurePathItems azurePathItems = new AzurePathItems(tmp);
-*/
+
                 updateProgress(1, 1);
                 return azurePathItems;
             }
