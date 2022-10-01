@@ -1,7 +1,9 @@
 package org.arnaudlt.warthog.ui.pane.output;
 
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.HBox;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,16 +38,48 @@ public class OutputResultTab extends Tab {
 
     public void build(String name) {
 
+        final int hBoxSpace = 7;
+
         final Label pinLabel = LabelFactory.buildSegoeLabel("\uE718");
         final Label unpinLabel = LabelFactory.buildSegoeLabel("\uE77A");
 
-        this.setText(name);
-        this.setGraphic(unpinLabel);
+        final Label label = new Label(name);
+        this.setGraphic(new HBox(hBoxSpace, unpinLabel, label));
+        final TextField textField = new TextField();
+
+        label.setOnMouseClicked(evt -> {
+
+            textField.setText(label.getText());
+            setGraphic(new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, textField));
+            textField.selectAll();
+            textField.requestFocus();
+        });
+
+        textField.setOnAction(evt -> {
+
+            label.setText(textField.getText());
+        });
+
+        textField.setOnKeyPressed(evt -> {
+
+            if (KeyCode.ENTER.equals(evt.getCode())) {
+                label.setText(textField.getText());
+                setGraphic(new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label));
+            }
+        });
+
+        textField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+
+            if (Boolean.FALSE.equals(newValue)) {
+                label.setText(textField.getText());
+                setGraphic(new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label));
+            }
+        });
 
         pinLabel.setOnMouseClicked(evt -> {
 
             if (pin) {
-                this.setGraphic(unpinLabel);
+                setGraphic(new HBox(hBoxSpace, unpinLabel, label));
                 pin = false;
             }
         });
@@ -53,7 +87,7 @@ public class OutputResultTab extends Tab {
         unpinLabel.setOnMouseClicked(evt -> {
 
             if (!pin) {
-                this.setGraphic(pinLabel);
+                setGraphic(new HBox(hBoxSpace, pinLabel, label));
                 pin = true;
             }
         });

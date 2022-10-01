@@ -85,9 +85,8 @@ public class AzureStorageDfsClient {
     }
 
 
-    public static AzurePathItems listDirectoryContent(Connection connection, String container, String directory) {
+    public static AzurePathItems listDirectoryContent(DataLakeFileSystemClient fileSystem, String directory) {
 
-        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
         DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(directory);
 
         List<AzurePathItem> azurePathItems = directoryClient.listPaths(false, false, null, null)

@@ -1,5 +1,6 @@
 package org.arnaudlt.warthog.ui.service;
 
+import com.azure.storage.file.datalake.DataLakeFileSystemClient;
 import javafx.concurrent.Task;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.azure.AzurePathItems;
@@ -15,6 +16,8 @@ public class AzureDirectoryListingService extends AbstractMonitoredService<Azure
     private final String azContainer;
 
     private final String azDirectoryPath;
+
+    private DataLakeFileSystemClient fileSystem;
 
 
     public AzureDirectoryListingService(PoolService poolService, Connection connection, String azContainer, String azDirectoryPath) {
@@ -48,7 +51,10 @@ public class AzureDirectoryListingService extends AbstractMonitoredService<Azure
                 updateMessage("Listing content of " + azContainer + "/" + azDirectoryPath);
                 updateProgress(-1,1);
 
-                AzurePathItems azurePathItems = AzureStorageDfsClient.listDirectoryContent(connection, azContainer, azDirectoryPath);
+                if (fileSystem == null) {
+                    fileSystem = AzureStorageDfsClient.getDataLakeFileSystemClient(connection, azContainer);
+                }
+                AzurePathItems azurePathItems = AzureStorageDfsClient.listDirectoryContent(fileSystem, azDirectoryPath);
 
                 updateProgress(1, 1);
                 return azurePathItems;

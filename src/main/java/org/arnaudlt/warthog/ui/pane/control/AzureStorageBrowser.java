@@ -53,7 +53,6 @@ public class AzureStorageBrowser {
 
     public AzureStorageBrowser(Stage owner, PoolService poolService, Connection connection, String azureContainer, StringProperty azureCurrentDirectory) {
 
-
         this.owner = owner;
         this.poolService = poolService;
         this.connection = connection;
@@ -181,8 +180,7 @@ public class AzureStorageBrowser {
 
         Label icon;
         if (param.getValue().getPathItem().isDirectory()) {
-            icon = LabelFactory.buildSegoeLabel("\uF12B");
-            icon.setStyle("-fx-text-fill: #F1C40F;");
+            icon = LabelFactory.buildSegoeLabel("\uF12B", "#F1C40F");
         } else {
             icon = LabelFactory.buildSegoeLabel("\uE7C3");
         }

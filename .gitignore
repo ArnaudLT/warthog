@@ -9,6 +9,3 @@ metastore_db/
 
 /user/
 /history/
-
-
-*MockDirectoryListingService.java

@@ -18,4 +18,12 @@ public class LabelFactory {
         label.setFont(SEGOE_MDL2_FONT);
         return label;
     }
+
+
+    public static Label buildSegoeLabel(String text, String color) {
+
+        Label label = buildSegoeLabel(text);
+        label.setStyle("-fx-text-fill: "+color+";");
+        return label;
+    }
 }

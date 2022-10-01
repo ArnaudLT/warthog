@@ -24,18 +24,17 @@ public class SqlTab extends Tab {
 
     public void build(String name) {
 
-        this.sqlArea = new SqlCodeArea(poolService);
-        this.setContent(this.sqlArea.getWrappedSqlArea());
+        sqlArea = new SqlCodeArea(poolService);
+        setContent(sqlArea.getWrappedSqlArea());
 
-        // TODO duplicated code !! (OutputResultTab)
         final Label label = new Label(name);
-        this.setGraphic(label);
+        setGraphic(label);
         final TextField textField = new TextField();
 
         label.setOnMouseClicked(evt -> {
 
             textField.setText(label.getText());
-            this.setGraphic(textField);
+            setGraphic(textField);
             textField.selectAll();
             textField.requestFocus();
         });
@@ -49,7 +48,7 @@ public class SqlTab extends Tab {
 
             if (KeyCode.ENTER.equals(evt.getCode())) {
                 label.setText(textField.getText());
-                this.setGraphic(label);
+                setGraphic(label);
             }
         });
 
@@ -57,7 +56,7 @@ public class SqlTab extends Tab {
 
             if (Boolean.FALSE.equals(newValue)) {
                 label.setText(textField.getText());
-                this.setGraphic(label);
+                setGraphic(label);
             }
         });
     }
