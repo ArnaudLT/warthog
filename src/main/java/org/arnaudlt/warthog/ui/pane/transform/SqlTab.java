@@ -7,6 +7,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -139,7 +140,15 @@ public class SqlTab extends Tab {
     }
 
 
-    public void saveToFile(File targetSqlFile) {
+    public void saveToFileWithChooser() {
+
+        FileChooser fc = new FileChooser();
+        if (sqlFile.getValue() != null) {
+            fc.setInitialDirectory(sqlFile.getValue().getParentFile());
+            fc.setInitialFileName(sqlFile.getValue().toPath().getFileName().toString());
+        }
+        File targetSqlFile = fc.showSaveDialog(owner);
+        if (targetSqlFile == null) return;
 
         SaveToSqlFileService saveToSqlFileService = new SaveToSqlFileService(poolService, sqlArea.getText(), targetSqlFile);
         saveToSqlFileService.setOnSucceeded(success -> {

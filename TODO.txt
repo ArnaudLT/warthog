@@ -9,7 +9,6 @@
 
 => SQL :
     => Auto-completion
-    => Open files on fs (tabs)
 
 => UI :
     => Capability to change the size of the font

@@ -2,8 +2,9 @@ package org.arnaudlt.warthog.ui.pane.transform;
 
 import javafx.geometry.Side;
 import javafx.scene.Node;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.stage.FileChooser;
+import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -41,15 +43,25 @@ public class TransformPane {
         this.namedDatasetsTabPane.setSide(Side.BOTTOM);
         this.namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
+        this.namedDatasetsTabPane.setOnDragOver(dragEvent -> {
+
+            if (dragEvent.getDragboard().hasFiles()) {
+                dragEvent.acceptTransferModes(TransferMode.ANY);
+            }
+        });
+
+        this.namedDatasetsTabPane.setOnDragDropped(dragEvent -> {
+
+            List<File> files = dragEvent.getDragboard().getFiles();
+            for (File file : files) {
+
+                openSqlFile(file);
+            }
+        });
+
         addSqlNewTab();
 
         return this.namedDatasetsTabPane;
-    }
-
-
-    public SqlTab getSelectedSqlTab() {
-
-        return (SqlTab) namedDatasetsTabPane.getSelectionModel().getSelectedItem();
     }
 
 
@@ -73,6 +85,12 @@ public class TransformPane {
 
     public void openSqlFile(File sqlFile) {
 
+        SqlTab target = alreadyOpened(sqlFile);
+        if (target != null) {
+            namedDatasetsTabPane.getSelectionModel().select(target);
+            return;
+        }
+
         OpenSqlFileService openSqlFileService = new OpenSqlFileService(poolService, sqlFile);
 
         openSqlFileService.setOnSucceeded(success -> {
@@ -90,16 +108,25 @@ public class TransformPane {
     }
 
 
+    private SqlTab alreadyOpened(File sqlFile) {
+
+        for (Tab t : namedDatasetsTabPane.getTabs()) {
+
+            SqlTab tab = (SqlTab) t;
+            if (sqlFile.equals(tab.getSqlFile())) {
+                return tab;
+            }
+        }
+        return null;
+    }
+
+
     public void saveAsSqlTabToFile() {
 
         SqlTab selectedTab = (SqlTab) this.namedDatasetsTabPane.getSelectionModel().getSelectedItem();
         if (selectedTab == null) return;
 
-        FileChooser fc = new FileChooser();
-        File sqlFile = fc.showSaveDialog(stage);
-        if (sqlFile == null) return;
-
-        selectedTab.saveToFile(sqlFile);
+        selectedTab.saveToFileWithChooser();
     }
 
 

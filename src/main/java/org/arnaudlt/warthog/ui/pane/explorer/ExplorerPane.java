@@ -130,7 +130,6 @@ public class ExplorerPane {
             TreeItem<NamedDatasetItem> childItem = new TreeItem<>(child);
             item.getChildren().add(childItem);
             addSubItems(childItem, field.dataType());
-
         }
 
         this.treeExplorer.getRoot().getChildren().add(item);
