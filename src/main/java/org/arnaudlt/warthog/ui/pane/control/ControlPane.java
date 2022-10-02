@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
@@ -113,19 +114,31 @@ public class ControlPane {
         newSqlTabItem.setAccelerator(KeyCombination.valueOf("CTRL+N"));
         newSqlTabItem.setOnAction(requestNewSqlTab);
 
+        MenuItem openSqlTabItem = new MenuItem("Open SQL sheet...");
+        openSqlTabItem.setAccelerator(KeyCombination.valueOf("CTRL+O"));
+        openSqlTabItem.setOnAction(requestOpenSqlTab);
+
+        MenuItem saveItem = new MenuItem("Save");
+        saveItem.setAccelerator(KeyCombination.valueOf("CTRL+S"));
+        saveItem.setOnAction(requestSave);
+
+        MenuItem saveAsItem = new MenuItem("Save as...");
+        saveAsItem.setAccelerator(KeyCombination.valueOf("CTRL+ALT+S"));
+        saveAsItem.setOnAction(requestSaveAs);
+
         MenuItem importFromLocal = new MenuItem("Import from local...");
-        importFromLocal.setAccelerator(KeyCombination.valueOf("CTRL+O"));
+        importFromLocal.setAccelerator(KeyCombination.valueOf("CTRL+I"));
         importFromLocal.setOnAction(requestImportLocal);
 
         MenuItem importFromItem = new MenuItem("Import...");
-        importFromItem.setAccelerator(KeyCombination.valueOf("CTRL+SHIFT+O"));
+        importFromItem.setAccelerator(KeyCombination.valueOf("CTRL+SHIFT+I"));
         importFromItem.setOnAction(requestImportFrom);
 
-        MenuItem deleteItem = new MenuItem("Delete");
-        deleteItem.setAccelerator(KeyCombination.valueOf("DELETE"));
-        deleteItem.setOnAction(requestDelete);
+        MenuItem removeDatasetItem = new MenuItem("Remove dataset");
+        removeDatasetItem.setAccelerator(KeyCombination.valueOf("DELETE"));
+        removeDatasetItem.setOnAction(requestRemoveDataset);
 
-        fileMenu.getItems().addAll(newSqlTabItem, new SeparatorMenuItem(), importFromLocal, importFromItem, new SeparatorMenuItem(), deleteItem);
+        fileMenu.getItems().addAll(newSqlTabItem, openSqlTabItem, new SeparatorMenuItem(), saveItem, saveAsItem, new SeparatorMenuItem(), importFromLocal, importFromItem, new SeparatorMenuItem(), removeDatasetItem);
 
         Menu viewMenu = new Menu("View");
 
@@ -133,7 +146,6 @@ public class ControlPane {
         connectionManagerItem.setOnAction(getConnectionsManagerActionEventHandler());
 
         MenuItem settingsItem = new MenuItem("Settings...");
-        settingsItem.setAccelerator(KeyCombination.valueOf("CTRL+ALT+S"));
         settingsItem.setOnAction(getSettingsActionEventHandler());
 
         MenuItem backgroundTasksItem = new MenuItem("Background tasks...");
@@ -229,6 +241,32 @@ public class ControlPane {
             this.importDialog.showImportDialog();
 
 
+    private final EventHandler<ActionEvent> requestOpenSqlTab = actionEvent -> {
+
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("SQL file (*.sql)", "*.sql")
+        );
+        File chosenSqlFile = fc.showOpenDialog(stage);
+        if (chosenSqlFile != null) {
+
+            this.mainPane.getTransformPane().openSqlFile(chosenSqlFile);
+        }
+    };
+
+
+    private final EventHandler<ActionEvent> requestSave = actionEvent -> {
+
+        this.mainPane.getTransformPane().saveSqlTabToFile();
+    };
+
+
+    private final EventHandler<ActionEvent> requestSaveAs = actionEvent -> {
+
+        this.mainPane.getTransformPane().saveAsSqlTabToFile();
+    };
+
+
     public void importFile(File file) {
 
         NamedDatasetImportFromFileService importService = new NamedDatasetImportFromFileService(poolService, namedDatasetManager, file);
@@ -238,7 +276,7 @@ public class ControlPane {
     }
 
 
-    private final EventHandler<ActionEvent> requestDelete = actionEvent -> {
+    private final EventHandler<ActionEvent> requestRemoveDataset = actionEvent -> {
 
         Set<NamedDataset> selectedItems = this.mainPane.getExplorerPane().getSelectedItems();
         for (NamedDataset selectedNamedDataset : selectedItems) {

@@ -228,7 +228,13 @@ public class SqlCodeArea {
 
     public void setText(String text) {
 
-        this.codeArea.clear();
-        this.codeArea.appendText(text);
+        codeArea.clear();
+        codeArea.appendText(text);
+    }
+
+
+    public String getText() {
+
+        return codeArea.getText();
     }
 }

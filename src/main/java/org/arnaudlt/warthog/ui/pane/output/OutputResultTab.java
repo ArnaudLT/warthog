@@ -1,9 +1,11 @@
 package org.arnaudlt.warthog.ui.pane.output;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.stream.IntStream;
 
 @Setter
 @Getter
+@EqualsAndHashCode
 @Slf4j
 public class OutputResultTab extends Tab {
 
@@ -44,13 +47,17 @@ public class OutputResultTab extends Tab {
         final Label unpinLabel = LabelFactory.buildSegoeLabel("\uE77A");
 
         final Label label = new Label(name);
-        this.setGraphic(new HBox(hBoxSpace, unpinLabel, label));
+        HBox hBoxContainer = new HBox(hBoxSpace, unpinLabel, label);
+        hBoxContainer.setAlignment(Pos.BASELINE_LEFT);
+        this.setGraphic(hBoxContainer);
         final TextField textField = new TextField();
 
         label.setOnMouseClicked(evt -> {
 
             textField.setText(label.getText());
-            setGraphic(new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, textField));
+            HBox hBox = new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, textField);
+            hBox.setAlignment(Pos.BASELINE_LEFT);
+            setGraphic(hBox);
             textField.selectAll();
             textField.requestFocus();
         });
@@ -64,7 +71,9 @@ public class OutputResultTab extends Tab {
 
             if (KeyCode.ENTER.equals(evt.getCode())) {
                 label.setText(textField.getText());
-                setGraphic(new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label));
+                HBox hBox = new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label);
+                hBox.setAlignment(Pos.BASELINE_LEFT);
+                setGraphic(hBox);
             }
         });
 
@@ -72,14 +81,18 @@ public class OutputResultTab extends Tab {
 
             if (Boolean.FALSE.equals(newValue)) {
                 label.setText(textField.getText());
-                setGraphic(new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label));
+                HBox hBox = new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label);
+                hBox.setAlignment(Pos.BASELINE_LEFT);
+                setGraphic(hBox);
             }
         });
 
         pinLabel.setOnMouseClicked(evt -> {
 
             if (pin) {
-                setGraphic(new HBox(hBoxSpace, unpinLabel, label));
+                HBox hBox = new HBox(hBoxSpace, unpinLabel, label);
+                hBox.setAlignment(Pos.BASELINE_LEFT);
+                setGraphic(hBox);
                 pin = false;
             }
         });
@@ -87,7 +100,9 @@ public class OutputResultTab extends Tab {
         unpinLabel.setOnMouseClicked(evt -> {
 
             if (!pin) {
-                setGraphic(new HBox(hBoxSpace, pinLabel, label));
+                HBox hBox = new HBox(hBoxSpace, pinLabel, label);
+                hBox.setAlignment(Pos.BASELINE_LEFT);
+                setGraphic(hBox);
                 pin = true;
             }
         });
