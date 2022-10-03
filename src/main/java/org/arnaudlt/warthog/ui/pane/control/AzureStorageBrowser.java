@@ -1,7 +1,10 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import com.azure.storage.file.datalake.models.PathItem;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -29,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +53,8 @@ public class AzureStorageBrowser {
     private final String azureContainer;
 
     private final StringProperty azureCurrentDirectory;
+
+    private CheckBox selectAll;
 
 
     public AzureStorageBrowser(Stage owner, PoolService poolService, Connection connection, String azureContainer, StringProperty azureCurrentDirectory) {
@@ -74,7 +80,7 @@ public class AzureStorageBrowser {
 
         TableColumn<AzureSelectableItem, Boolean> checkBoxColumn = new TableColumn<>();
 
-        CheckBox selectAll = new CheckBox();
+        selectAll = new CheckBox();
         selectAll.setSelected(true);
         selectAll.selectedProperty().addListener((obs, oldValue, newValue) ->
                 setAllCheckBoxAzurePathItems(!Boolean.TRUE.equals(oldValue)));
@@ -95,10 +101,9 @@ public class AzureStorageBrowser {
         });
         filesView.getColumns().add(itemName);
 
-        TableColumn<AzureSelectableItem, String> itemLastModification = new TableColumn<>("Last modified");
+        TableColumn<AzureSelectableItem, LastModified> itemLastModification = new TableColumn<>("Last modified");
         itemLastModification.setPrefWidth(130);
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-M-yyyy hh:mm:ss");
-        itemLastModification.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPathItem().getLastModified().format(dateFormatter)));
+        itemLastModification.setCellValueFactory(param -> new SimpleObjectProperty<>(new LastModified(param.getValue().getPathItem().getLastModified())));
         filesView.getColumns().add(itemLastModification);
 
         itemName.prefWidthProperty().bind(
@@ -210,6 +215,7 @@ public class AzureStorageBrowser {
 
             filesView.getItems().clear();
             filesView.getItems().addAll(azureSelectableItems);
+            selectAll.setSelected(true);
         });
 
         azureDirectoryListingService.setOnFailed(fail -> {
@@ -233,7 +239,7 @@ public class AzureStorageBrowser {
     }
 
 
-    public static class IconAndName extends HBox implements Comparable<IconAndName> {
+    private static class IconAndName extends HBox implements Comparable<IconAndName> {
 
         private final String icon;
 
@@ -266,6 +272,42 @@ public class AzureStorageBrowser {
         @Override
         public int compareTo(@NotNull AzureStorageBrowser.IconAndName o) {
             return this.name.compareTo(o.name);
+        }
+    }
+
+
+    private static class LastModified implements Comparable<LastModified> {
+
+        private final OffsetDateTime date;
+
+
+        public LastModified(OffsetDateTime date) {
+            this.date = date;
+        }
+
+        @Override
+        public String toString() {
+            return date.format(DateTimeFormatter.ofPattern("dd-M-yyyy hh:mm:ss"));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            LastModified that = (LastModified) o;
+
+            return Objects.equals(date, that.date);
+        }
+
+        @Override
+        public int hashCode() {
+            return date != null ? date.hashCode() : 0;
+        }
+
+        @Override
+        public int compareTo(@NotNull AzureStorageBrowser.LastModified o) {
+            return date.compareTo(o.date);
         }
     }
 
