@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 
 @Slf4j
@@ -236,7 +237,10 @@ public class ImportDialog {
         basePathField.disableProperty().bind(automaticBasePathCheckBox.selectedProperty());
 
         StringBinding basePathFieldBind = Bindings.createStringBinding(() ->
-                        Paths.get(localDirectoryField.getText(), azContainerField.getText(), azDirectoryField.getText()).toString(),
+                        Paths.get(
+                                Objects.requireNonNull(localDirectoryField.getText(), ""),
+                                Objects.requireNonNull(azContainerField.getText(), ""),
+                                Objects.requireNonNull(azDirectoryField.getText(), "")).toString(),
                 localDirectoryField.textProperty(), azContainerField.textProperty(), azDirectoryField.textProperty());
 
         basePathField.textProperty().bind(basePathFieldBind);
