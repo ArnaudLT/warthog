@@ -153,7 +153,6 @@ public class ImportDialog {
         GridPane basicSettingsNode = GridFactory.buildGrid();
         int rowIndex = 0;
 
-
         Label azContainerLabel = new Label("Azure container :");
         TextField azContainerField = new TextField();
         azContainerField.setMinWidth(300);
@@ -163,7 +162,6 @@ public class ImportDialog {
         Label azDirectoryLabel = new Label("Azure directory :");
         TextField azDirectoryField = new TextField();
         Button azureDirectoryBrowserButton = new Button("...");
-
 
         Connection initiallySelectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
         if (initiallySelectedConnection != null && initiallySelectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE) {
@@ -278,7 +276,7 @@ public class ImportDialog {
             directoryStatisticsService.setOnSucceeded(success -> {
 
                 AzureDirectoryStatisticsService.DirectoryStatistics statistics = directoryStatisticsService.getValue();
-                AlertFactory.showConfirmationAlert(owner, "Do you want to download " + statistics.filesCount + " files for " + statistics.bytes / 1_000_000 + " MB ?")
+                AlertFactory.showConfirmationAlert(owner, "Do you want to download " + statistics.filesCount + " files for " + Utils.format2Decimals(statistics.bytes / 1_000_000d) + " MB ?")
                         .filter(button -> button == ButtonType.OK)
                         .ifPresent(b -> {
 

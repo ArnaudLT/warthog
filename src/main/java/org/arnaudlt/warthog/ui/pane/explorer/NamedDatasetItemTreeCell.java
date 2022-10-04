@@ -102,8 +102,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
                 Format format = localDecoration.format();
                 grid.addRow(rowIdx++, new Label("Format :"), new Label(format.getLabel()));
 
-                DecimalFormat formatter = new DecimalFormat("#.##");
-                String formattedSizeInMB = formatter.format(localDecoration.sizeInMegaBytes());
+                String formattedSizeInMB = Utils.format2Decimals(localDecoration.sizeInMegaBytes());
                 grid.addRow(rowIdx++, new Label("Size :"), new Label( formattedSizeInMB + "MB"));
 
             }  else if (decoration instanceof DatabaseDecoration databaseDecoration) {

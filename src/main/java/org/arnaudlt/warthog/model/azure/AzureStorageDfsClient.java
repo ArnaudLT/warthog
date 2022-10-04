@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -121,7 +122,16 @@ public class AzureStorageDfsClient {
         String fileName = Paths.get(pathItem.getName()).getFileName().toString();
         DataLakeFileClient fileClient = dc.getFileClient(fileName);
 
-        fileClient.readToFile(localFilePath.toString());
+        try {
+            fileClient.readToFile(localFilePath.toString());
+        } catch (Exception e) {
+            // This exception can occur ! Trust me :-) (
+            if (e instanceof FileAlreadyExistsException fae) {
+                log.warn("File '{}' already exists and will not be replaced.", localFilePath.toString());
+            } else {
+                throw e;
+            }
+        }
 
         return fileClient.getProperties().getFileSize();
     }
