@@ -54,7 +54,17 @@ public class AzureDirectoryListingService extends AbstractMonitoredService<Azure
                 if (fileSystem == null) {
                     fileSystem = AzureStorageDfsClient.getDataLakeFileSystemClient(connection, azContainer);
                 }
-                AzurePathItems azurePathItems = AzureStorageDfsClient.listDirectoryContent(fileSystem, azDirectoryPath);
+
+                AzurePathItems azurePathItems;
+                try {
+                    azurePathItems = AzureStorageDfsClient.listDirectoryContent(fileSystem, azDirectoryPath);
+                } catch (Exception e) {
+
+                    updateProgress(1, 2);
+                    updateMessage("Retrying to list content of " + azContainer + "/" + azDirectoryPath);
+                    fileSystem = AzureStorageDfsClient.getDataLakeFileSystemClient(connection, azContainer);
+                    azurePathItems = AzureStorageDfsClient.listDirectoryContent(fileSystem, azDirectoryPath);
+                }
 
                 updateProgress(1, 1);
                 return azurePathItems;

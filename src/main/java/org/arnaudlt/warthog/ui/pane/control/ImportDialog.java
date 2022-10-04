@@ -105,8 +105,10 @@ public class ImportDialog {
                     selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
         }, connectionsListBox.getSelectionModel().selectedItemProperty()));
 
-        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
-                this.dialog.getScene().getWindow().sizeToScene());
+        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+
+            this.dialog.getScene().getWindow().sizeToScene();
+        });
 
         Scene dialogScene = StageFactory.buildScene(new VBox(common, new Group(nodeDatabase, nodeAzureStorage)));
         dialog.setScene(dialogScene);
@@ -150,6 +152,7 @@ public class ImportDialog {
         GridPane basicSettingsNode = GridFactory.buildGrid();
         int rowIndex = 0;
 
+
         Label azContainerLabel = new Label("Azure container :");
         TextField azContainerField = new TextField();
         azContainerField.setMinWidth(300);
@@ -159,6 +162,23 @@ public class ImportDialog {
         Label azDirectoryLabel = new Label("Azure directory :");
         TextField azDirectoryField = new TextField();
         Button azureDirectoryBrowserButton = new Button("...");
+
+
+        Connection initiallySelectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
+        if (initiallySelectedConnection != null && initiallySelectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE) {
+
+            azContainerField.setText(initiallySelectedConnection.getPreferredContainer());
+            azDirectoryField.setText(initiallySelectedConnection.getPreferredAzureDirectory());
+        }
+
+        connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+
+            if (newValue != null && newValue.getConnectionType() == ConnectionType.AZURE_STORAGE) {
+
+                    azContainerField.setText(newValue.getPreferredContainer());
+                    azDirectoryField.setText(newValue.getPreferredAzureDirectory());
+            }
+        });
 
         azureDirectoryBrowserButton.setOnAction(event -> {
 

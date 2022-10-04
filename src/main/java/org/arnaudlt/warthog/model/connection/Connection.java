@@ -32,6 +32,12 @@ public class Connection implements Serializable {
 
     private String storageAccount;
 
+    // Optional
+    private String preferredContainer;
+
+    // Optional
+    private String preferredAzureDirectory;
+
     // Database
     protected static final List<String> knownDatabaseType = List.of("SID", "Service name");
 
@@ -64,6 +70,8 @@ public class Connection implements Serializable {
         this.proxyUrl = value.proxyUrl;
         this.proxyPort = value.proxyPort;
         this.storageAccount = value.storageAccount;
+        this.preferredContainer = value.preferredContainer;
+        this.preferredAzureDirectory = value.preferredAzureDirectory;
         this.host = value.host;
         this.port = value.port;
         this.database = value.database;
@@ -82,6 +90,8 @@ public class Connection implements Serializable {
             this.proxyUrl = null;
             this.proxyPort = null;
             this.storageAccount = null;
+            this.preferredContainer = null;
+            this.preferredAzureDirectory = null;
         } else if (connectionType == ConnectionType.AZURE_STORAGE) {
             this.host = null;
             this.port = null;

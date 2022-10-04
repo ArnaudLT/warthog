@@ -53,6 +53,10 @@ public class ConnectionsManagerDialog {
 
     private TextField storageAccount;
 
+    private TextField preferredContainer;
+
+    private TextField preferredAzureDirectory;
+
 
     // Databases
 
@@ -223,7 +227,19 @@ public class ConnectionsManagerDialog {
         grid.add(storageAccount, 1, i, 3, 1);
         i++;
 
-        grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 2, 1);
+        grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 4, 1);
+
+        Label preferredContainerLabel = new Label("Preferred container :");
+        this.preferredContainer = new TextField();
+
+        grid.addRow(i++, preferredContainerLabel, preferredContainer);
+
+        Label preferredAzureDirectoryLabel = new Label("Preferred Azure directory :");
+        this.preferredAzureDirectory = new TextField();
+
+        grid.addRow(i++, preferredAzureDirectoryLabel, preferredAzureDirectory);
+
+        grid.add(new Separator(Orientation.HORIZONTAL), 0, i++, 4, 1);
 
         Button saveButton = new Button("Save");
         saveButton.setOnAction(event -> {
@@ -241,6 +257,8 @@ public class ConnectionsManagerDialog {
             connection.setProxyUrl(proxyUrl.getText());
             connection.setProxyPort(Integer.parseInt(proxyPort.getText())); // TODO handle the NumberFormatException exception please :-)
             connection.setStorageAccount(storageAccount.getText());
+            connection.setPreferredContainer(preferredContainer.getText());
+            connection.setPreferredAzureDirectory(preferredAzureDirectory.getText());
             log.info("Saving {}", connection);
 
             try {
@@ -348,6 +366,8 @@ public class ConnectionsManagerDialog {
                 this.proxyUrl.setText(connection.getProxyUrl());
                 this.proxyPort.setText(connection.getProxyPort().toString());
                 this.storageAccount.setText(connection.getStorageAccount());
+                this.preferredContainer.setText(connection.getPreferredContainer());
+                this.preferredAzureDirectory.setText(connection.getPreferredAzureDirectory());
             }
             default -> throw new IllegalStateException("Unexpected connection type : " + connection.getConnectionType());
         }
@@ -362,6 +382,8 @@ public class ConnectionsManagerDialog {
         this.proxyUrl.setText("");
         this.proxyPort.setText("");
         this.storageAccount.setText("");
+        this.preferredContainer.setText("");
+        this.preferredAzureDirectory.setText("");
         this.host.setText("");
         this.port.setText("");
         this.database.setText("");
