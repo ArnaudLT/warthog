@@ -104,6 +104,8 @@ public class AzureStorageBrowser {
         TableColumn<AzureSelectableItem, LastModified> itemLastModification = new TableColumn<>("Last modified");
         itemLastModification.setPrefWidth(130);
         itemLastModification.setCellValueFactory(param -> new SimpleObjectProperty<>(new LastModified(param.getValue().getPathItem().getLastModified())));
+        itemLastModification.setSortType(TableColumn.SortType.DESCENDING);
+        filesView.getSortOrder().add(itemLastModification);
         filesView.getColumns().add(itemLastModification);
 
         itemName.prefWidthProperty().bind(
@@ -146,9 +148,9 @@ public class AzureStorageBrowser {
         topControlBar.getChildren().addAll(parentDirectoryButton, currentDirectory);
 
         HBox bottomControlBar = new HBox();
-        Button okButton = new Button("Ok");
-        okButton.setPrefWidth(150);
-        okButton.setOnAction(evt -> {
+        Button validateButton = new Button("Validate");
+        validateButton.setPrefWidth(150);
+        validateButton.setOnAction(evt -> {
 
             selectedAzurePathItems.getItems().addAll(
                     filesView.getItems().stream()
@@ -157,7 +159,7 @@ public class AzureStorageBrowser {
             );
             dialog.close();
         });
-        bottomControlBar.getChildren().addAll(okButton);
+        bottomControlBar.getChildren().addAll(validateButton);
         bottomControlBar.setAlignment(Pos.CENTER_RIGHT);
 
         Scene dialogScene = StageFactory.buildScene(new VBox(topControlBar, filesView, bottomControlBar), 750, 400);
@@ -215,6 +217,7 @@ public class AzureStorageBrowser {
 
             filesView.getItems().clear();
             filesView.getItems().addAll(azureSelectableItems);
+            filesView.sort();
             selectAll.setSelected(true);
         });
 
