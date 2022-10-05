@@ -6,7 +6,7 @@
 
     <groupId>org.arnaudlt.warthog</groupId>
     <artifactId>warthog</artifactId>
-    <version>2.2.3-SNAPSHOT</version>
+    <version>2.2.3</version>
 
 
     <parent>
