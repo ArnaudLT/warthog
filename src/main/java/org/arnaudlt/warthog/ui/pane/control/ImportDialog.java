@@ -63,6 +63,7 @@ public class ImportDialog {
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.explorerPane = explorerPane;
+        this.azurePathItems = new AzurePathItems();
     }
 
 
