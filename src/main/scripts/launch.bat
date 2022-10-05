@@ -14,4 +14,4 @@ javaw --add-exports java.base/sun.nio.ch=ALL-UNNAMED ^
 --add-opens=java.base/sun.nio.ch=ALL-UNNAMED ^
 --add-opens=java.base/sun.nio.cs=ALL-UNNAMED ^
 --add-opens=java.base/sun.security.action=ALL-UNNAMED ^
---add-opens=java.base/sun.util.calendar=ALL-UNNAMED -jar warthog-2.2.3.jar
+--add-opens=java.base/sun.util.calendar=ALL-UNNAMED -jar warthog-2.2.4-SNAPSHOT.jar
