@@ -303,7 +303,7 @@ public class ImportDialog {
 
     public void showImportDialog() {
 
-        Utils.refreshComboBoxAllItems(connectionsListBox);
+        Utils.refreshComboBoxItems(connectionsListBox);
         dialog.show();
     }
 

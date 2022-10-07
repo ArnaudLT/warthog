@@ -138,7 +138,7 @@ public class ExportDialog {
 
     public void showExportDatabaseDialog() {
 
-        Utils.refreshComboBoxAllItems(connectionsListBox);
+        Utils.refreshComboBoxItems(connectionsListBox);
         dialog.show();
     }
 

@@ -8,22 +8,18 @@ import java.text.DecimalFormat;
 
 public class Utils {
 
-    private static DecimalFormat formatter = new DecimalFormat("#.##");
+    private static final DecimalFormat formatter = new DecimalFormat("#.##");
 
 
     private Utils() {}
 
-    // TODO Hack to force the refresh of the names in the combo box.
-    // Can be 'fixed' with a callback and a StringProperty for the displayed name ... so I prefer the HACK !
-    public static <T> void refreshComboBoxAllItems(ComboBox<T> comboBox) {
+
+    public static <T> void refreshComboBoxItems(ComboBox<T> comboBox) {
 
         T selectedItem = comboBox.getSelectionModel().getSelectedItem();
-        comboBox.getSelectionModel().clearSelection();
-        for (int i = 0; i < comboBox.getItems().size(); i++) {
-
-            comboBox.getSelectionModel().select(i);
+        if (selectedItem == null) {
+            comboBox.getSelectionModel().selectFirst();
         }
-        comboBox.getSelectionModel().select(selectedItem);
     }
 
 
