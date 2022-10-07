@@ -93,19 +93,18 @@ public class ImportDialog {
 
         Node nodeAzureStorage = getAzureStorageImportNode();
 
-        // TODO Need to switch nodeDatabase/nodeAzureStorage visible property on selected Connection type value. (it may have changed and desync !)
         nodeDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
             return selectedConnection != null && (
                     selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
                             selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
-        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+        }, connectionsListBox.getSelectionModel().selectedItemProperty(), dialog.showingProperty()));
 
         nodeAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
             return selectedConnection != null &&
                     selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
-        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+        }, connectionsListBox.getSelectionModel().selectedItemProperty(), dialog.showingProperty()));
 
         connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
 
@@ -215,7 +214,7 @@ public class ImportDialog {
 
             if (!newValue.matches("^[a-zA-Z0-9_]*$")) {
 
-                ((StringProperty)observable).setValue(oldValue);
+                ((StringProperty) observable).setValue(oldValue);
             }
         });
         basicSettingsNode.addRow(rowIndex++, nameLabel, nameField);

@@ -110,7 +110,7 @@ public class ExportDialog {
         // =============== Export to Azure storage ===============
         GridPane gridAzureStorage = GridFactory.buildGrid();
         int k = 0;
-        Label featureIncomingLabel = new Label("Feature coming soon ;-)");
+        Label featureIncomingLabel = new Label("Not available for Azure storage");
         gridAzureStorage.addRow(k, featureIncomingLabel);
         // ===============
 
@@ -120,13 +120,13 @@ public class ExportDialog {
                 return selectedConnection != null && (
                         selectedConnection.getConnectionType() == ConnectionType.ORACLE_DATABASE ||
                         selectedConnection.getConnectionType() == ConnectionType.POSTGRESQL);
-            }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+            }, connectionsListBox.getSelectionModel().selectedItemProperty(), dialog.showingProperty()));
 
         gridAzureStorage.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
             return selectedConnection != null &&
                     selectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE;
-        }, connectionsListBox.getSelectionModel().selectedItemProperty()));
+        }, connectionsListBox.getSelectionModel().selectedItemProperty(), dialog.showingProperty()));
 
         connectionsListBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) ->
                 this.dialog.getScene().getWindow().sizeToScene());
