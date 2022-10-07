@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.user.GlobalSettings;
@@ -12,6 +13,8 @@ import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
 
 
 @Slf4j
@@ -40,15 +43,34 @@ public class SettingsDialog {
         Label rowsNumberLabel = new Label("Number of rows in overview :");
         Spinner<Integer> rowsNumber = new Spinner<>(1, 1000, globalSettings.getOverview().getRows(), 1);
         rowsNumber.setEditable(true);
-        generalGrid.addRow(rowIndex++, rowsNumberLabel, rowsNumber);
+        generalGrid.add(rowsNumberLabel, 0, rowIndex);
+        generalGrid.add(rowsNumber, 1, rowIndex, 2, 1);
+        rowIndex++;
 
         Label truncateAfterLabel = new Label("Truncate after (chars) :");
         Spinner<Integer> truncateAfter = new Spinner<>(0, 1000, globalSettings.getOverview().getTruncateAfter(), 1);
         truncateAfter.setEditable(true);
         truncateAfter.setTooltip(new Tooltip("Set to 0 if you don't want to truncate value"));
-        generalGrid.addRow(rowIndex++, truncateAfterLabel, truncateAfter);
+        generalGrid.add(truncateAfterLabel, 0, rowIndex);
+        generalGrid.add(truncateAfter, 1, rowIndex, 2, 1);
+        rowIndex++;
+
+        Label preferredDownloadDirectoryLabel = new Label("Preferred download directory :");
+        TextField preferredDownloadDirectory = new TextField(globalSettings.getUser().getPreferredDownloadDirectory());
+        preferredDownloadDirectory.prefWidth(250);
+        Button preferredDownloadDirectoryButton = new Button("...");
+        preferredDownloadDirectoryButton.setOnAction(event -> {
+
+            DirectoryChooser dc = new DirectoryChooser();
+            File file = dc.showDialog(this.dialog);
+
+            if (file == null) return;
+            preferredDownloadDirectory.setText(file.getAbsolutePath());
+        });
+        generalGrid.addRow(rowIndex++, preferredDownloadDirectoryLabel, preferredDownloadDirectory, preferredDownloadDirectoryButton);
 
         Tab generalsTab = new Tab("Generals", generalGrid);
+
 
         GridPane sparkGrid = GridFactory.buildGrid();
         rowIndex = 0;
@@ -76,6 +98,7 @@ public class SettingsDialog {
 
             try {
 
+                globalSettings.getUser().setPreferredDownloadDirectory(preferredDownloadDirectory.getText());
                 globalSettings.getOverview().setRows(rowsNumber.getValue());
                 globalSettings.getOverview().setTruncateAfter(truncateAfter.getValue());
                 globalSettings.getSpark().setThreads(sparkThreads.getValue());

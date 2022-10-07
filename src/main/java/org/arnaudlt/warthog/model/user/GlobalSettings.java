@@ -91,7 +91,6 @@ public class GlobalSettings {
                 '}';
     }
 
-
     @Data
     protected static class SerializableGlobalSettings implements Serializable {
 

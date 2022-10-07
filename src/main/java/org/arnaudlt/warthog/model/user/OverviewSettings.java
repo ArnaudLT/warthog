@@ -1,13 +1,12 @@
 package org.arnaudlt.warthog.model.user;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public final class OverviewSettings {
 
     private Integer rows;

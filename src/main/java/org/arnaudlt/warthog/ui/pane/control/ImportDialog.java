@@ -19,6 +19,7 @@ import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ImportAzureDfsStorageSettings;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.AzureDirectoryStatisticsService;
@@ -48,6 +49,8 @@ public class ImportDialog {
 
     private final ExplorerPane explorerPane;
 
+    private final GlobalSettings globalSettings;
+
     private Stage owner;
 
     private ComboBox<Connection> connectionsListBox;
@@ -58,11 +61,13 @@ public class ImportDialog {
 
 
     @Autowired
-    public ImportDialog(ConnectionsCollection connectionsCollection, NamedDatasetManager namedDatasetManager, PoolService poolService, ExplorerPane explorerPane) {
+    public ImportDialog(ConnectionsCollection connectionsCollection, NamedDatasetManager namedDatasetManager,
+                        PoolService poolService, ExplorerPane explorerPane, GlobalSettings globalSettings) {
         this.connectionsCollection = connectionsCollection;
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
         this.explorerPane = explorerPane;
+        this.globalSettings = globalSettings;
         this.azurePathItems = new AzurePathItems();
     }
 
@@ -170,8 +175,8 @@ public class ImportDialog {
 
             if (newValue != null && newValue.getConnectionType() == ConnectionType.AZURE_STORAGE) {
 
-                    azContainerField.setText(newValue.getPreferredContainer());
-                    azDirectoryField.setText(newValue.getPreferredAzureDirectory());
+                azContainerField.setText(newValue.getPreferredContainer());
+                azDirectoryField.setText(newValue.getPreferredAzureDirectory());
             }
         });
 
@@ -188,7 +193,7 @@ public class ImportDialog {
         basicSettingsNode.add(new Separator(Orientation.HORIZONTAL), 0, rowIndex++, 3, 1);
 
         Label localDirectoryLabel = new Label("Local directory :");
-        TextField localDirectoryField = new TextField();
+        TextField localDirectoryField = new TextField(globalSettings.getUser().getPreferredDownloadDirectory());
         Button directoryChooserButton = new Button("...");
         directoryChooserButton.setOnAction(event -> {
 
@@ -232,9 +237,9 @@ public class ImportDialog {
 
         StringBinding basePathFieldBind = Bindings.createStringBinding(() ->
                         Paths.get(
-                                Objects.requireNonNull(localDirectoryField.getText(), ""),
-                                Objects.requireNonNull(azContainerField.getText(), ""),
-                                Objects.requireNonNull(azDirectoryField.getText(), "")).toString(),
+                                Objects.requireNonNullElse(localDirectoryField.getText(), ""),
+                                Objects.requireNonNullElse(azContainerField.getText(), ""),
+                                Objects.requireNonNullElse(azDirectoryField.getText(), "")).toString(),
                 localDirectoryField.textProperty(), azContainerField.textProperty(), azDirectoryField.textProperty());
 
         basePathField.textProperty().bind(basePathFieldBind);

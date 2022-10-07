@@ -1,16 +1,21 @@
 package org.arnaudlt.warthog.model.user;
 
 
-import javafx.beans.property.SimpleStringProperty;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public final class UserSettings {
 
     private String directory;
 
-    private SimpleStringProperty preferredDownloadDirectory;
+    private String preferredDownloadDirectory;
 
 
     public UserSettings(UserSettings user) {
@@ -22,30 +27,15 @@ public final class UserSettings {
 
     public UserSettings(GlobalSettings.SerializableUserSettings user) {
 
-        this.preferredDownloadDirectory = new SimpleStringProperty();
-        if (user != null) {
-            this.preferredDownloadDirectory.setValue(user.getPreferredDownloadDirectory());
-        }
+        this.preferredDownloadDirectory = user.getPreferredDownloadDirectory();
     }
 
 
-    public String getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(String directory) {
-        this.directory = directory;
-    }
-
-    public String getPreferredDownloadDirectory() {
-        return preferredDownloadDirectory.get();
-    }
-
-    public SimpleStringProperty preferredDownloadDirectoryProperty() {
-        return preferredDownloadDirectory;
-    }
-
-    public void setPreferredDownloadDirectory(String preferredDownloadDirectory) {
-        this.preferredDownloadDirectory.set(preferredDownloadDirectory);
+    @Override
+    public String toString() {
+        return "UserSettings{" +
+                "directory='" + directory + '\'' +
+                ", preferredDownloadDirectory='" + preferredDownloadDirectory + '\'' +
+                '}';
     }
 }

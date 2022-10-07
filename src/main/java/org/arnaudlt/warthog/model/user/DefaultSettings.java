@@ -1,13 +1,11 @@
 package org.arnaudlt.warthog.model.user;
 
 
-import javafx.beans.property.SimpleStringProperty;
-
 public enum DefaultSettings {
 
     INSTANCE;
 
-    public final UserSettings user = new UserSettings("user", new SimpleStringProperty());
+    public final UserSettings user = new UserSettings("user", "");
 
     public final SqlHistorySettings sqlHistory = new SqlHistorySettings("history", 20);
 

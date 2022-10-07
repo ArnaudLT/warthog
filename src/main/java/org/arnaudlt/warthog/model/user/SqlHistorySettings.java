@@ -1,10 +1,9 @@
 package org.arnaudlt.warthog.model.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SqlHistorySettings {
@@ -27,5 +26,14 @@ public final class SqlHistorySettings {
             this.directory = sqlHistory.getDirectory();
             this.size = sqlHistory.getSize();
         }
+    }
+
+
+    @Override
+    public String toString() {
+        return "SqlHistorySettings{" +
+                "directory='" + directory + '\'' +
+                ", size=" + size +
+                '}';
     }
 }

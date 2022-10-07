@@ -50,7 +50,10 @@ public class UserConfiguration {
 
     private void defaultMissingSettings(GlobalSettings settings) {
 
-        settings.setUser(DefaultSettings.INSTANCE.user);
+        if (settings.getUser() == null) {
+            settings.setUser(new UserSettings());
+        }
+        settings.getUser().setDirectory(DefaultSettings.INSTANCE.user.getDirectory()); // forced
 
         if (settings.getSpark() == null) {
             settings.setSpark(new SparkSettings());
@@ -62,6 +65,9 @@ public class UserConfiguration {
             settings.setSqlHistory(new SqlHistorySettings());
         }
 
+        if (settings.getUser().getPreferredDownloadDirectory() == null) {
+            settings.getUser().setPreferredDownloadDirectory(DefaultSettings.INSTANCE.user.getPreferredDownloadDirectory());
+        }
         if (settings.getSqlHistory().getDirectory() == null) {
             settings.getSqlHistory().setDirectory(DefaultSettings.INSTANCE.sqlHistory.getDirectory());
         }
