@@ -15,6 +15,7 @@ import java.io.IOException;
 @Configuration
 public class UserConfiguration {
 
+
     @Bean
     public Gson getGson() {
 
@@ -24,17 +25,17 @@ public class UserConfiguration {
 
     @Bean
     @Autowired
-    public GlobalSettings getGlobalSettings(Gson gson, DefaultSettings defaultSettings) {
+    public GlobalSettings getGlobalSettings(Gson gson) {
 
         GlobalSettings settings;
         try {
 
-            settings = GlobalSettings.load(gson, defaultSettings.user());
-            defaultMissingSettings(gson, settings, defaultSettings);
+            settings = GlobalSettings.load(gson);
+            defaultMissingSettings(settings);
         } catch (IOException e) {
 
             log.warn("Unable to read settings");
-            settings = new GlobalSettings(gson, defaultSettings);
+            settings = new GlobalSettings(gson);
             try {
 
                 settings.persist();
@@ -47,10 +48,9 @@ public class UserConfiguration {
     }
 
 
-    private void defaultMissingSettings(Gson gson, GlobalSettings settings, DefaultSettings defaultSettings) {
+    private void defaultMissingSettings(GlobalSettings settings) {
 
-        settings.setGson(gson);
-        settings.setUser(defaultSettings.user());
+        settings.setUser(DefaultSettings.INSTANCE.user);
 
         if (settings.getSpark() == null) {
             settings.setSpark(new SparkSettings());
@@ -63,38 +63,38 @@ public class UserConfiguration {
         }
 
         if (settings.getSqlHistory().getDirectory() == null) {
-            settings.getSqlHistory().setDirectory(defaultSettings.sqlHistory().getDirectory());
+            settings.getSqlHistory().setDirectory(DefaultSettings.INSTANCE.sqlHistory.getDirectory());
         }
         if (settings.getSqlHistory().getSize() == null) {
-            settings.getSqlHistory().setSize(defaultSettings.sqlHistory().getSize());
+            settings.getSqlHistory().setSize(DefaultSettings.INSTANCE.sqlHistory.getSize());
         }
         if (settings.getSpark().getThreads() == null) {
-            settings.getSpark().setThreads(defaultSettings.spark().getThreads());
+            settings.getSpark().setThreads(DefaultSettings.INSTANCE.spark.getThreads());
         }
         if (settings.getSpark().getUi() == null) {
-            settings.getSpark().setUi(defaultSettings.spark().getUi());
+            settings.getSpark().setUi(DefaultSettings.INSTANCE.spark.getUi());
         }
         if (settings.getOverview().getRows() == null) {
-            settings.getOverview().setRows(defaultSettings.overview().getRows());
+            settings.getOverview().setRows(DefaultSettings.INSTANCE.overview.getRows());
         }
         if (settings.getOverview().getTruncateAfter() == null) {
-            settings.getOverview().setTruncateAfter(defaultSettings.overview().getTruncateAfter());
+            settings.getOverview().setTruncateAfter(DefaultSettings.INSTANCE.overview.getTruncateAfter());
         }
     }
 
 
     @Bean
     @Autowired
-    public ConnectionsCollection getConnectionsCollection(Gson gson, DefaultSettings defaultSettings) {
+    public ConnectionsCollection getConnectionsCollection(Gson gson) {
 
         ConnectionsCollection connectionsCollection;
         try {
 
-            connectionsCollection = ConnectionsCollection.load(gson, defaultSettings.user().getDirectory());
+            connectionsCollection = ConnectionsCollection.load(gson);
         } catch (IOException e) {
 
             log.warn("Unable to read connections");
-            connectionsCollection = new ConnectionsCollection(gson, defaultSettings.user().getDirectory());
+            connectionsCollection = new ConnectionsCollection(gson);
             try {
 
                 connectionsCollection.persist();
@@ -109,16 +109,16 @@ public class UserConfiguration {
 
     @Bean
     @Autowired
-    public SqlHistoryCollection getSqlHistoryCollection(Gson gson, DefaultSettings defaultSettings) {
+    public SqlHistoryCollection getSqlHistoryCollection(Gson gson, GlobalSettings globalSettings) {
 
         SqlHistoryCollection sqlHistoryCollection;
         try {
 
-            sqlHistoryCollection = SqlHistoryCollection.load(gson, defaultSettings.sqlHistory());
+            sqlHistoryCollection = SqlHistoryCollection.load(gson, globalSettings.getSqlHistory());
         } catch (IOException e) {
 
             log.warn("Unable to read history");
-            sqlHistoryCollection = new SqlHistoryCollection(gson, defaultSettings.sqlHistory());
+            sqlHistoryCollection = new SqlHistoryCollection(gson, globalSettings.getSqlHistory());
             try {
 
                 sqlHistoryCollection.initializeHistoryDirectory();

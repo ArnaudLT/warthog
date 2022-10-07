@@ -4,17 +4,3 @@ spring:
   output:
     ansi:
       enabled: always
-
-warthog:
-  default-settings:
-    user:
-      directory: user
-    sql-history:
-      directory: history
-      size: 20
-    overview:
-      rows: 50
-      truncate-after: 0
-    spark:
-      threads: 4
-      ui: false

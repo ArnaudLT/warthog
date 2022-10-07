@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.arnaudlt.warthog.model.user.DefaultSettings;
 import org.arnaudlt.warthog.model.user.SqlHistorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 

@@ -84,16 +84,11 @@ public class ImportDialog {
 
         common.addRow(i++, connectionLabel, connectionsListBox);
 
-        // =============== Import from database ===============
         Node nodeDatabase = getDatabaseImportNode();
 
-        // ==============================
-
-        // =============== Import from Azure storage ===============
         Node nodeAzureStorage = getAzureStorageImportNode();
 
-        // ===============
-
+        // TODO Need to switch nodeDatabase/nodeAzureStorage visible property on selected Connection type value. (it may have changed and desync !)
         nodeDatabase.visibleProperty().bind(Bindings.createBooleanBinding(() -> {
             Connection selectedConnection = connectionsListBox.getSelectionModel().selectedItemProperty().get();
             return selectedConnection != null && (

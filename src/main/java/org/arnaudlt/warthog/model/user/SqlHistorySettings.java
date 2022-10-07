@@ -1,13 +1,13 @@
 package org.arnaudlt.warthog.model.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
-public final class SqlHistorySettings implements Serializable {
+@AllArgsConstructor
+public final class SqlHistorySettings {
 
     private String directory;
 
@@ -18,5 +18,14 @@ public final class SqlHistorySettings implements Serializable {
 
         this.directory = sqlHistorySettings.directory;
         this.size = sqlHistorySettings.size;
+    }
+
+
+    public SqlHistorySettings(GlobalSettings.SerializableSqlHistorySettings sqlHistory) {
+
+        if (sqlHistory != null) {
+            this.directory = sqlHistory.getDirectory();
+            this.size = sqlHistory.getSize();
+        }
     }
 }
