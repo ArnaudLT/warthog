@@ -71,10 +71,10 @@ public class OutputPane {
         showSchemaButton.setOnAction(getDatasetShowSchemaEventHandler());
 
         VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showQueryButton, showSchemaButton);
+        buttonBar.setFillWidth(true);
 
         HBox hBox = new HBox(buttonBar, this.outputResultTabPane);
-        hBox.setMinHeight(10);
-        this.outputResultTabPane.prefWidthProperty().bind(hBox.widthProperty().add(-27));
+        this.outputResultTabPane.prefWidthProperty().bind(hBox.widthProperty().subtract(buttonBar.widthProperty()));
 
         return hBox;
     }

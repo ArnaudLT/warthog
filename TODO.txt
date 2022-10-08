@@ -8,6 +8,7 @@
     => Export
 
 => SQL :
+    => Migrate to Web view with codemirror !
     => Auto-completion
 
 => UI :
@@ -15,7 +16,7 @@
     => Help menu
 
 => Overview
-    =>
+    => Avoid pined tab to be clean (?)
 
 => Import
 

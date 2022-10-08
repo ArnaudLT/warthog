@@ -22,12 +22,4 @@ public class ButtonFactory {
         return button;
     }
 
-
-    public static Button buildSegoeButton(String text, String tooltipText, String color) {
-
-        Button button = buildSegoeButton(text, tooltipText);
-        button.setStyle("-fx-text-fill: "+color+";");
-        return button;
-    }
-
 }
