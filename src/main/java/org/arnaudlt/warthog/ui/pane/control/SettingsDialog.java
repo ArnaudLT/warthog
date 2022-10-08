@@ -40,7 +40,7 @@ public class SettingsDialog {
         GridPane generalGrid = GridFactory.buildGrid();
         int rowIndex = 0;
 
-        Label rowsNumberLabel = new Label("Number of rows in overview :");
+        Label rowsNumberLabel = new Label("Rows in overview :");
         Spinner<Integer> rowsNumber = new Spinner<>(1, 1000, globalSettings.getOverview().getRows(), 1);
         rowsNumber.setEditable(true);
         generalGrid.add(rowsNumberLabel, 0, rowIndex);
@@ -55,9 +55,8 @@ public class SettingsDialog {
         generalGrid.add(truncateAfter, 1, rowIndex, 2, 1);
         rowIndex++;
 
-        Label preferredDownloadDirectoryLabel = new Label("Preferred download directory :");
+        Label preferredDownloadDirectoryLabel = new Label("Pref. download directory :");
         TextField preferredDownloadDirectory = new TextField(globalSettings.getUser().getPreferredDownloadDirectory());
-        preferredDownloadDirectory.prefWidth(250);
         Button preferredDownloadDirectoryButton = new Button("...");
         preferredDownloadDirectoryButton.setOnAction(event -> {
 

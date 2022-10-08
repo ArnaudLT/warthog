@@ -39,18 +39,18 @@ public class TransformPane {
 
         this.stage = stage;
 
-        this.namedDatasetsTabPane = new TabPane();
-        this.namedDatasetsTabPane.setSide(Side.BOTTOM);
-        this.namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
+        namedDatasetsTabPane = new TabPane();
+        namedDatasetsTabPane.setSide(Side.BOTTOM);
+        namedDatasetsTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
-        this.namedDatasetsTabPane.setOnDragOver(dragEvent -> {
+        namedDatasetsTabPane.setOnDragOver(dragEvent -> {
 
             if (dragEvent.getDragboard().hasFiles()) {
                 dragEvent.acceptTransferModes(TransferMode.ANY);
             }
         });
 
-        this.namedDatasetsTabPane.setOnDragDropped(dragEvent -> {
+        namedDatasetsTabPane.setOnDragDropped(dragEvent -> {
 
             List<File> files = dragEvent.getDragboard().getFiles();
             for (File file : files) {
