@@ -87,6 +87,11 @@ public class ControlPane {
         MenuBar menuBar = buildNewMenuBar();
 
         ProgressBar progressBar = new ProgressBar();
+        progressBar.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                this.backgroundTasksDialog.showTasksManagerDialog();
+            }
+        });
         progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
 
         HBox hBox = new HBox(10, menuBar, progressBar);

@@ -61,6 +61,9 @@ public class StageFactory {
 
     private static Scene enrichScene(Scene scene) {
 
+        String customStyleSheet = StageFactory.class.getResource("/custom-style.css").toExternalForm();
+        scene.getStylesheets().add(customStyleSheet);
+
         String sqlStyleSheet = StageFactory.class.getResource("/sql-keywords.css").toExternalForm();
         scene.getStylesheets().add(sqlStyleSheet);
         return scene;
