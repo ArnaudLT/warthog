@@ -6,6 +6,7 @@
 
 => Azure DFS connector
     => Export
+    => user/password + sas
 
 => SQL :
     => Migrate to Web view with codemirror !

@@ -8,6 +8,7 @@ import org.arnaudlt.warthog.model.azure.AzurePathItems;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.util.PoolService;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -43,8 +44,18 @@ public class MockDirectoryListingService extends AzureDirectoryListingService {
                 try (Stream<Path> paths = Files.walk(Paths.get(getAzDirectoryPath()), 1, FileVisitOption.FOLLOW_LINKS)) {
                     tmp = paths
                             .skip(1)
-                            .map(path -> new AzurePathItem(new PathItem("-", OffsetDateTime.ofInstant(Instant.ofEpochMilli(path.toFile().lastModified()), ZoneId.systemDefault()), 0, "", path.toFile().isDirectory(), path.toString(), "", "")))
-                            .peek(path -> log.info("path : {}", path.getPathItem().getName()))
+                            .map(path -> {
+                                File file = path.toFile();
+                                return new AzurePathItem(new PathItem(
+                                        "-",
+                                        OffsetDateTime.ofInstant(Instant.ofEpochMilli(file.lastModified()), ZoneId.systemDefault()),
+                                        file.length(),
+                                        "",
+                                        file.isDirectory(),
+                                        path.toString(),
+                                        "",
+                                        ""));
+                            })
                             .toList();
                 }
                 AzurePathItems azurePathItems = new AzurePathItems(tmp);

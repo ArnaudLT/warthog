@@ -24,16 +24,15 @@ import org.arnaudlt.warthog.model.azure.AzurePathItems;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.AzureDirectoryListingService;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.ButtonFactory;
-import org.arnaudlt.warthog.ui.util.LabelFactory;
-import org.arnaudlt.warthog.ui.util.StageFactory;
+import org.arnaudlt.warthog.ui.service.MockDirectoryListingService;
+import org.arnaudlt.warthog.ui.util.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -108,10 +107,15 @@ public class AzureStorageBrowser {
         filesView.getSortOrder().add(itemLastModification);
         filesView.getColumns().add(itemLastModification);
 
+        TableColumn<AzureSelectableItem, ContentSize> itemContentSize = new TableColumn<>("Size");
+        itemContentSize.setCellValueFactory(param -> new SimpleObjectProperty<>(new ContentSize(param.getValue().getPathItem())));
+        filesView.getColumns().add(itemContentSize);
+
         itemName.prefWidthProperty().bind(
                 filesView.widthProperty()
                         .subtract(checkBoxColumn.widthProperty())
                         .subtract(itemLastModification.widthProperty())
+                        .subtract(itemContentSize.widthProperty())
                         .subtract(2)
         );
 
@@ -137,7 +141,7 @@ public class AzureStorageBrowser {
         currentDirectory.setDisable(true);
         HBox.setHgrow(currentDirectory, Priority.ALWAYS);
 
-        Button parentDirectoryButton = ButtonFactory.buildSegoeButton("\uE752", "Parent directory");
+        Button parentDirectoryButton = ButtonFactory.buildSegoeButton("\uE752", "Parent directory", 14);
         parentDirectoryButton.setOnAction(event -> {
 
             String azureParentDirectoryString = getAzureParentDirectory();
@@ -203,7 +207,7 @@ public class AzureStorageBrowser {
 
     private void startAzureDirectoryListingService() {
 
-        AzureDirectoryListingService azureDirectoryListingService = new AzureDirectoryListingService(
+        AzureDirectoryListingService azureDirectoryListingService = new MockDirectoryListingService(
                 poolService, connection, azureContainer, azureCurrentDirectory.getValue());
 
         azureDirectoryListingService.setOnSucceeded(success -> {
@@ -250,6 +254,7 @@ public class AzureStorageBrowser {
 
         public IconAndName(double spacing, Label icon, Label name) {
             super(spacing, icon, name);
+            this.setAlignment(Pos.BASELINE_LEFT);
             this.icon = icon.getText();
             this.name = name.getText();
         }
@@ -311,6 +316,51 @@ public class AzureStorageBrowser {
         @Override
         public int compareTo(@NotNull AzureStorageBrowser.LastModified o) {
             return date.compareTo(o.date);
+        }
+    }
+
+
+    private static class ContentSize implements Comparable<ContentSize> {
+
+        private final long size;
+
+        public ContentSize(PathItem pathItem) {
+
+            if (pathItem.isDirectory()) {
+                size = - 1;
+            } else {
+                size = pathItem.getContentLength();
+            }
+        }
+
+        @Override
+        public String toString() {
+            if (size < 0) {
+                return "";
+            } else {
+                return Utils.format2Decimals(size / 1_000_000d) + " MB";
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ContentSize that = (ContentSize) o;
+
+            return size == that.size;
+        }
+
+        @Override
+        public int hashCode() {
+            return (int) (size ^ (size >>> 32));
+        }
+
+        @Override
+        public int compareTo(@NotNull AzureStorageBrowser.ContentSize o) {
+
+            return Long.compare(size, o.size);
         }
     }
 

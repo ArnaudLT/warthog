@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.ui.util;
 
 import javafx.scene.control.Label;
-import javafx.scene.text.Font;
 
 public class LabelFactory {
 
@@ -12,7 +11,7 @@ public class LabelFactory {
     public static Label buildSegoeLabel(String text) {
 
         Label label = new Label(text);
-        label.setStyle("-fx-font-family: 'Segoe MDL2 Assets'");
+        label.setStyle("-fx-font-family: 'Segoe MDL2 Assets';");
         return label;
     }
 
@@ -20,7 +19,7 @@ public class LabelFactory {
     public static Label buildSegoeLabel(String text, String color) {
 
         Label label = buildSegoeLabel(text);
-        label.setStyle("-fx-text-fill: "+color+";");
+        label.setStyle(label.getStyle() + "-fx-text-fill: "+color+";");
         return label;
     }
 }

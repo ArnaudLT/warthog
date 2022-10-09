@@ -5,7 +5,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -20,9 +22,10 @@ import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -55,22 +58,19 @@ public class OutputPane {
         this.outputResultTabPane.setSide(Side.TOP);
         this.outputResultTabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
-        Button clearButton = ButtonFactory.buildSegoeButton("\uE74D", "Clear overview");
-        clearButton.setOnAction(event -> clear());
-
-        Button copyButton = ButtonFactory.buildSegoeButton("\uE8C8", "Copy all to clipboard");
+        Button copyButton = ButtonFactory.buildSegoeButton("\uE8C8", "Copy all to clipboard", 14);
         copyButton.setOnAction(event -> copyAllToClipboard());
 
-        Button countRowsButton = ButtonFactory.buildSegoeButton("\uF272", "Count rows");
+        Button countRowsButton = ButtonFactory.buildSegoeButton("\uF272", "Count rows", 14);
         countRowsButton.setOnAction(getDatasetCountRowsEventHandler());
 
-        Button showQueryButton = ButtonFactory.buildSegoeButton("\uEC42", "Show query");
+        Button showQueryButton = ButtonFactory.buildSegoeButton("\uEC42", "Show query", 14);
         showQueryButton.setOnAction(getShowQueryEventHandler());
 
-        Button showSchemaButton = ButtonFactory.buildSegoeButton("\ue822", "Show schema");
+        Button showSchemaButton = ButtonFactory.buildSegoeButton("\ue822", "Show schema", 14);
         showSchemaButton.setOnAction(getDatasetShowSchemaEventHandler());
 
-        VBox buttonBar = new VBox(clearButton, copyButton, countRowsButton, showQueryButton, showSchemaButton);
+        VBox buttonBar = new VBox(copyButton, countRowsButton, showQueryButton, showSchemaButton);
         buttonBar.setFillWidth(true);
 
         HBox hBox = new HBox(buttonBar, this.outputResultTabPane);
@@ -145,15 +145,6 @@ public class OutputPane {
     private OutputResultTab getSelectedOutputResultTab() {
 
         return (OutputResultTab) this.outputResultTabPane.getSelectionModel().getSelectedItem();
-    }
-
-
-    public void clear() {
-
-        OutputResultTab selectedOutputResultTab = getSelectedOutputResultTab();
-        if (selectedOutputResultTab == null) return;
-
-        selectedOutputResultTab.clear();
     }
 
 
