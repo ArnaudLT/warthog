@@ -136,6 +136,10 @@ public class ExportFileDialog {
         ComboBox<Compression> compression = new ComboBox<>(FXCollections.observableArrayList(Compression.values()));
         compression.setValue(Compression.SNAPPY);
 
+        BooleanBinding parquetSelected = format.valueProperty().isEqualTo(Format.PARQUET);
+        compressionLabel.visibleProperty().bind(parquetSelected);
+        compression.visibleProperty().bind(parquetSelected);
+
         advancedGrid.addRow(rowIndex++, compressionLabel, compression);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedGrid);
@@ -151,14 +155,13 @@ public class ExportFileDialog {
 
                 Path outputDirectoryPath = Paths.get(output.getText());
 
-                boolean atLeastOneFileInOutputDirectory;
+                boolean atLeastOneFileInOutputDirectory = false;
                 try {
                     atLeastOneFileInOutputDirectory = Files.list(outputDirectoryPath)
                             .findFirst()
                             .isPresent();
                 } catch (IOException e) {
-                    log.error("Unable to check output directory", e);
-                    return;
+                    log.warn("Unable to check output directory", e);
                 }
 
                 if (atLeastOneFileInOutputDirectory) {

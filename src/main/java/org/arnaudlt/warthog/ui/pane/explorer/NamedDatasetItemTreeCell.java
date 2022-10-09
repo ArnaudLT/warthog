@@ -8,6 +8,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.Decoration;
 import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
@@ -16,9 +17,11 @@ import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 
-import java.text.DecimalFormat;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
 
 
@@ -54,23 +57,44 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
                 MenuItem renameMenuItem = buildRenameMenuItem(namedDatasetItem);
                 contextMenu.getItems().add(renameMenuItem);
 
+                if (namedDatasetItem.getNamedDataset().getDecoration() instanceof LocalDecoration deco) {
+                    MenuItem openFileLocation = buildOpenFileLocationMenuItem(deco);
+                    contextMenu.getItems().add(openFileLocation);
+                }
+
                 MenuItem helpMenuItem = buildInfoMenuItem(namedDatasetItem);
                 contextMenu.getItems().add(helpMenuItem);
 
-            } else if ("struct".equals(namedDatasetItem.getDataType().typeName())) {
+            } /*else if ("struct".equals(namedDatasetItem.getDataType().typeName())) {
 
-                setGraphic(new Label("S"));
             } else if ("map".equals(namedDatasetItem.getDataType().typeName())) {
 
-                setGraphic(new Label("M"));
             } else if ("array".equals(namedDatasetItem.getDataType().typeName())) {
 
-                setGraphic(new Label("A"));
-            }
+            }*/
 
             setContextMenu(contextMenu);
             setText(namedDatasetItem.getLabel());
+            setGraphic(null);
         }
+    }
+
+
+    private MenuItem buildOpenFileLocationMenuItem(LocalDecoration decoration) {
+
+        MenuItem openFileLocationItem = new MenuItem("Open folder...");
+        openFileLocationItem.setOnAction(evt -> {
+            try {
+                if (decoration.parts() != null && decoration.parts().size() == 1) {
+                    Runtime.getRuntime().exec("explorer /select, " + Paths.get(decoration.basePath(), decoration.parts().get(0)).toString());
+                } else {
+                    Runtime.getRuntime().exec("explorer /select, " + decoration.basePath());
+                }
+            } catch (IOException e) {
+                log.error("Unable to open base path", e);
+            }
+        });
+        return openFileLocationItem;
     }
 
 

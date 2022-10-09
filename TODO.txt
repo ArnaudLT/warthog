@@ -17,7 +17,10 @@
     => Help menu
 
 => Overview
-    => Avoid pined tab to be clean (?)
+
+
+=> Export
+    => Automatic load of a dataset after export
 
 => Import
 
