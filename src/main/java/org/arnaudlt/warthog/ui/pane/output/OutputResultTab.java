@@ -1,5 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.output;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -30,12 +32,13 @@ public class OutputResultTab extends Tab {
 
     private PreparedDataset preparedDataset;
 
-    private boolean pin;
+    private SimpleBooleanProperty pin;
 
 
     public OutputResultTab() {
 
         super();
+        pin = new SimpleBooleanProperty(false);
     }
 
 
@@ -55,7 +58,7 @@ public class OutputResultTab extends Tab {
         label.setOnMouseClicked(evt -> {
 
             textField.setText(label.getText());
-            HBox hBox = new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, textField);
+            HBox hBox = new HBox(hBoxSpace, pin.get() ? pinLabel : unpinLabel, textField);
             hBox.setAlignment(Pos.BASELINE_LEFT);
             setGraphic(hBox);
             textField.selectAll();
@@ -71,7 +74,7 @@ public class OutputResultTab extends Tab {
 
             if (KeyCode.ENTER.equals(evt.getCode())) {
                 label.setText(textField.getText());
-                HBox hBox = new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label);
+                HBox hBox = new HBox(hBoxSpace, pin.get() ? pinLabel : unpinLabel, label);
                 hBox.setAlignment(Pos.BASELINE_LEFT);
                 setGraphic(hBox);
             }
@@ -81,7 +84,7 @@ public class OutputResultTab extends Tab {
 
             if (Boolean.FALSE.equals(newValue)) {
                 label.setText(textField.getText());
-                HBox hBox = new HBox(hBoxSpace, pin ? pinLabel : unpinLabel, label);
+                HBox hBox = new HBox(hBoxSpace, pin.get() ? pinLabel : unpinLabel, label);
                 hBox.setAlignment(Pos.BASELINE_LEFT);
                 setGraphic(hBox);
             }
@@ -89,23 +92,25 @@ public class OutputResultTab extends Tab {
 
         pinLabel.setOnMouseClicked(evt -> {
 
-            if (pin) {
+            if (pin.get()) {
                 HBox hBox = new HBox(hBoxSpace, unpinLabel, label);
                 hBox.setAlignment(Pos.BASELINE_LEFT);
                 setGraphic(hBox);
-                pin = false;
+                pin.set(false);
             }
         });
 
         unpinLabel.setOnMouseClicked(evt -> {
 
-            if (!pin) {
+            if (!pin.get()) {
                 HBox hBox = new HBox(hBoxSpace, pinLabel, label);
                 hBox.setAlignment(Pos.BASELINE_LEFT);
                 setGraphic(hBox);
-                pin = true;
+                pin.set(true);
             }
         });
+
+        this.closableProperty().bind(pin.not());
 
         this.tableView = new TableView<>();
         this.tableView.setPlaceholder(new Label("No data to display"));

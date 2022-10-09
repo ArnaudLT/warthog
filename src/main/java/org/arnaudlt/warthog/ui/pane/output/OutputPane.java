@@ -183,7 +183,7 @@ public class OutputPane {
 
         return outputResultTabPane.getTabs().stream()
                 .map(OutputResultTab.class::cast)
-                .filter(Predicate.not(OutputResultTab::isPin))
+                .filter(Predicate.not(ort -> ort.getPin().get()))
                 .findFirst()
                 .orElseGet(this::addOutputResultTab);
     }

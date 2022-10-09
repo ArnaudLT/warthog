@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCombination;
@@ -15,6 +16,7 @@ import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetRenameViewService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
+import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

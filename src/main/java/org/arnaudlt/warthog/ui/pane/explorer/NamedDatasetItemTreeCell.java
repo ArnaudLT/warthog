@@ -56,11 +56,20 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
 
                 MenuItem helpMenuItem = buildInfoMenuItem(namedDatasetItem);
                 contextMenu.getItems().add(helpMenuItem);
+
+            } else if ("struct".equals(namedDatasetItem.getDataType().typeName())) {
+
+                setGraphic(new Label("S"));
+            } else if ("map".equals(namedDatasetItem.getDataType().typeName())) {
+
+                setGraphic(new Label("M"));
+            } else if ("array".equals(namedDatasetItem.getDataType().typeName())) {
+
+                setGraphic(new Label("A"));
             }
 
             setContextMenu(contextMenu);
             setText(namedDatasetItem.getLabel());
-            setGraphic(null);
         }
     }
 
