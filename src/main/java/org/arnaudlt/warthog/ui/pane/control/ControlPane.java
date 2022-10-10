@@ -157,6 +157,7 @@ public class ControlPane {
         backgroundTasksItem.setOnAction(getBackgroundTasksActionEventHandler());
 
         MenuItem sqlHistoryItem = new MenuItem("SQL history...");
+        sqlHistoryItem.setAccelerator(KeyCombination.valueOf("F8"));
         sqlHistoryItem.setOnAction(getSqlHistoryActionEventHandler());
 
         viewMenu.getItems().addAll(connectionManagerItem, settingsItem, new SeparatorMenuItem(), sqlHistoryItem,
