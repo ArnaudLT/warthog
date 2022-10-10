@@ -68,6 +68,9 @@ public class UserConfiguration {
         if (settings.getUser().getPreferredDownloadDirectory() == null) {
             settings.getUser().setPreferredDownloadDirectory(DefaultSettings.INSTANCE.user.getPreferredDownloadDirectory());
         }
+        if (settings.getUser().getPreferredExportDirectory() == null) {
+            settings.getUser().setPreferredExportDirectory(DefaultSettings.INSTANCE.user.getPreferredExportDirectory());
+        }
         if (settings.getSqlHistory().getDirectory() == null) {
             settings.getSqlHistory().setDirectory(DefaultSettings.INSTANCE.sqlHistory.getDirectory());
         }

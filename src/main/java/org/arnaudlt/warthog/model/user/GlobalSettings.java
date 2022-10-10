@@ -116,9 +116,11 @@ public class GlobalSettings {
     protected static class SerializableUserSettings implements Serializable {
 
         private String preferredDownloadDirectory;
+        private String preferredExportDirectory;
 
         public SerializableUserSettings(UserSettings userSettings) {
             this.preferredDownloadDirectory = userSettings.getPreferredDownloadDirectory();
+            this.preferredExportDirectory = userSettings.getPreferredExportDirectory();
         }
     }
 

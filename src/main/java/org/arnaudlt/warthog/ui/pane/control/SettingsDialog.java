@@ -68,6 +68,19 @@ public class SettingsDialog {
         });
         generalGrid.addRow(rowIndex++, preferredDownloadDirectoryLabel, preferredDownloadDirectory, preferredDownloadDirectoryButton);
 
+        Label preferredExportDirectoryLabel = new Label("Pref. export directory :");
+        TextField preferredExportDirectory = new TextField();
+        Button preferredExportDirectoryButton = new Button("...");
+        preferredExportDirectoryButton.setOnAction(event -> {
+
+            DirectoryChooser dc = new DirectoryChooser();
+            File file = dc.showDialog(this.dialog);
+
+            if (file == null) return;
+            preferredExportDirectory.setText(file.getAbsolutePath());
+        });
+        generalGrid.addRow(rowIndex++, preferredExportDirectoryLabel, preferredExportDirectory, preferredExportDirectoryButton);
+
         Tab generalsTab = new Tab("Generals", generalGrid);
 
 
@@ -98,6 +111,7 @@ public class SettingsDialog {
             try {
 
                 globalSettings.getUser().setPreferredDownloadDirectory(preferredDownloadDirectory.getText());
+                globalSettings.getUser().setPreferredExportDirectory(preferredExportDirectory.getText());
                 globalSettings.getOverview().setRows(rowsNumber.getValue());
                 globalSettings.getOverview().setTruncateAfter(truncateAfter.getValue());
                 globalSettings.getSpark().setThreads(sparkThreads.getValue());

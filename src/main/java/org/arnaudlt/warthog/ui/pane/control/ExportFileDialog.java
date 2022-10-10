@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
+import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.Compression;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
@@ -41,15 +42,18 @@ public class ExportFileDialog {
 
     private final TransformPane transformPane;
 
+    private final GlobalSettings globalSettings;
+
     private Stage owner;
 
     private Stage dialog;
 
 
     @Autowired
-    public ExportFileDialog(NamedDatasetManager namedDatasetManager, PoolService poolService, TransformPane transformPane) {
+    public ExportFileDialog(NamedDatasetManager namedDatasetManager, PoolService poolService, GlobalSettings globalSettings, TransformPane transformPane) {
         this.namedDatasetManager = namedDatasetManager;
         this.poolService = poolService;
+        this.globalSettings = globalSettings;
         this.transformPane = transformPane;
     }
 
@@ -64,7 +68,7 @@ public class ExportFileDialog {
         int rowIndex = 0;
 
         Label outputLabel = new Label("Output directory :");
-        TextField output = new TextField();
+        TextField output = new TextField(globalSettings.getUser().getPreferredExportDirectory());
 
         Button outputButton = new Button("...");
         outputButton.setOnAction(event -> {

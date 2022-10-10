@@ -5,7 +5,7 @@ public enum DefaultSettings {
 
     INSTANCE;
 
-    public final UserSettings user = new UserSettings("user", "");
+    public final UserSettings user = new UserSettings("user", "", "");
 
     public final SqlHistorySettings sqlHistory = new SqlHistorySettings("history", 20);
 
