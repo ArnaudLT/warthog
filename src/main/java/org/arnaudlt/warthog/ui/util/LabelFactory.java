@@ -10,16 +10,15 @@ public class LabelFactory {
 
     public static Label buildSegoeLabel(String text) {
 
-        Label label = new Label(text);
-        label.setStyle("-fx-font-family: 'Segoe MDL2 Assets';");
-        return label;
+        return buildSegoeLabel(text, "darkblue");
     }
 
 
     public static Label buildSegoeLabel(String text, String color) {
 
-        Label label = buildSegoeLabel(text);
-        label.setStyle(label.getStyle() + "-fx-text-fill: "+color+";");
+        Label label = new Label(text);
+        label.setStyle("-fx-font-family: 'Segoe MDL2 Assets'; -fx-text-fill: " +color+";");
         return label;
     }
+
 }
