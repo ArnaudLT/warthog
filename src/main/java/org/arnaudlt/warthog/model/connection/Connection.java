@@ -3,7 +3,7 @@ package org.arnaudlt.warthog.model.connection;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.jasypt.util.StrongTextEncryptor;
+import org.arnaudlt.warthog.model.user.PasswordEncryptor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -110,11 +110,11 @@ public class Connection implements Serializable {
     }
 
 
-    public Properties getDatabaseProperties(StrongTextEncryptor encryptor) {
+    public Properties getDatabaseProperties() {
 
         final Properties dbProperties = new Properties();
         dbProperties.put("user", user);
-        dbProperties.put("password", encryptor.decrypt(password));
+        dbProperties.put("password", PasswordEncryptor.INSTANCE.encryptor.decrypt(password));
 
         if (ConnectionType.ORACLE_DATABASE.equals(connectionType)) {
 

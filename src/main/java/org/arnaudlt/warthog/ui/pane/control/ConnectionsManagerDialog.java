@@ -15,10 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.connection.ConnectionType;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
+import org.arnaudlt.warthog.model.user.PasswordEncryptor;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
-import org.jasypt.util.StrongTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,8 +30,6 @@ public class ConnectionsManagerDialog {
 
 
     private final ConnectionsCollection connectionsCollection;
-
-    private final StrongTextEncryptor encryptor;
 
     private Stage owner;
 
@@ -77,9 +75,8 @@ public class ConnectionsManagerDialog {
 
 
     @Autowired
-    public ConnectionsManagerDialog(ConnectionsCollection connectionsCollection, StrongTextEncryptor encryptor) {
+    public ConnectionsManagerDialog(ConnectionsCollection connectionsCollection) {
         this.connectionsCollection = connectionsCollection;
-        this.encryptor = encryptor;
     }
 
 
@@ -257,7 +254,7 @@ public class ConnectionsManagerDialog {
             connection.setConnectionType(connectionType.getValue());
             connection.setTenantId(tenantId.getText());
             connection.setClientId(clientId.getText());
-            connection.setClientKey(encryptor.encrypt(clientKey.getText()));
+            connection.setClientKey(PasswordEncryptor.INSTANCE.encryptor.encrypt(clientKey.getText()));
             connection.setProxyUrl(proxyUrl.getText());
             connection.setProxyPort(Integer.parseInt(proxyPort.getText())); // TODO handle the NumberFormatException exception please :-)
             connection.setStorageAccount(storageAccount.getText());
@@ -332,7 +329,7 @@ public class ConnectionsManagerDialog {
             connection.setDatabase(database.getText());
             connection.setDatabaseType(databaseType.getValue());
             connection.setUser(user.getText());
-            connection.setPassword(encryptor.encrypt(password.getText()));
+            connection.setPassword(PasswordEncryptor.INSTANCE.encryptor.encrypt(password.getText()));
             log.info("Save ... {}", connection);
 
             try {
@@ -361,12 +358,12 @@ public class ConnectionsManagerDialog {
                 this.database.setText(connection.getDatabase());
                 this.databaseType.setValue(connection.getDatabaseType());
                 this.user.setText(connection.getUser());
-                this.password.setText(encryptor.decrypt(connection.getPassword()));
+                this.password.setText(PasswordEncryptor.INSTANCE.encryptor.decrypt(connection.getPassword()));
             }
             case AZURE_STORAGE -> {
                 this.tenantId.setText(connection.getTenantId());
                 this.clientId.setText(connection.getClientId());
-                this.clientKey.setText(encryptor.decrypt(connection.getClientKey()));
+                this.clientKey.setText(PasswordEncryptor.INSTANCE.encryptor.decrypt(connection.getClientKey()));
                 this.proxyUrl.setText(connection.getProxyUrl());
                 this.proxyPort.setText(connection.getProxyPort().toString());
                 this.storageAccount.setText(connection.getStorageAccount());
