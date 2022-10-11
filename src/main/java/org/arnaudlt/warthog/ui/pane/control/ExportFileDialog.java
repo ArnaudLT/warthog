@@ -20,6 +20,7 @@ import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.SqlExportToFileService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.LabelFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -117,6 +118,7 @@ public class ExportFileDialog {
         // End conditional display
 
         Tab basicSettingsTab = new Tab("Settings", basicGrid);
+        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
 
         // Advanced settings
         GridPane advancedGrid = GridFactory.buildGrid();

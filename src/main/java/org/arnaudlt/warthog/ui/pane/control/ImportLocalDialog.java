@@ -22,6 +22,7 @@ import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromLocalService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
+import org.arnaudlt.warthog.ui.util.LabelFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -128,6 +129,7 @@ public class ImportLocalDialog {
                 basicGrid,
                 new Separator(Orientation.HORIZONTAL),
                 new Group(csvBasicGrid, jsonBasicGrid)));
+        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
 
         // Advanced settings
         GridPane advancedGrid = GridFactory.buildGrid();

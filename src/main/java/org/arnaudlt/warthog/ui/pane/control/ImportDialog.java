@@ -25,10 +25,7 @@ import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.AzureDirectoryStatisticsService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromAzureDfsStorageService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromDatabaseService;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.GridFactory;
-import org.arnaudlt.warthog.ui.util.StageFactory;
-import org.arnaudlt.warthog.ui.util.Utils;
+import org.arnaudlt.warthog.ui.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -127,6 +124,7 @@ public class ImportDialog {
         basicSettingsNode.addRow(0, tableNameLabel, tableName);
 
         Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
+        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
         TabPane tabPane = new TabPane(basicSettingsTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -220,6 +218,7 @@ public class ImportDialog {
         basicSettingsNode.addRow(rowIndex++, nameLabel, nameField);
 
         Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
+        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
 
         // Advanced settings
         GridPane advancedSettingsNode = GridFactory.buildGrid();
