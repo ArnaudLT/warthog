@@ -69,7 +69,7 @@ public class SettingsDialog {
         generalGrid.addRow(rowIndex++, preferredDownloadDirectoryLabel, preferredDownloadDirectory, preferredDownloadDirectoryButton);
 
         Label preferredExportDirectoryLabel = new Label("Pref. export directory :");
-        TextField preferredExportDirectory = new TextField();
+        TextField preferredExportDirectory = new TextField(globalSettings.getUser().getPreferredExportDirectory());
         Button preferredExportDirectoryButton = new Button("...");
         preferredExportDirectoryButton.setOnAction(event -> {
 

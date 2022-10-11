@@ -170,6 +170,7 @@ public class ControlPane {
         overviewItem.setOnAction(getOverviewActionEventHandler());
 
         MenuItem exportToFileItem = new MenuItem("Export locally...");
+        exportToFileItem.setAccelerator(KeyCombination.valueOf("CTRL+E"));
         exportToFileItem.setOnAction(getExportToFileActionEventHandler());
 
         MenuItem exportItem = new MenuItem("Export...");
