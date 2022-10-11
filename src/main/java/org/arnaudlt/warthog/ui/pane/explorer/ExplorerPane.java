@@ -1,7 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.explorer;
 
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCombination;
@@ -16,7 +16,6 @@ import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetRenameViewService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,6 +70,7 @@ public class ExplorerPane {
         TreeView<NamedDatasetItem> tree = new TreeView<>(root);
         tree.setCellFactory(x -> new NamedDatasetItemTreeCell(stage, this));
         tree.setShowRoot(false);
+        tree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         tree.setOnDragOver(dragEvent -> {
 
@@ -102,11 +102,14 @@ public class ExplorerPane {
     private void copySelectionToClipboard() {
 
         String content;
-        TreeItem<NamedDatasetItem> selectedItem = this.treeExplorer.getSelectionModel().getSelectedItem();
-        if (selectedItem == null) {
+        List<TreeItem<NamedDatasetItem>> selectedItems = this.treeExplorer.getSelectionModel().getSelectedItems();
+        if (selectedItems == null) {
             content = "";
         } else {
-            content = selectedItem.getValue().getCleanedSqlName();
+
+            content = selectedItems.stream()
+                    .map(si -> si.getValue().getCleanedSqlName())
+                    .collect(Collectors.joining(", "));
         }
         Utils.copyStringToClipboard(content);
     }
@@ -180,13 +183,7 @@ public class ExplorerPane {
 
         return this.treeExplorer.getSelectionModel().getSelectedItems().stream()
                 .filter(Objects::nonNull)
-                .map(item -> {
-                    if (item.getParent() != null && item.getParent() != this.treeExplorer.getRoot()) {
-                        return item.getParent().getValue().getNamedDataset();
-                    } else {
-                        return item.getValue().getNamedDataset();
-                    }
-                })
+                .map(item -> item.getValue().getNamedDataset())
                 .collect(Collectors.toSet());
     }
 
