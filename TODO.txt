@@ -8,6 +8,9 @@
     => Export
     => user/password + sas
 
+=> Azure explorer
+    => Capability to directly edit current url/navigation
+
 => SQL :
     => Migrate to Web view with codemirror !
     => Auto-completion

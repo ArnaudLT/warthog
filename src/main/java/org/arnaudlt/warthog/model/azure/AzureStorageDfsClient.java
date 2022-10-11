@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
 import org.arnaudlt.warthog.ui.service.AzureDirectoryStatisticsService;
+import org.jasypt.util.StrongTextEncryptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -168,8 +170,17 @@ public class AzureStorageDfsClient {
     }
 
 
-    private record AzureTokenCredential(Connection connection) implements TokenCredential {
+    private static class AzureTokenCredential implements TokenCredential {
 
+        private final Connection connection;
+
+        @Autowired
+        private StrongTextEncryptor encryptor;
+
+
+        public AzureTokenCredential(Connection connection) {
+            this.connection = connection;
+        }
 
         @Override
         public Mono<AccessToken> getToken(TokenRequestContext tokenRequestContext) {
@@ -180,7 +191,7 @@ public class AzureStorageDfsClient {
                 ApplicationTokenCredentials applicationTokenCredentials = new ApplicationTokenCredentials(
                         connection.getClientId(),
                         connection.getTenantId(),
-                        connection.getClientKey(),
+                        encryptor.decrypt(connection.getClientKey()),
                         AzureEnvironment.AZURE
                 );
 

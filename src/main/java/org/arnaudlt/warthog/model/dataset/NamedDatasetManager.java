@@ -14,6 +14,7 @@ import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.UniqueIdGenerator;
+import org.jasypt.util.StrongTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,14 +40,17 @@ public class NamedDatasetManager {
 
     private final ObservableList<NamedDataset> observableNamedDatasets;
 
+    private final StrongTextEncryptor encryptor;
+
 
     @Autowired
-    public NamedDatasetManager(SparkSession spark, UniqueIdGenerator uniqueIdGenerator) {
+    public NamedDatasetManager(SparkSession spark, UniqueIdGenerator uniqueIdGenerator, StrongTextEncryptor encryptor) {
 
         this.spark = spark;
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.observableNamedDatasets = FXCollections.synchronizedObservableList(
                 FXCollections.observableArrayList(new ArrayList<>()));
+        this.encryptor = encryptor;
     }
 
 
@@ -158,7 +162,7 @@ public class NamedDatasetManager {
 
         Dataset<Row> dataset = this.spark
                 .read()
-                .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
+                .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties(encryptor));
 
         return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset,
                 new DatabaseDecoration(databaseConnection.getName(), tableName));
@@ -305,7 +309,7 @@ public class NamedDatasetManager {
         output
                 .write()
                 .mode(SaveMode.valueOf(exportDatabaseSettings.saveMode()))
-                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.tableName(), databaseConnection.getDatabaseProperties());
+                .jdbc(databaseConnection.getDatabaseUrl(), exportDatabaseSettings.tableName(), databaseConnection.getDatabaseProperties(encryptor));
     }
 
 }

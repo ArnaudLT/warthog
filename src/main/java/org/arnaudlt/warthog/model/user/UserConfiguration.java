@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
+import org.jasypt.util.StrongTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,15 @@ public class UserConfiguration {
     public Gson getGson() {
 
         return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    }
+
+
+    @Bean
+    public StrongTextEncryptor getEncryptor() {
+
+        StrongTextEncryptor encryptor = new StrongTextEncryptor();
+        encryptor.setPassword(")(-z<~?f40k+*+)b#L[)o<?iRL-v@0UQ");
+        return encryptor;
     }
 
 
