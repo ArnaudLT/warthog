@@ -20,10 +20,7 @@ import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.explorer.ExplorerPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromLocalService;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.GridFactory;
-import org.arnaudlt.warthog.ui.util.LabelFactory;
-import org.arnaudlt.warthog.ui.util.StageFactory;
+import org.arnaudlt.warthog.ui.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +63,7 @@ public class ImportLocalDialog {
         Label inputLabel = new Label("Input directory :");
         TextField input = new TextField();
 
-        Button inputButton = new Button("...");
+        Button inputButton = ButtonFactory.buildExplorerButton();
         inputButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
@@ -129,7 +126,7 @@ public class ImportLocalDialog {
                 basicGrid,
                 new Separator(Orientation.HORIZONTAL),
                 new Group(csvBasicGrid, jsonBasicGrid)));
-        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
+        basicSettingsTab.setGraphic(LabelFactory.buildSettingsLabel());
 
         // Advanced settings
         GridPane advancedGrid = GridFactory.buildGrid();

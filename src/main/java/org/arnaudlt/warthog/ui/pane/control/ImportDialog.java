@@ -124,7 +124,7 @@ public class ImportDialog {
         basicSettingsNode.addRow(0, tableNameLabel, tableName);
 
         Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
-        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
+        basicSettingsTab.setGraphic(LabelFactory.buildSettingsLabel());
         TabPane tabPane = new TabPane(basicSettingsTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
@@ -159,7 +159,7 @@ public class ImportDialog {
 
         Label azDirectoryLabel = new Label("Azure directory :");
         TextField azDirectoryField = new TextField();
-        Button azureDirectoryBrowserButton = new Button("...");
+        Button azureDirectoryBrowserButton = ButtonFactory.buildExplorerButton();
 
         Connection initiallySelectedConnection = connectionsListBox.getSelectionModel().getSelectedItem();
         if (initiallySelectedConnection != null && initiallySelectedConnection.getConnectionType() == ConnectionType.AZURE_STORAGE) {
@@ -191,7 +191,7 @@ public class ImportDialog {
 
         Label localDirectoryLabel = new Label("Local directory :");
         TextField localDirectoryField = new TextField(globalSettings.getUser().getPreferredDownloadDirectory());
-        Button directoryChooserButton = new Button("...");
+        Button directoryChooserButton = ButtonFactory.buildExplorerButton();
         directoryChooserButton.setOnAction(event -> {
 
             DirectoryChooser fc = new DirectoryChooser();
@@ -218,7 +218,7 @@ public class ImportDialog {
         basicSettingsNode.addRow(rowIndex++, nameLabel, nameField);
 
         Tab basicSettingsTab = new Tab("Settings", basicSettingsNode);
-        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
+        basicSettingsTab.setGraphic(LabelFactory.buildSettingsLabel());
 
         // Advanced settings
         GridPane advancedSettingsNode = GridFactory.buildGrid();

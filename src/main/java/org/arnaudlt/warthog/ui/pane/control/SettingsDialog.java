@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
+import org.arnaudlt.warthog.ui.util.ButtonFactory;
 import org.arnaudlt.warthog.ui.util.GridFactory;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class SettingsDialog {
 
         Label preferredDownloadDirectoryLabel = new Label("Pref. download directory :");
         TextField preferredDownloadDirectory = new TextField(globalSettings.getUser().getPreferredDownloadDirectory());
-        Button preferredDownloadDirectoryButton = new Button("...");
+        Button preferredDownloadDirectoryButton = ButtonFactory.buildExplorerButton();
         preferredDownloadDirectoryButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
@@ -70,7 +71,7 @@ public class SettingsDialog {
 
         Label preferredExportDirectoryLabel = new Label("Pref. export directory :");
         TextField preferredExportDirectory = new TextField(globalSettings.getUser().getPreferredExportDirectory());
-        Button preferredExportDirectoryButton = new Button("...");
+        Button preferredExportDirectoryButton = ButtonFactory.buildExplorerButton();
         preferredExportDirectoryButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();

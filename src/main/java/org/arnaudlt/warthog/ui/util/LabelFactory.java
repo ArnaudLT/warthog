@@ -24,6 +24,27 @@ public class LabelFactory {
     }
 
 
+    public static Label buildSettingsLabel() {
 
+        return buildSegoeLabel("\uE713");
+    }
+
+
+    public static Label buildAdvancedLabel() {
+
+        return buildSegoeLabel("\uE97E");
+    }
+
+
+    public static Label buildDirectoryLabel() {
+
+        return buildSegoeLabel("\uED42", "goldenrod");
+    }
+
+
+    public static Label buildFileLabel() {
+
+        return buildSegoeLabel("\uE7C3", "black");
+    }
 
 }

@@ -190,9 +190,9 @@ public class AzureStorageBrowser {
 
         Label icon;
         if (param.getValue().getPathItem().isDirectory()) {
-            icon = LabelFactory.buildSegoeLabel("\uED42", "goldenrod");
+            icon = LabelFactory.buildDirectoryLabel();
         } else {
-            icon = LabelFactory.buildSegoeLabel("\uE7C3", "black");
+            icon = LabelFactory.buildFileLabel();
         }
         return icon;
     }
@@ -206,7 +206,7 @@ public class AzureStorageBrowser {
 
     private void startAzureDirectoryListingService() {
 
-        AzureDirectoryListingService azureDirectoryListingService = new MockDirectoryListingService(
+        AzureDirectoryListingService azureDirectoryListingService = new AzureDirectoryListingService(
                 poolService, connection, azureContainer, azureCurrentDirectory.getValue());
 
         azureDirectoryListingService.setOnSucceeded(success -> {

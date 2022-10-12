@@ -29,4 +29,10 @@ public class ButtonFactory {
         button.setTooltip(tooltip);
         return button;
     }
+
+
+    public static Button buildExplorerButton() {
+
+        return buildSegoeButton("\uEC50", "Explorer", 14, "goldenrod");
+    }
 }

@@ -18,10 +18,7 @@ import org.arnaudlt.warthog.model.util.Format;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.pane.transform.TransformPane;
 import org.arnaudlt.warthog.ui.service.SqlExportToFileService;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.GridFactory;
-import org.arnaudlt.warthog.ui.util.LabelFactory;
-import org.arnaudlt.warthog.ui.util.StageFactory;
+import org.arnaudlt.warthog.ui.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -71,7 +68,7 @@ public class ExportFileDialog {
         Label outputLabel = new Label("Output directory :");
         TextField output = new TextField(globalSettings.getUser().getPreferredExportDirectory());
 
-        Button outputButton = new Button("...");
+        Button outputButton = ButtonFactory.buildExplorerButton();
         outputButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
@@ -118,7 +115,7 @@ public class ExportFileDialog {
         // End conditional display
 
         Tab basicSettingsTab = new Tab("Settings", basicGrid);
-        basicSettingsTab.setGraphic(LabelFactory.buildSegoeLabel("\uE713"));
+        basicSettingsTab.setGraphic(LabelFactory.buildSettingsLabel());
 
         // Advanced settings
         GridPane advancedGrid = GridFactory.buildGrid();
@@ -149,6 +146,7 @@ public class ExportFileDialog {
         advancedGrid.addRow(rowIndex++, compressionLabel, compression);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedGrid);
+        advancedSettingsTab.setGraphic(LabelFactory.buildAdvancedLabel());
 
         TabPane tabPane = new TabPane(basicSettingsTab, advancedSettingsTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
