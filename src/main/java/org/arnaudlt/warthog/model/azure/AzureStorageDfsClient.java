@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.file.FileAlreadyExistsException;
@@ -126,13 +127,10 @@ public class AzureStorageDfsClient {
 
         try {
             fileClient.readToFile(localFilePath.toString());
-        } catch (Exception e) {
-            // This exception can occur ! Trust me :-) (
-            if (e instanceof FileAlreadyExistsException fae) {
-                log.warn("File '{}' already exists and will not be replaced.", localFilePath.toString());
-            } else {
-                throw e;
-            }
+        } catch (UncheckedIOException e) {
+            // 'FileAlreadyExistsException' wrapped into a UncheckedIOException...
+            log.warn("File '{}' already exists and will not be replaced.", localFilePath);
+            log.debug(e.getMessage(), e);
         }
 
         return fileClient.getProperties().getFileSize();

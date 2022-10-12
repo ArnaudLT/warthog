@@ -86,7 +86,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
         openFileLocationItem.setOnAction(evt -> {
             try {
                 if (decoration.parts() != null && decoration.parts().size() == 1) {
-                    Runtime.getRuntime().exec("explorer /select, " + Paths.get(decoration.basePath(), decoration.parts().get(0)).toString());
+                    Runtime.getRuntime().exec("explorer /select, " + Paths.get(decoration.basePath(), decoration.parts().get(0)));
                 } else {
                     Runtime.getRuntime().exec("explorer /select, " + decoration.basePath());
                 }

@@ -24,7 +24,6 @@ import org.arnaudlt.warthog.model.azure.AzurePathItems;
 import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.service.AzureDirectoryListingService;
-import org.arnaudlt.warthog.ui.service.MockDirectoryListingService;
 import org.arnaudlt.warthog.ui.util.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -207,7 +205,7 @@ public class AzureStorageBrowser {
 
     private void startAzureDirectoryListingService() {
 
-        AzureDirectoryListingService azureDirectoryListingService = new MockDirectoryListingService(
+        AzureDirectoryListingService azureDirectoryListingService = new AzureDirectoryListingService(
                 poolService, connection, azureContainer, azureCurrentDirectory.getValue());
 
         azureDirectoryListingService.setOnSucceeded(success -> {

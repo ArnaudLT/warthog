@@ -302,6 +302,7 @@ public class ImportDialog {
     public void showImportDialog() {
 
         Utils.refreshComboBoxItems(connectionsListBox);
+        azurePathItems.getItems().clear(); // clear the previously selected files each time the window is closed->opened
         dialog.show();
     }
 
