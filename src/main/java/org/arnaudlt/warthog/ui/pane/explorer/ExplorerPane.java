@@ -138,6 +138,7 @@ public class ExplorerPane {
         }
 
         this.treeExplorer.getRoot().getChildren().add(item);
+        this.treeExplorer.getSelectionModel().clearSelection();
         this.treeExplorer.getSelectionModel().select(item);
         this.namedDatasetToTreeItem.put(namedDataset, item);
     }

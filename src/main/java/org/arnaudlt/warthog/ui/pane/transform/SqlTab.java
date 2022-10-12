@@ -116,7 +116,7 @@ public class SqlTab extends Tab {
     private void buildSqlFileGraphic() {
 
         String tabName = sqlFile.getValue().getName();
-        HBox hBoxContainer = new HBox(7, LabelFactory.buildSegoeLabel("\uE7C3"), new Label(tabName));
+        HBox hBoxContainer = new HBox(7, LabelFactory.buildSegoeLabel("\uE7C3", "black"), new Label(tabName));
         hBoxContainer.setAlignment(Pos.BASELINE_LEFT);
         setGraphic(hBoxContainer);
     }

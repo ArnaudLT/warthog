@@ -189,9 +189,9 @@ public class AzureStorageBrowser {
 
         Label icon;
         if (param.getValue().getPathItem().isDirectory()) {
-            icon = LabelFactory.buildSegoeLabel("\uF12B", "goldenrod");
+            icon = LabelFactory.buildSegoeLabel("\uED42", "goldenrod");
         } else {
-            icon = LabelFactory.buildSegoeLabel("\uE7C3");
+            icon = LabelFactory.buildSegoeLabel("\uE7C3", "black");
         }
         return icon;
     }
