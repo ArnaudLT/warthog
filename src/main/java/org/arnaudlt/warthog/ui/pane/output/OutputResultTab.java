@@ -1,6 +1,5 @@
 package org.arnaudlt.warthog.ui.pane.output;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -46,8 +45,8 @@ public class OutputResultTab extends Tab {
 
         final int hBoxSpace = 7;
 
-        final Label pinLabel = LabelFactory.buildSegoeLabel("\uE718");
-        final Label unpinLabel = LabelFactory.buildSegoeLabel("\uE77A");
+        final Label pinLabel = LabelFactory.buildSegoeLabel("\uE72E");
+        final Label unpinLabel = LabelFactory.buildSegoeLabel("\uE785");
 
         final Label label = new Label(name);
         HBox hBoxContainer = new HBox(hBoxSpace, unpinLabel, label);

@@ -15,7 +15,7 @@ public class ButtonFactory {
 
     public static Button buildSegoeButton(String text, String tooltipText, int size) {
 
-        return buildSegoeButton(text, tooltipText, size, "darkblue");
+        return buildSegoeButton(text, tooltipText, size, "MidnightBlue");
     }
 
 

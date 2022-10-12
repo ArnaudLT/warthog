@@ -19,6 +19,9 @@
     => Capability to change the size of the font
     => Help menu
 
+=> Dataset explorer :
+    => drag and drop to SQL area
+
 => Overview
 
 

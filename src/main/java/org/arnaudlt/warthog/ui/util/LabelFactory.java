@@ -11,7 +11,7 @@ public class LabelFactory {
 
     public static Label buildSegoeLabel(String text) {
 
-        return buildSegoeLabel(text, "darkblue");
+        return buildSegoeLabel(text, "MidnightBlue");
     }
 
 
@@ -22,5 +22,8 @@ public class LabelFactory {
         label.setStyle("-fx-font-family: 'Segoe MDL2 Assets'; -fx-text-fill: " +color+"; -fx-font-size: 14px;");
         return label;
     }
+
+
+
 
 }
