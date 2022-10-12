@@ -252,6 +252,7 @@ public class ImportDialog {
         advancedSettingsNode.addRow(rowIndex++, basePathLabel, basePathField, automaticBasePathCheckBox);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedSettingsNode);
+        advancedSettingsTab.setGraphic(LabelFactory.buildAdvancedLabel());
         TabPane tabPane = new TabPane(basicSettingsTab, advancedSettingsTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 

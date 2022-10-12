@@ -156,6 +156,7 @@ public class ImportLocalDialog {
         advancedGrid.addRow(rowIndex++, basePathLabel, basePathField, automaticBasePathCheckBox);
 
         Tab advancedSettingsTab = new Tab("Advanced", advancedGrid);
+        advancedSettingsTab.setGraphic(LabelFactory.buildAdvancedLabel());
 
         TabPane tabPane = new TabPane(basicSettingsTab, advancedSettingsTab);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
