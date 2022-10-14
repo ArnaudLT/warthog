@@ -89,7 +89,7 @@ public class AzureStorageBrowser {
         checkBoxColumn.setEditable(true);
         filesView.getColumns().add(checkBoxColumn);
 
-        TableColumn<AzureSelectableItem, Node> itemName = new TableColumn<>("Name");
+        TableColumn<AzureSelectableItem, IconAndName> itemName = new TableColumn<>("Name");
 
         itemName.setCellValueFactory(param -> {
 
@@ -186,7 +186,7 @@ public class AzureStorageBrowser {
 
 
     @NotNull
-    private Label getIcon(TableColumn.CellDataFeatures<AzureSelectableItem, Node> param) {
+    private Label getIcon(TableColumn.CellDataFeatures<AzureSelectableItem, IconAndName> param) {
 
         Label icon;
         if (param.getValue().getPathItem().isDirectory()) {

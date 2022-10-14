@@ -13,12 +13,13 @@ import org.arnaudlt.warthog.model.history.SqlHistory;
 import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
 import org.arnaudlt.warthog.ui.util.StageFactory;
 import org.arnaudlt.warthog.ui.util.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
 
 @Slf4j
 @Component
@@ -57,27 +58,23 @@ public class SqlHistoryDialog {
             }
         });
 
-        TableColumn<SqlHistory,String> timeCol = new TableColumn<>("Time");
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-        timeCol.setCellValueFactory(param -> {
+        TableColumn<SqlHistory, ExecutionDate> timeCol = new TableColumn<>("Time");
 
-            long timestamp = param.getValue().getTimestamp();
-            Date date = Date.from(Instant.ofEpochMilli(timestamp));
-            return new SimpleObjectProperty<>(dateFormatter.format(date));
-        });
+        timeCol.setCellValueFactory(param ->
+            new SimpleObjectProperty<>(new ExecutionDate(param.getValue().getTimestamp())));
 
-        TableColumn<SqlHistory,String> sqlCol = new TableColumn<>("SQL query");
+        TableColumn<SqlHistory, String> sqlCol = new TableColumn<>("SQL query");
         sqlCol.setCellValueFactory(param -> {
 
             String sqlQuery = param.getValue().getSqlQuery();
             return new SimpleObjectProperty<>(sqlQuery);
         });
 
-        TableColumn<SqlHistory,String> durationCol = new TableColumn<>("Duration (s)");
+        TableColumn<SqlHistory, Double> durationCol = new TableColumn<>("Duration (s)");
         durationCol.setCellValueFactory(param -> {
 
             double durationMs = param.getValue().getDuration() / 1_000d;
-            return new SimpleObjectProperty<>(Double.toString(durationMs));
+            return new SimpleObjectProperty<>(durationMs);
         });
 
         timeCol.setPrefWidth(150);
@@ -111,6 +108,33 @@ public class SqlHistoryDialog {
     public void showTasksManagerDialog() {
 
         this.dialog.show();
+    }
+
+
+    private record ExecutionDate(long timestamp) implements Comparable<ExecutionDate> {
+
+        @Override
+        public String toString() {
+            return new SimpleDateFormat("dd-M-yyyy hh:mm:ss").format(Date.from(Instant.ofEpochMilli(timestamp)));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ExecutionDate that = (ExecutionDate) o;
+            return timestamp == that.timestamp;
+        }
+
+        @Override
+        public int hashCode() {
+            return (int) (timestamp ^ (timestamp >>> 32));
+        }
+
+        @Override
+        public int compareTo(@NotNull SqlHistoryDialog.ExecutionDate o) {
+            return Long.compare(timestamp, o.timestamp);
+        }
     }
 
 }
