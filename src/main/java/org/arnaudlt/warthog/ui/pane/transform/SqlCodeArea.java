@@ -4,8 +4,15 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.util.Utils;
@@ -88,6 +95,12 @@ public class SqlCodeArea {
         this.codeArea = new CodeArea();
 
         this.codeArea.getStyleClass().add("sql-area");
+        this.codeArea.setParagraphGraphicFactory(i -> {
+
+            Label lineNumber = new Label("%3d ".formatted(i+1));
+            lineNumber.setBackground(new Background(new BackgroundFill(Color.color(0.94, 0.94, 0.94), null, null)));
+            return lineNumber;
+        });
 
         // Auto indent
         final Pattern whiteSpace = Pattern.compile("^\\s+");

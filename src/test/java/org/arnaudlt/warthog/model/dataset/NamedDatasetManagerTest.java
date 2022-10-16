@@ -146,20 +146,6 @@ class NamedDatasetManagerTest {
     }
 
 
-    @Test
-    void registerNamedDataset() {
-
-        File file = new File("src/test/resources/covid19-sample.csv");
-        NamedDataset namedDataset = this.namedDatasetManager.createNamedDataset(file);
-
-        this.namedDatasetManager.registerNamedDataset(namedDataset);
-        assertTrue(this.namedDatasetManager.getObservableNamedDatasets().contains(namedDataset));
-
-        this.namedDatasetManager.deregisterNamedDataset(namedDataset);
-        assertFalse(this.namedDatasetManager.getObservableNamedDatasets().contains(namedDataset));
-    }
-
-
     Dataset<Row> datasetWithOneArray() {
 
         ArrayList<ObjectWithOneArray> items = new ArrayList<>();

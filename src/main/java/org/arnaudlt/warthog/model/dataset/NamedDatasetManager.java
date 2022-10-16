@@ -86,7 +86,6 @@ public class NamedDatasetManager {
     }
 
 
-
     public NamedDataset createNamedDataset(ImportDirectorySettings importDirectorySettings) {
 
         Dataset<Row> dataset = switch (importDirectorySettings.getFormat()) {
@@ -123,6 +122,17 @@ public class NamedDatasetManager {
     }
 
 
+    public NamedDataset createNamedDataset(Connection databaseConnection, String tableName) {
+
+        Dataset<Row> dataset = this.spark
+                .read()
+                .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
+
+        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset,
+                new DatabaseDecoration(databaseConnection.getName(), tableName));
+    }
+
+
     private LocalDecoration buildDecoration(ImportDirectorySettings importDirectorySettings, Dataset<Row> dataset) {
 
         List<Path> partPaths = Arrays.stream(dataset.inputFiles())
@@ -151,17 +161,6 @@ public class NamedDatasetManager {
         } else {
             return basePath.getFileName().toString();
         }
-    }
-
-
-    public NamedDataset createNamedDataset(Connection databaseConnection, String tableName) {
-
-        Dataset<Row> dataset = this.spark
-                .read()
-                .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
-
-        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset,
-                new DatabaseDecoration(databaseConnection.getName(), tableName));
     }
 
 
@@ -201,14 +200,6 @@ public class NamedDatasetManager {
     }
 
 
-    public void tryRenameTempView(NamedDataset namedDataset, String name) throws AnalysisException {
-
-        namedDataset.getDataset().createTempView(name);
-        this.spark.catalog().dropTempView(namedDataset.getLocalTemporaryViewName());
-        namedDataset.setLocalTemporaryViewName(name);
-    }
-
-
     public void deregisterNamedDataset(NamedDataset namedDataset) {
 
         if (namedDataset == null) {
@@ -233,6 +224,14 @@ public class NamedDatasetManager {
     }
 
 
+    public void tryRenameTempView(NamedDataset namedDataset, String name) throws AnalysisException {
+
+        namedDataset.getDataset().createTempView(name);
+        this.spark.catalog().dropTempView(namedDataset.getLocalTemporaryViewName());
+        namedDataset.setLocalTemporaryViewName(name);
+    }
+
+
     private String replaceForbiddenCharacters(String datasetName) {
 
         return datasetName.trim()
@@ -240,11 +239,6 @@ public class NamedDatasetManager {
                 .replace(" ", "_")
                 .replace("-", "_")
                 .replace("=", "_");
-    }
-
-
-    public ObservableList<NamedDataset> getObservableNamedDatasets() {
-        return observableNamedDatasets;
     }
 
 
@@ -256,12 +250,12 @@ public class NamedDatasetManager {
 
     public void export(String sqlQuery, ExportFileSettings exportFileSettings) {
 
-        Dataset<Row> output = this.spark.sqlContext().sql(sqlQuery);
+        Dataset<Row> output = prepareDataset(sqlQuery);
         export(output, exportFileSettings);
     }
 
 
-    public void export(Dataset<Row> output, ExportFileSettings exportFileSettings) {
+    private void export(Dataset<Row> output, ExportFileSettings exportFileSettings) {
 
         DataFrameWriter<Row> dfw = output
                 .repartition(exportFileSettings.repartition())
