@@ -1,5 +1,7 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -9,6 +11,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
@@ -16,6 +19,7 @@ import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
 import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
+import org.arnaudlt.warthog.ui.service.ActiveThreadsCountService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromFileService;
 import org.arnaudlt.warthog.ui.service.SqlOverviewService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
@@ -92,7 +96,13 @@ public class ControlPane {
                 this.backgroundTasksDialog.showTasksManagerDialog();
             }
         });
-        progressBar.visibleProperty().bind(poolService.tickTackProperty().greaterThan(0));
+
+        ActiveThreadsCountService activeThreadsCountService = new ActiveThreadsCountService(poolService);
+        activeThreadsCountService.setRestartOnFailure(true);
+        activeThreadsCountService.setDelay(Duration.millis(500));
+        activeThreadsCountService.start();
+
+        progressBar.visibleProperty().bind(Bindings.notEqual(0, activeThreadsCountService.lastValueProperty()));
 
         HBox hBox = new HBox(10, menuBar, progressBar);
         hBox.setMaxHeight(25);

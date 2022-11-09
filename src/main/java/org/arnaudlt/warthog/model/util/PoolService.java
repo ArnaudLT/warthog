@@ -1,6 +1,5 @@
 package org.arnaudlt.warthog.model.util;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -9,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -18,23 +19,12 @@ public class PoolService {
 
     private final ThreadPoolExecutor executor;
 
-    private final SimpleIntegerProperty tickTack;
-
-    private final ScheduledExecutorService scheduler;
-
     private final ObservableList<Service<?>> services;
 
 
     @Autowired
     public PoolService() {
         this.executor = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        this.tickTack = new SimpleIntegerProperty(0);
-
-        // Scheduled thread used to probe the 'executor' thread pool
-        this.scheduler = Executors.newScheduledThreadPool(1);
-        Runnable goTickTack = () -> this.tickTack.set(this.executor.getActiveCount());
-        this.scheduler.scheduleAtFixedRate(goTickTack, 500, 500, TimeUnit.MILLISECONDS);
-
         this.services = FXCollections.synchronizedObservableList(FXCollections.observableList(new ArrayList<>()));
     }
 
@@ -69,35 +59,10 @@ public class PoolService {
     }
 
 
-    public int getActiveCount() {
-
-        return this.executor.getActiveCount();
-    }
-
-
-    public int getTickTack() {
-
-        return tickTack.get();
-    }
-
-
-    public SimpleIntegerProperty tickTackProperty() {
-
-        return tickTack;
-    }
-
-
-    public void setTickTack(int tickTack) {
-
-        this.tickTack.set(tickTack);
-    }
-
-
     public void shutdown() {
 
         try {
             log.info("Closing the executor service");
-            this.scheduler.shutdownNow();
             if (!this.getExecutor().awaitTermination(200, TimeUnit.MILLISECONDS)) {
                 this.getExecutor().shutdownNow();
             }

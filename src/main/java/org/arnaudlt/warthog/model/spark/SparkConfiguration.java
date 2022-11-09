@@ -47,6 +47,5 @@ public class SparkConfiguration {
     private static final UDF1<scala.collection.Map<String,?>, String> mapToString = map ->
             map != null ?JavaConverters.mapAsJavaMap(map).toString().replace("WrappedArray", "") : "";
 
-
 }
 

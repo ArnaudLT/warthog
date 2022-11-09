@@ -1,6 +1,5 @@
 package org.arnaudlt.warthog.ui.pane.transform;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -111,7 +110,7 @@ public class SqlCodeArea {
                 int currentParagraph = codeArea.getCurrentParagraph();
                 Matcher m0 = whiteSpace.matcher(codeArea.getParagraph( currentParagraph-1 ).getSegments().get(0));
                 if ( m0.find() ) {
-                    Platform.runLater(() -> codeArea.insertText(caretPosition, m0.group()));
+                    poolService.getExecutor().execute(() -> codeArea.insertText(caretPosition, m0.group()));
                 }
             }
         });
