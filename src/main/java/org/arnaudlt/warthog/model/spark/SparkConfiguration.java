@@ -25,6 +25,7 @@ public class SparkConfiguration {
                 .appName("Warthog")
                 .master("local["+ globalSettings.getSpark().getThreads() +"]")
                 .config("spark.ui.enabled", globalSettings.getSpark().getUi())
+                .config("spark.driver.bindAddress","127.0.0.1")
                 .enableHiveSupport()
                 .getOrCreate();
 
