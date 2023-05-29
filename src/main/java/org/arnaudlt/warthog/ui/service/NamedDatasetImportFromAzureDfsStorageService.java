@@ -139,7 +139,9 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
             PagedIterable<PathItem> subPathItems = subDirectory.listPaths(true, false, null, null);
             for (PathItem subPathItem : subPathItems) {
 
-                importOnePathItem(fileSystem, subPathItem, listOfPaths);
+                if (!subPathItem.isDirectory()) {
+                    importOnePathItem(fileSystem, subPathItem, listOfPaths);
+                }
             }
         }
 
