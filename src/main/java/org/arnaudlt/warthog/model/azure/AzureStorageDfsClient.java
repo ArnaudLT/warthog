@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,25 +38,12 @@ public class AzureStorageDfsClient {
     private AzureStorageDfsClient() {}
 
 
-    public static AzureDirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container, String path) {
+    public static AzureDirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container,
+                                                                                    List<String> paths, AzurePathItems azurePathItems) {
 
-        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
-        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(path);
-
-        AzureDirectoryStatisticsService.DirectoryStatistics directoryStatistics = new AzureDirectoryStatisticsService.DirectoryStatistics();
-
-        PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
-        for (PathItem pathItem : pathItems) {
-
-            if (!pathItem.isDirectory()) {
-
-                DataLakeFileClient fileClient = fileSystem.getFileClient(pathItem.getName());
-
-                directoryStatistics.filesCount++;
-                directoryStatistics.bytes += fileClient.getProperties().getFileSize();
-            }
-        }
-        return directoryStatistics;
+        return paths.stream()
+                .map(path -> getStatistics(connection, container, path, azurePathItems))
+                .reduce(AzureDirectoryStatisticsService.DirectoryStatistics.identity(), AzureDirectoryStatisticsService.DirectoryStatistics::add);
     }
 
 
@@ -86,6 +72,28 @@ public class AzureStorageDfsClient {
             }
             return directoryStatistics;
         }
+    }
+
+
+    public static AzureDirectoryStatisticsService.DirectoryStatistics getStatistics(Connection connection, String container, String path) {
+
+        DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, container);
+        DataLakeDirectoryClient directoryClient = fileSystem.getDirectoryClient(path);
+
+        AzureDirectoryStatisticsService.DirectoryStatistics directoryStatistics = new AzureDirectoryStatisticsService.DirectoryStatistics();
+
+        PagedIterable<PathItem> pathItems = directoryClient.listPaths(true, false, null, null);
+        for (PathItem pathItem : pathItems) {
+
+            if (!pathItem.isDirectory()) {
+
+                DataLakeFileClient fileClient = fileSystem.getFileClient(pathItem.getName());
+
+                directoryStatistics.filesCount++;
+                directoryStatistics.bytes += fileClient.getProperties().getFileSize();
+            }
+        }
+        return directoryStatistics;
     }
 
 

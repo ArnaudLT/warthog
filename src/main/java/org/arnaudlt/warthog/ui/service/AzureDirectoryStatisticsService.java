@@ -1,6 +1,8 @@
 package org.arnaudlt.warthog.ui.service;
 
 import javafx.concurrent.Task;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.azure.AzureStorageDfsClient;
 import org.arnaudlt.warthog.model.connection.Connection;
@@ -30,10 +32,10 @@ public class AzureDirectoryStatisticsService extends AbstractMonitoredService<Az
             @Override
             protected DirectoryStatistics call() {
 
-                updateMessage("Gather statistics on " + importAzureDfsStorageSettings.azContainer() + "/" + importAzureDfsStorageSettings.azDirectoryPath());
+                updateMessage("Gather statistics on " + importAzureDfsStorageSettings.azContainer() + "/" + importAzureDfsStorageSettings.azDirectoryPaths());
                 updateProgress(-1,1);
                 DirectoryStatistics statistics = AzureStorageDfsClient.getStatistics(connection,
-                        importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath(), importAzureDfsStorageSettings.azPathItems());
+                        importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPaths(), importAzureDfsStorageSettings.azPathItems());
                 updateProgress(1, 1);
                 return statistics;
             }
@@ -41,16 +43,25 @@ public class AzureDirectoryStatisticsService extends AbstractMonitoredService<Az
     }
 
 
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class DirectoryStatistics {
 
         public long filesCount;
         public long bytes;
 
 
-        public void add(DirectoryStatistics subDirectoryStatistics) {
+        public DirectoryStatistics add(DirectoryStatistics subDirectoryStatistics) {
 
             this.filesCount += subDirectoryStatistics.filesCount;
             this.bytes += subDirectoryStatistics.bytes;
+            return this;
+        }
+
+
+        public static DirectoryStatistics identity() {
+
+            return new DirectoryStatistics(0, 0);
         }
     }
 

@@ -31,6 +31,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -233,11 +235,22 @@ public class ImportDialog {
         automaticBasePathCheckBox.setSelected(true);
         basePathField.disableProperty().bind(automaticBasePathCheckBox.selectedProperty());
 
-        StringBinding basePathFieldBind = Bindings.createStringBinding(() ->
-                        Paths.get(
+        StringBinding basePathFieldBind = Bindings.createStringBinding(() -> {
+
+                    final String base;
+                    if (isMultiplePathsString(azDirectoryField.getText())) {
+                        base = Paths.get(
+                                Objects.requireNonNullElse(localDirectoryField.getText(), ""),
+                                Objects.requireNonNullElse(azContainerField.getText(), "")).toString();
+                    }
+                    else {
+                        base = Paths.get(
                                 Objects.requireNonNullElse(localDirectoryField.getText(), ""),
                                 Objects.requireNonNullElse(azContainerField.getText(), ""),
-                                Objects.requireNonNullElse(azDirectoryField.getText(), "")).toString(),
+                                Objects.requireNonNullElse(azDirectoryField.getText(), "")).toString();
+                    }
+                    return base;
+                },
                 localDirectoryField.textProperty(), azContainerField.textProperty(), azDirectoryField.textProperty());
 
         basePathField.textProperty().bind(basePathFieldBind);
@@ -264,13 +277,13 @@ public class ImportDialog {
             if (selectedConnection == null) return;
 
             final String azContainer = azContainerField.getText().strip();
-            final String azDirectoryPath = azDirectoryField.getText().strip();
+            final List<String> azDirectoryPaths = buildDirectoryPaths(azDirectoryField.getText().strip());
             final String localDirectory = localDirectoryField.getText().strip();
             final String basePath = basePathField.getText().strip();
             final String name = nameField.getText().strip();
 
             ImportAzureDfsStorageSettings importAzureDfsStorageSettings = new ImportAzureDfsStorageSettings(
-                    azContainer, azDirectoryPath, azurePathItems, localDirectory, basePath, name);
+                    azContainer, azDirectoryPaths, azurePathItems, localDirectory, basePath, name);
 
             AzureDirectoryStatisticsService directoryStatisticsService = new AzureDirectoryStatisticsService(poolService, selectedConnection, importAzureDfsStorageSettings);
             directoryStatisticsService.setOnSucceeded(success -> {
@@ -287,7 +300,7 @@ public class ImportDialog {
             });
             directoryStatisticsService.setOnFailed(fail -> {
                 importAzureButton.setDisable(false);
-                AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azDirectoryPath + "'");
+                AlertFactory.showFailureAlert(owner, fail, "Not able to check directory size '" + azDirectoryPaths + "'");
             });
             directoryStatisticsService.setOnCancelled(cancel -> importAzureButton.setDisable(false));
             directoryStatisticsService.start();
@@ -297,6 +310,22 @@ public class ImportDialog {
         bottomGrid.addRow(0, importAzureButton);
 
         return new VBox(tabPane, bottomGrid);
+    }
+
+
+    private boolean isMultiplePathsString(String concatPaths) {
+
+        return concatPaths.contains(";");
+    }
+
+
+    private List<String> buildDirectoryPaths(String concatPaths) {
+
+        return Arrays.stream(concatPaths.split(";", -1))
+                .map(String::strip)
+                .filter(Objects::nonNull)
+                .filter(path -> !path.isBlank())
+                .toList();
     }
 
 
@@ -324,7 +353,7 @@ public class ImportDialog {
                 poolService, namedDatasetManager, connection, importAzureDfsStorageSettings, statistics);
         importService.setOnSucceeded(success -> explorerPane.addNamedDatasetItem(importService.getValue()));
         importService.setOnFailed(fail -> AlertFactory.showFailureAlert(owner, fail,
-                "Not able to import the dataset '" + importAzureDfsStorageSettings.azDirectoryPath() + "'"));
+                "Not able to import the dataset '" + importAzureDfsStorageSettings.azDirectoryPaths() + "'"));
         importService.start();
     }
 

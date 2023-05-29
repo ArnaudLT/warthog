@@ -89,7 +89,7 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
         protected NamedDataset call() throws Exception {
 
             updateMessage("Importing " + importAzureDfsStorageSettings.azContainer() + "/" +
-                    importAzureDfsStorageSettings.azDirectoryPath());
+                    importAzureDfsStorageSettings.azDirectoryPaths());
 
             updateProgress(workDone, totalWork);
 
@@ -99,15 +99,15 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
 
             DataLakeFileSystemClient fileSystem = getDataLakeFileSystemClient(connection, importAzureDfsStorageSettings.azContainer());
 
-            Path baseDirectory = Paths.get(importAzureDfsStorageSettings.localDirectoryPath(), importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
-            createDirectory(baseDirectory);
+            Path defaultBaseDirectory = Paths.get(importAzureDfsStorageSettings.localDirectoryPath(), importAzureDfsStorageSettings.azContainer());
+            createDirectory(defaultBaseDirectory);
 
             List<Path> listOfPaths = new ArrayList<>(); // feed by side effect
-            log.info("Starting to download {}/{}", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
-            if (azurePathItems.isEmpty()) {
+            log.info("Starting to download {}/{}", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPaths());
+            if (azurePathItems.isEmpty()) { // selection with Azure browser
 
-                importAllPathItems(fileSystem, importAzureDfsStorageSettings.azDirectoryPath(), listOfPaths);
-            } else {
+                importAllPathItems(fileSystem, importAzureDfsStorageSettings.azDirectoryPaths(), listOfPaths);
+            } else { // just one or several paths (no Azure browser)
 
                 for (AzurePathItem azurePathItem : azurePathItems) {
 
@@ -121,15 +121,24 @@ public class NamedDatasetImportFromAzureDfsStorageService extends AbstractMonito
                     }
                 }
             }
-            log.info("Download of {}/{} completed", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPath());
+            log.info("Download of {}/{} completed", importAzureDfsStorageSettings.azContainer(), importAzureDfsStorageSettings.azDirectoryPaths());
             updateProgress(statistics.bytes, totalWork);
 
-            ImportDirectorySettings importDirectorySettings = getImportDirectorySettings(customBasePath, name, baseDirectory, listOfPaths);
+            ImportDirectorySettings importDirectorySettings = getImportDirectorySettings(customBasePath, name, defaultBaseDirectory, listOfPaths);
             NamedDataset namedDataset = namedDatasetManager.createNamedDataset(importDirectorySettings);
 
             namedDatasetManager.registerNamedDataset(namedDataset);
             updateProgress(totalWork, totalWork);
             return namedDataset;
+        }
+
+
+        private void importAllPathItems(DataLakeFileSystemClient fileSystem, List<String> pathItems, List<Path> listOfPaths) throws IOException {
+
+            for (String pi : pathItems) {
+
+                importAllPathItems(fileSystem, pi, listOfPaths);
+            }
         }
 
 
