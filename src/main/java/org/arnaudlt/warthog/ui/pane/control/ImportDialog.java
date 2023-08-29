@@ -197,14 +197,11 @@ public class ImportDialog {
         directoryChooserButton.setOnAction(event -> {
 
             DirectoryChooser fc = new DirectoryChooser();
+            Utils.setInitialDirectory(fc, localDirectoryField.getText());
             File exportFile = fc.showDialog(this.dialog);
-            if (localDirectoryField.getText() != null) {
-                fc.setInitialDirectory(new File(localDirectoryField.getText()));
-            }
             if (exportFile == null) return;
             localDirectoryField.setText(exportFile.getAbsolutePath());
         });
-
 
         basicSettingsNode.addRow(rowIndex++, localDirectoryLabel, localDirectoryField, directoryChooserButton);
 

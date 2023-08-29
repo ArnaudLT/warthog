@@ -67,6 +67,7 @@ public class ImportLocalDialog {
         inputButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
+            Utils.setInitialDirectory(dc, input.getText());
             File importFile = dc.showDialog(this.dialog);
 
             if (importFile == null) return;

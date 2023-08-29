@@ -72,6 +72,7 @@ public class ExportFileDialog {
         outputButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
+            Utils.setInitialDirectory(dc, output.getText());
             File exportFile = dc.showDialog(this.dialog);
 
             if (exportFile == null) return;

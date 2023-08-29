@@ -8,10 +8,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.user.GlobalSettings;
-import org.arnaudlt.warthog.ui.util.AlertFactory;
-import org.arnaudlt.warthog.ui.util.ButtonFactory;
-import org.arnaudlt.warthog.ui.util.GridFactory;
-import org.arnaudlt.warthog.ui.util.StageFactory;
+import org.arnaudlt.warthog.ui.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +59,7 @@ public class SettingsDialog {
         preferredDownloadDirectoryButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
+            Utils.setInitialDirectory(dc, preferredDownloadDirectory.getText());
             File file = dc.showDialog(this.dialog);
 
             if (file == null) return;
@@ -75,6 +73,7 @@ public class SettingsDialog {
         preferredExportDirectoryButton.setOnAction(event -> {
 
             DirectoryChooser dc = new DirectoryChooser();
+            Utils.setInitialDirectory(dc, preferredExportDirectory.getText());
             File file = dc.showDialog(this.dialog);
 
             if (file == null) return;
