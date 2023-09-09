@@ -5,7 +5,7 @@ import org.arnaudlt.warthog.model.util.Format;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ImportDirectorySettings {
+public class ImportDirectorySettings implements ImportSettings {
 
     private final String[] filePath;
 

@@ -28,6 +28,9 @@ public class GlobalSettings {
 
     private SparkSettings spark;
 
+    private WorkspaceSettings workspace;
+
+
 
     public GlobalSettings(Gson gson) {
 
@@ -36,6 +39,7 @@ public class GlobalSettings {
         this.sqlHistory = new SqlHistorySettings(DefaultSettings.INSTANCE.sqlHistory);
         this.overview = new OverviewSettings(DefaultSettings.INSTANCE.overview);
         this.spark = new SparkSettings(DefaultSettings.INSTANCE.spark);
+        this.workspace = new WorkspaceSettings(DefaultSettings.INSTANCE.workspaceSettings);
     }
 
 
@@ -88,6 +92,7 @@ public class GlobalSettings {
                 ", sqlHistory=" + sqlHistory +
                 ", overview=" + overview +
                 ", spark=" + spark +
+                ", workspace=" + workspace +
                 '}';
     }
 
@@ -102,6 +107,8 @@ public class GlobalSettings {
 
         private SerializableSparkSettings spark;
 
+        private SerializableWorkspaceSettings workspace;
+
 
         public SerializableGlobalSettings(GlobalSettings globalSettings) {
 
@@ -109,6 +116,7 @@ public class GlobalSettings {
             this.sqlHistory = new SerializableSqlHistorySettings(globalSettings.sqlHistory);
             this.overview = new SerializableOverviewSettings(globalSettings.overview);
             this.spark = new SerializableSparkSettings(globalSettings.spark);
+            this.workspace = new SerializableWorkspaceSettings(globalSettings.workspace);
         }
     }
 
@@ -157,6 +165,16 @@ public class GlobalSettings {
         public SerializableSparkSettings(SparkSettings spark) {
             this.threads = spark.getThreads();
             this.ui = spark.getUi();
+        }
+    }
+
+    @Data
+    protected static class SerializableWorkspaceSettings implements Serializable {
+
+        private String directory;
+
+        public SerializableWorkspaceSettings(WorkspaceSettings workspace) {
+            this.directory = workspace.getDirectory();
         }
     }
 

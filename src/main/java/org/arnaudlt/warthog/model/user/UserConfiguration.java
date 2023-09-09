@@ -5,11 +5,14 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
+import org.arnaudlt.warthog.model.history.WorkspaceHistory;
+import org.arnaudlt.warthog.model.setting.ImportSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Slf4j
 @Configuration
@@ -19,7 +22,11 @@ public class UserConfiguration {
     @Bean
     public Gson getGson() {
 
-        return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        return new GsonBuilder()
+                .registerTypeAdapter(ImportSettings.class, new ImportSettings.ImportSettingsDeserializerAdapter())
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .create();
     }
 
 
@@ -135,8 +142,23 @@ public class UserConfiguration {
                 log.error("Unable to write history");
             }
         }
-
         return sqlHistoryCollection;
+    }
+
+
+    @Bean
+    @Autowired
+    public WorkspaceHistory getWorkspaceHistory(Gson gson, GlobalSettings globalSettings) {
+
+        WorkspaceHistory workspaceHistory;
+        try {
+            workspaceHistory = WorkspaceHistory.load(gson, globalSettings.getWorkspace());
+        } catch (Exception e) {
+
+            log.warn("Unable to read workspace");
+            workspaceHistory = new WorkspaceHistory(gson, globalSettings.getWorkspace(), new ArrayList<>());
+        }
+        return workspaceHistory;
     }
 
 }

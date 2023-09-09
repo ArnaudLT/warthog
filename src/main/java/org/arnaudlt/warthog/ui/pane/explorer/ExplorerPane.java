@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
+import org.arnaudlt.warthog.model.history.WorkspaceHistory;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetRenameViewService;
@@ -54,10 +55,10 @@ public class ExplorerPane {
     public Node buildExplorerPane(Stage stage) {
 
         this.stage = stage;
-        this.treeExplorer = buildTreeView();
+        treeExplorer = buildTreeView();
 
         VBox vBox = new VBox(treeExplorer);
-        this.treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
+        treeExplorer.prefHeightProperty().bind(vBox.heightProperty());
 
         return vBox;
     }
@@ -84,7 +85,7 @@ public class ExplorerPane {
             List<File> files = dragEvent.getDragboard().getFiles();
             for (File file : files) {
 
-                this.mainPane.getControlPane().importFile(file);
+                mainPane.getControlPane().importFile(file);
             }
         });
 

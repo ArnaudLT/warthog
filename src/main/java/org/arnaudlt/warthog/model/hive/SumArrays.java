@@ -43,20 +43,12 @@ public class SumArrays extends AbstractGenericUDAFResolver {
 
         ObjectInspector objectInspector = ((StandardListObjectInspector) argument).getListElementObjectInspector();
 
-        switch (((AbstractPrimitiveJavaObjectInspector) objectInspector).getPrimitiveCategory()) {
-
-            case BYTE:
-            case SHORT:
-            case INT:
-            case LONG:
-                return new GenericUDAFSumLongArray();
-            case FLOAT:
-            case DOUBLE:
-            case DECIMAL:
-                return new GenericUDAFSumDoubleArray();
-            default:
-                throw new UDFArgumentTypeException(0, "Expected arrays of numbers, but arrays of " + objectInspector.getTypeName() + " detected");
-        }
+        return switch (((AbstractPrimitiveJavaObjectInspector) objectInspector).getPrimitiveCategory()) {
+            case BYTE, SHORT, INT, LONG -> new GenericUDAFSumLongArray();
+            case FLOAT, DOUBLE, DECIMAL -> new GenericUDAFSumDoubleArray();
+            default ->
+                    throw new UDFArgumentTypeException(0, "Expected arrays of numbers, but arrays of " + objectInspector.getTypeName() + " detected");
+        };
 
     }
 

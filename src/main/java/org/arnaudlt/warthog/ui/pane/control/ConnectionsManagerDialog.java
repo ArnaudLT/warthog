@@ -247,7 +247,7 @@ public class ConnectionsManagerDialog {
 
             TreeItem<Connection> selectedConnectionItem = this.connectionsList.getSelectionModel().getSelectedItem();
 
-            // TODO need to create a connection before saving ... weird.
+            // TODO need to click on create a connection before saving. It is not user friendly ! Fix it.
             Connection connection = selectedConnectionItem.getValue();
             connection.cleanUselessAttributes(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());
@@ -319,7 +319,7 @@ public class ConnectionsManagerDialog {
 
             TreeItem<Connection> selectedConnectionItem = this.connectionsList.getSelectionModel().getSelectedItem();
 
-            // TODO need to create a connection before saving ... weird.
+            // TODO need to click on create a connection before saving. It is not user friendly ! Fix it.
             Connection connection = selectedConnectionItem.getValue();
             connection.cleanUselessAttributes(); // not mandatory if the connection type has not changed
             connection.setName(connectionName.getText());

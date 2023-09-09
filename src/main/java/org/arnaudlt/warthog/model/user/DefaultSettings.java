@@ -13,4 +13,6 @@ public enum DefaultSettings {
 
     public final SparkSettings spark = new SparkSettings(4, false);
 
+    public final WorkspaceSettings workspaceSettings = new WorkspaceSettings("workspace");
+
 }

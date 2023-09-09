@@ -557,7 +557,7 @@ public class HiveConf extends Configuration {
 
         // Hadoop Configuration Properties
         // Properties with null values are ignored and exist only for the purpose of giving us
-        // a symbolic name to reference in the Hive source code. Properties with non-null
+        // a symbolic name to reference in the Hive connection code. Properties with non-null
         // values will override any values set in the underlying Hadoop configuration.
         HADOOPBIN("hadoop.bin.path", findHadoopBinary(), "", true),
         YARNBIN("yarn.bin.path", findYarnBinary(), "", true),
@@ -1920,7 +1920,7 @@ public class HiveConf extends Configuration {
 
         MERGE_CARDINALITY_VIOLATION_CHECK("hive.merge.cardinality.check", true,
                 "Set to true to ensure that each SQL Merge statement ensures that for each row in the target\n" +
-                        "table there is at most 1 matching row in the source table per SQL Specification."),
+                        "table there is at most 1 matching row in the connection table per SQL Specification."),
 
         // For Druid storage handler
         HIVE_DRUID_INDEXING_GRANULARITY("hive.druid.indexer.segments.granularity", "DAY",
@@ -2815,7 +2815,7 @@ public class HiveConf extends Configuration {
                 "The number of attempts waiting for localizing a resource in hive-tez."),
         TEZ_AUTO_REDUCER_PARALLELISM("hive.tez.auto.reducer.parallelism", false,
                 "Turn on Tez' auto reducer parallelism feature. When enabled, Hive will still estimate data sizes\n" +
-                        "and set parallelism estimates. Tez will sample source vertices' output sizes and adjust the estimates at runtime as\n" +
+                        "and set parallelism estimates. Tez will sample connection vertices' output sizes and adjust the estimates at runtime as\n" +
                         "necessary."),
         TEZ_MAX_PARTITION_FACTOR("hive.tez.max.partition.factor", 2f,
                 "When auto reducer parallelism is enabled this factor will be used to over-partition data in shuffle edges."),
@@ -3233,11 +3233,11 @@ public class HiveConf extends Configuration {
 
         SPARK_USE_OP_STATS("hive.spark.use.op.stats", true,
                 "Whether to use operator stats to determine reducer parallelism for Hive on Spark. "
-                        + "If this is false, Hive will use source table stats to determine reducer "
+                        + "If this is false, Hive will use connection table stats to determine reducer "
                         + "parallelism for all first level reduce tasks, and the maximum reducer parallelism "
                         + "from all parents for all the rest (second level and onward) reducer tasks."),
         SPARK_USE_FILE_SIZE_FOR_MAPJOIN("hive.spark.use.file.size.for.mapjoin", false,
-                "If this is set to true, mapjoin optimization in Hive/Spark will use source file sizes associated "
+                "If this is set to true, mapjoin optimization in Hive/Spark will use connection file sizes associated "
                         + "with TableScan operator on the root of operator tree, instead of using operator statistics."),
         SPARK_CLIENT_FUTURE_TIMEOUT("hive.spark.client.future.timeout",
                 "60s", new TimeValidator(TimeUnit.SECONDS),

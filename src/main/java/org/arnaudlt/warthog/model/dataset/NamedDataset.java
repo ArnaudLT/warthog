@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.arnaudlt.warthog.model.dataset.decoration.Decoration;
+import org.arnaudlt.warthog.model.setting.ImportSettings;
 
 import java.util.Objects;
 
@@ -16,6 +17,8 @@ public class NamedDataset {
 
     private final String name;
 
+    private final ImportSettings importSettings; // TODO + replace 'decoration' attr
+
     private final Dataset<Row> dataset;
 
     private final Decoration decoration;
@@ -23,10 +26,11 @@ public class NamedDataset {
     private String localTemporaryViewName;
 
 
-    public NamedDataset(int id, String name, Dataset<Row> dataset, Decoration decoration) {
+    public NamedDataset(int id, String name, ImportSettings importSettings, Dataset<Row> dataset, Decoration decoration) {
 
         this.id = id;
         this.name = name;
+        this.importSettings = importSettings;
         this.dataset = dataset;
         this.decoration = decoration;
     }
@@ -41,6 +45,10 @@ public class NamedDataset {
         return name;
     }
 
+
+    public ImportSettings getImportSettings() {
+        return importSettings;
+    }
 
     public Dataset<Row> getDataset() {
         return dataset;

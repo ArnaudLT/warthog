@@ -1,6 +1,7 @@
 package org.arnaudlt.warthog.model.dataset;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.*;
@@ -8,8 +9,10 @@ import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
+import org.arnaudlt.warthog.model.history.WorkspaceHistory;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
+import org.arnaudlt.warthog.model.setting.ImportDatabaseTableSettings;
 import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.util.FileUtil;
 import org.arnaudlt.warthog.model.util.Format;
@@ -35,18 +38,26 @@ public class NamedDatasetManager {
 
     private final SparkSession spark;
 
+    private final WorkspaceHistory workspaceHistory;
+
     private final UniqueIdGenerator uniqueIdGenerator;
 
     private final ObservableList<NamedDataset> observableNamedDatasets;
 
 
     @Autowired
-    public NamedDatasetManager(SparkSession spark, UniqueIdGenerator uniqueIdGenerator) {
+    public NamedDatasetManager(SparkSession spark, WorkspaceHistory workspaceHistory, UniqueIdGenerator uniqueIdGenerator) {
 
         this.spark = spark;
+        this.workspaceHistory = workspaceHistory;
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.observableNamedDatasets = FXCollections.synchronizedObservableList(
                 FXCollections.observableArrayList(new ArrayList<>()));
+        this.observableNamedDatasets.addListener((ListChangeListener<? super NamedDataset>) change ->
+                workspaceHistory.persist(
+                        observableNamedDatasets.stream()
+                                .map(NamedDataset::getImportSettings)
+                                .toList()));
     }
 
 
@@ -80,7 +91,7 @@ public class NamedDatasetManager {
         String separator = FileUtil.inferSeparator(fileType, filePaths);
 
         ImportDirectorySettings importDirectorySettings = new ImportDirectorySettings(
-            filePaths, fileType, preferredName, separator, basePath);
+                filePaths, fileType, preferredName, separator, basePath);
 
         return createNamedDataset(importDirectorySettings);
     }
@@ -117,6 +128,7 @@ public class NamedDatasetManager {
         return new NamedDataset(
                 this.uniqueIdGenerator.getUniqueId(),
                 name,
+                importDirectorySettings,
                 dataset,
                 decoration);
     }
@@ -128,7 +140,9 @@ public class NamedDatasetManager {
                 .read()
                 .jdbc(databaseConnection.getDatabaseUrl(), tableName, databaseConnection.getDatabaseProperties());
 
-        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, dataset,
+        ImportDatabaseTableSettings importSettings = new ImportDatabaseTableSettings(databaseConnection, tableName);
+
+        return new NamedDataset(this.uniqueIdGenerator.getUniqueId(), tableName, importSettings, dataset,
                 new DatabaseDecoration(databaseConnection.getName(), tableName));
     }
 
@@ -150,7 +164,7 @@ public class NamedDatasetManager {
                 parts,
                 importDirectorySettings.getFormat(),
                 sizeInMegaBytes
-                );
+        );
     }
 
 
