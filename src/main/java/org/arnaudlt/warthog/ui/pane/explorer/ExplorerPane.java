@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.types.*;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.model.history.WorkspaceHistory;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
 import org.arnaudlt.warthog.ui.service.NamedDatasetRenameViewService;

@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.connection.ConnectionsCollection;
 import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
-import org.arnaudlt.warthog.model.history.WorkspaceHistory;
+import org.arnaudlt.warthog.model.history.Workspace;
 import org.arnaudlt.warthog.model.setting.ImportSettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -148,17 +148,17 @@ public class UserConfiguration {
 
     @Bean
     @Autowired
-    public WorkspaceHistory getWorkspaceHistory(Gson gson, GlobalSettings globalSettings) {
+    public Workspace getWorkspaceHistory(Gson gson, GlobalSettings globalSettings) {
 
-        WorkspaceHistory workspaceHistory;
+        Workspace workspace;
         try {
-            workspaceHistory = WorkspaceHistory.load(gson, globalSettings.getWorkspace());
+            workspace = Workspace.load(gson, globalSettings.getWorkspace());
         } catch (Exception e) {
 
             log.warn("Unable to read workspace");
-            workspaceHistory = new WorkspaceHistory(gson, globalSettings.getWorkspace(), new ArrayList<>());
+            workspace = new Workspace(gson, globalSettings.getWorkspace(), new ArrayList<>());
         }
-        return workspaceHistory;
+        return workspace;
     }
 
 }

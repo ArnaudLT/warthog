@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
-import org.arnaudlt.warthog.model.history.WorkspaceHistory;
+import org.arnaudlt.warthog.model.history.Workspace;
 import org.arnaudlt.warthog.model.setting.ImportDatabaseTableSettings;
 import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.setting.ImportSettings;
@@ -34,7 +34,7 @@ public class MainPane {
 
     private final NamedDatasetManager namedDatasetManager;
 
-    private final WorkspaceHistory workspaceHistory;
+    private final Workspace workspace;
 
     private final PoolService poolService;
 
@@ -43,14 +43,14 @@ public class MainPane {
 
     @Autowired
     public MainPane(ControlPane controlPane, ExplorerPane explorerPane, TransformPane transformPane,
-                    OutputPane outputPane, NamedDatasetManager namedDatasetManager, WorkspaceHistory workspaceHistory, PoolService poolService) {
+                    OutputPane outputPane, NamedDatasetManager namedDatasetManager, Workspace workspace, PoolService poolService) {
 
         this.controlPane = controlPane;
         this.explorerPane = explorerPane;
         this.transformPane = transformPane;
         this.outputPane = outputPane;
         this.namedDatasetManager = namedDatasetManager;
-        this.workspaceHistory = workspaceHistory;
+        this.workspace = workspace;
         this.poolService = poolService;
 
         this.controlPane.setMainPane(this);
@@ -85,7 +85,7 @@ public class MainPane {
 
     private void loadPreviousWorkspace() {
 
-        for (ImportSettings is : workspaceHistory.getImportSettings()) {
+        for (ImportSettings is : workspace.getImportSettings()) {
 
             if (is instanceof ImportDirectorySettings ids) {
 
@@ -95,7 +95,7 @@ public class MainPane {
                 importTable(its);
             }
         }
-        workspaceHistory.getImportSettings().clear(); // useless to keep (?)
+        workspace.getImportSettings().clear(); // useless to keep (?)
     }
 
 

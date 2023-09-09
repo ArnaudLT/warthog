@@ -20,7 +20,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 @Slf4j
-public class WorkspaceHistory {
+public class Workspace {
 
 
     private final Gson gson;
@@ -30,27 +30,27 @@ public class WorkspaceHistory {
     private final List<ImportSettings> importSettings;
 
 
-    public WorkspaceHistory(Gson gson, WorkspaceSettings workspaceSettings, List<ImportSettings> importSettings) {
+    public Workspace(Gson gson, WorkspaceSettings workspaceSettings, List<ImportSettings> importSettings) {
         this.gson = gson;
         this.workspaceSettings = workspaceSettings;
         this.importSettings = importSettings;
     }
 
 
-    public static WorkspaceHistory load(Gson gson, WorkspaceSettings workspaceSettings) throws FileNotFoundException {
+    public static Workspace load(Gson gson, WorkspaceSettings workspaceSettings) throws FileNotFoundException {
 
         log.info("Start to load previous workspace");
 
-        WorkspaceHistory workspaceHistory;
+        Workspace workspace;
 
-            SerializableWorkspace serializableWorkspace = gson.fromJson(
-                    new FileReader(Paths.get(workspaceSettings.getDirectory(), "datasets.json").toFile()), SerializableWorkspace.class);
-            workspaceHistory = new WorkspaceHistory(gson, workspaceSettings, serializableWorkspace.importSettings);
+        SerializableWorkspace serializableWorkspace = gson.fromJson(
+                new FileReader(Paths.get(workspaceSettings.getDirectory(), "datasets.json").toFile()), SerializableWorkspace.class);
+        workspace = new Workspace(gson, workspaceSettings, serializableWorkspace.importSettings);
 
-        while (workspaceHistory.importSettings.remove(null));
+        while (workspace.importSettings.remove(null)) ;
 
-        log.info("{} datasets loaded from previous session", workspaceHistory.importSettings.size());
-        return workspaceHistory;
+        log.info("{} datasets loaded from previous session", workspace.importSettings.size());
+        return workspace;
     }
 
 

@@ -9,7 +9,7 @@ import org.arnaudlt.warthog.model.connection.Connection;
 import org.arnaudlt.warthog.model.dataset.decoration.DatabaseDecoration;
 import org.arnaudlt.warthog.model.dataset.decoration.LocalDecoration;
 import org.arnaudlt.warthog.model.exception.ProcessingException;
-import org.arnaudlt.warthog.model.history.WorkspaceHistory;
+import org.arnaudlt.warthog.model.history.Workspace;
 import org.arnaudlt.warthog.model.setting.ExportDatabaseSettings;
 import org.arnaudlt.warthog.model.setting.ExportFileSettings;
 import org.arnaudlt.warthog.model.setting.ImportDatabaseTableSettings;
@@ -38,7 +38,7 @@ public class NamedDatasetManager {
 
     private final SparkSession spark;
 
-    private final WorkspaceHistory workspaceHistory;
+    private final Workspace workspace;
 
     private final UniqueIdGenerator uniqueIdGenerator;
 
@@ -46,15 +46,15 @@ public class NamedDatasetManager {
 
 
     @Autowired
-    public NamedDatasetManager(SparkSession spark, WorkspaceHistory workspaceHistory, UniqueIdGenerator uniqueIdGenerator) {
+    public NamedDatasetManager(SparkSession spark, Workspace workspace, UniqueIdGenerator uniqueIdGenerator) {
 
         this.spark = spark;
-        this.workspaceHistory = workspaceHistory;
+        this.workspace = workspace;
         this.uniqueIdGenerator = uniqueIdGenerator;
         this.observableNamedDatasets = FXCollections.synchronizedObservableList(
                 FXCollections.observableArrayList(new ArrayList<>()));
         this.observableNamedDatasets.addListener((ListChangeListener<? super NamedDataset>) change ->
-                workspaceHistory.persist(
+                workspace.persist(
                         observableNamedDatasets.stream()
                                 .map(NamedDataset::getImportSettings)
                                 .toList()));
