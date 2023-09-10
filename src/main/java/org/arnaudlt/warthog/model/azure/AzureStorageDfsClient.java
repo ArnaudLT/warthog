@@ -6,6 +6,8 @@ import com.azure.core.credential.TokenRequestContext;
 import com.azure.core.http.HttpClient;
 import com.azure.core.http.ProxyOptions;
 import com.azure.core.http.netty.NettyAsyncHttpClientBuilder;
+import com.azure.core.http.policy.FixedDelayOptions;
+import com.azure.core.http.policy.RetryOptions;
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.file.datalake.*;
 import com.azure.storage.file.datalake.models.PathItem;
@@ -169,6 +171,7 @@ public class AzureStorageDfsClient {
                 .build();
 
         return new DataLakeServiceClientBuilder()
+                .retryOptions(new RetryOptions(new FixedDelayOptions(5, Duration.ofSeconds(3))))
                 .credential(new AzureTokenCredential(connection))
                 .endpoint("https://" + connection.getStorageAccount() + ".dfs.core.windows.net")
                 .httpClient(azureHttpClient)
