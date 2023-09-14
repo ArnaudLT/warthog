@@ -1,7 +1,6 @@
 package org.arnaudlt.warthog.ui.pane.control;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -16,13 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.arnaudlt.warthog.model.dataset.NamedDataset;
 import org.arnaudlt.warthog.model.dataset.NamedDatasetManager;
 import org.arnaudlt.warthog.model.history.SqlHistoryCollection;
-import org.arnaudlt.warthog.model.setting.ImportDirectorySettings;
 import org.arnaudlt.warthog.model.user.GlobalSettings;
 import org.arnaudlt.warthog.model.util.PoolService;
 import org.arnaudlt.warthog.ui.MainPane;
-import org.arnaudlt.warthog.ui.service.ActiveThreadsCountService;
 import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromFileService;
-import org.arnaudlt.warthog.ui.service.NamedDatasetImportFromLocalService;
 import org.arnaudlt.warthog.ui.service.SqlOverviewService;
 import org.arnaudlt.warthog.ui.util.AlertFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,12 +95,7 @@ public class ControlPane {
             }
         });
 
-        ActiveThreadsCountService activeThreadsCountService = new ActiveThreadsCountService(poolService);
-        activeThreadsCountService.setRestartOnFailure(true);
-        activeThreadsCountService.setDelay(Duration.millis(500));
-        activeThreadsCountService.start();
-
-        progressBar.visibleProperty().bind(Bindings.notEqual(0, activeThreadsCountService.lastValueProperty()));
+        progressBar.visibleProperty().bind(Bindings.size(poolService.getServices()).greaterThan(0));
 
         HBox hBox = new HBox(10, menuBar, progressBar);
         hBox.setMaxHeight(25);
