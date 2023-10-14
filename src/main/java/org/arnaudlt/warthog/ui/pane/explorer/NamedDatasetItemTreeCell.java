@@ -148,7 +148,7 @@ public class NamedDatasetItemTreeCell extends TreeCell<NamedDatasetItem> {
             String selectAll = namedDatasetItem.getChild().stream()
                     .map(ndi -> "\t" + ndi.getCleanedSqlName())
                     .collect(Collectors.joining(",\n"));
-            TextArea stack = new TextArea("SELECT \n"+ selectAll + "\nFROM " + namedDatasetItem.getCleanedSqlName() + ";\n");
+            TextArea stack = new TextArea("select \n"+ selectAll + "\nfrom " + namedDatasetItem.getCleanedSqlName() + ";\n");
             stack.setEditable(false);
 
             Scene dialogScene = StageFactory.buildScene(new VBox(grid, stack), -1d, -1d);
